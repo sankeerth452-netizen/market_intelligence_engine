@@ -133,7 +133,7 @@ class EngineService:
         sig = p["signals"]
         chips = []
         if sig["trend_surprise"] > 0.6:
-            chips.append("search rise")
+            chips.append("demand rising")
         if sig["trend_changepoint"] > 0.5:
             chips.append("change-point")
         if sig["cross_source_agreement"] > 0.6:

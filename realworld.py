@@ -51,11 +51,12 @@ def real_candidates(client=None):
     cands = []
     for i, cat in enumerate(client.categories):
         gap = index.gap(cat.lower())
-        news = adapters.news_relevance(cat)
-        news = NEUTRAL if news is None else news
+        d = adapters.demand_signals(cat)        # one fetch: news relevance + trend
+        news = NEUTRAL if d["news_relevance"] is None else d["news_relevance"]
+        tr = d["trend"]
         signals = {
-            "trend_surprise": NEUTRAL,
-            "trend_changepoint": NEUTRAL,
+            "trend_surprise": tr["trend_surprise"] if tr else NEUTRAL,
+            "trend_changepoint": tr["trend_changepoint"] if tr else NEUTRAL,
             "reddit_growth": NEUTRAL,
             "reddit_neg_sentiment": NEUTRAL,
             "tiktok_velocity": NEUTRAL,

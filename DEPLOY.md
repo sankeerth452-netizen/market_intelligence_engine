@@ -82,7 +82,7 @@ Set these in the Render dashboard (Service → **Environment**) — no code chan
 
 | Env var | Effect |
 |---|---|
-| `DATA_MODE=real` | use live signals (Google News + site crawl) instead of the synthetic demo world |
+| `DATA_MODE=real` | use live signals (Google News, demand trend, site crawl) instead of the synthetic demo world |
 | `SITE_URL` | the client's website to crawl for content-gap analysis (unset → demo site) |
 | `CLIENT_NAME` | client display name |
 | `CLIENT_INDUSTRY` | e.g. `home_builder`, `saas`, `automotive` |
@@ -95,6 +95,12 @@ Saving triggers a redeploy. The first real brief fetches live sources (~15s) the
 caches for 30 minutes. The synthetic world is always the automatic fallback, so a
 source outage can't break the page. No extra dependency — adapters + crawler are
 pure standard library.
+
+> **On the demand trend:** Google Trends rate-limits programmatic access hard
+> (HTTP 429), especially from cloud IPs, so the trend signal falls back to
+> **news-attention momentum** (recent vs prior coverage) — real and reliable, fed
+> through the same trend-detection logic. Drop in a hosted Trends API key later for
+> true search-volume if you want it.
 
 ---
 

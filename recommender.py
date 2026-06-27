@@ -50,7 +50,7 @@ def confidence_label(uncertainty: float) -> str:
 def rationale(signals: dict, pred: dict, effort: str, exploring: bool) -> str:
     bits = []
     if signals["trend_surprise"] > 0.6:
-        bits.append("a genuine deseasonalised search rise")
+        bits.append("a genuine rise in demand")
     if signals["trend_changepoint"] > 0.5:
         bits.append("a detected change-point")
     if signals["cross_source_agreement"] > 0.6:

@@ -149,7 +149,7 @@ both panels; the numbers live in `evaluation.json`.)
 | `client_config.py` | **`ClientConfig`** — a client = categories + `site_url` + industry (+ priority weights); resolved from env, demo fallback |
 | `demo_client.py` | isolated, clearly-labelled demo client (the spec's Home Builder example) — used only when nothing is configured |
 | `crawler.py` | generic, robots-aware website crawler (any URL → page text); business-free |
-| `adapters.py` | off-site signal adapters — Google News live (Trends/Reddit/TikTok next); fail-soft |
+| `adapters.py` | off-site signal adapters — Google News + demand trend (Google Trends, else news-momentum) live; Reddit/TikTok deferred; fail-soft |
 | `realworld.py` | assembles real candidates for the active client (live news + content-gap) in the engine's shape |
 | `trend_detection.py` | seasonality removal, robust surprise, CUSUM change-point |
 | `semantic.py` | TF-IDF embeddings + cosine content-gap |
