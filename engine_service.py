@@ -40,11 +40,16 @@ class EngineService:
         if os.path.exists(STATE_PATH):
             try:
                 with open(STATE_PATH) as f:
-                    return LinUCB.from_dict(json.load(f))
+                    loaded = LinUCB.from_dict(json.load(f))
+                # Guard: a model saved under a different feature schema would
+                # mis-align with today's context vectors and crash at predict
+                # time. If the dimensions don't match, retrain instead.
+                if loaded.d == config.N_FEATURES:
+                    return loaded
             except Exception:
                 pass
-        # First boot: pre-train on the synthetic history and log it, so the
-        # dashboard opens with a model that already has informed opinions.
+        # First boot (or a stale/incompatible state): pre-train on the synthetic
+        # history and log it, so the dashboard opens with informed opinions.
         bandit = self._train_initial()
         with open(STATE_PATH, "w") as f:
             json.dump(bandit.to_dict(), f)
