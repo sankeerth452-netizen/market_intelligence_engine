@@ -71,6 +71,25 @@ The GitHub CLI (`gh`) is the smoothest path and isn't installed yet.
 
 ---
 
+## Switching to real data (optional)
+
+The deployed app defaults to the **synthetic demo world** (the polished demo with
+the proof + learning story). To make the morning brief use **live signals**, set
+two env vars in the Render dashboard (Service → **Environment**):
+
+- `DATA_MODE` = `real` — uses **Google News** (relevance) + a **site crawl**
+  (content gap) for the Home Builder categories. Trends/Reddit/TikTok stay neutral
+  until wired, and the synthetic world is the automatic fallback, so a source
+  outage can't break the page.
+- `SITE_URL` = `https://your-site.example` *(optional)* — the site whose content
+  gaps to measure. Leave unset to use the built-in demo home-builder site.
+
+Saving triggers a redeploy. The first real brief fetches ~12 live sources (~15s)
+then caches for 30 minutes. No code change or extra dependency needed — the
+adapters are pure standard library.
+
+---
+
 ## Run the production image locally (optional sanity check)
 ```bash
 docker build -t mie:local .

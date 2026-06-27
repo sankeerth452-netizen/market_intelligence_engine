@@ -13,6 +13,7 @@ straight into bandit.update(), so the next brief reflects what was learned.
 import json
 import os
 import threading
+import time
 
 import numpy as np
 
@@ -31,6 +32,13 @@ DB_URL = os.environ.get(
 MODEL_KEY = "bandit"
 EVAL_PATH = os.path.join(os.path.dirname(__file__), "evaluation.json")
 
+# Data source for the live brief: "synthetic" (default — the seeded demo world,
+# what the deployed dashboard shows) or "real" (live Google News + site crawl via
+# realworld.py). Flip with the DATA_MODE env var; synthetic is always the safe
+# fallback so the public demo can never break.
+DATA_MODE = os.environ.get("DATA_MODE", "synthetic").strip().lower()
+REAL_CACHE_TTL = 1800.0  # seconds; live signals are slow + rate-limited -> cache
+
 
 class EngineService:
     def __init__(self):
@@ -39,6 +47,7 @@ class EngineService:
         self.engine = store.connect(DB_URL)
         self.bandit = self._load_bandit()   # ships pre-trained on first boot
         self._sim_cache = None
+        self._real_cache = None             # (timestamp, candidates, index)
 
     # ---------------------------------------------------------- persistence ----
     def _load_bandit(self) -> LinUCB:
@@ -84,13 +93,17 @@ class EngineService:
 
     # ----------------------------------------------------------------- brief ----
     def brief(self, week: int, k: int):
-        """Ranked opportunities for a given week. Deterministic per week so a
-        page refresh shows the same plan, while the bandit's view evolves as
-        results come in."""
+        """Ranked opportunities. In synthetic mode the plan is deterministic per
+        week (the bandit's view evolves as results come in); in real mode it's the
+        live picture from the adapters (Google News + site crawl), cached."""
         with self.lock:
-            rng = np.random.default_rng(config.SETTINGS["seed"] * 1000 + week)
-            cands = iter_candidates(self.topics, self.index, week, rng)
-            picks = rec.recommend(cands, self.bandit, self.index, k)
+            if DATA_MODE == "real":
+                cands, index = self._real_candidates()
+            else:
+                rng = np.random.default_rng(config.SETTINGS["seed"] * 1000 + week)
+                cands = iter_candidates(self.topics, self.index, week, rng)
+                index = self.index
+            picks = rec.recommend(cands, self.bandit, index, k)
             out = []
             for i, p in enumerate(picks, 1):
                 rid = store.save_recommendation(
@@ -102,6 +115,18 @@ class EngineService:
                     context_json=json.dumps(p["x"]))
                 out.append(self._serialize(rid, i, p, week))
             return out
+
+    def _real_candidates(self):
+        """Live candidates from the adapters, cached. Fetching ~12 live sources is
+        slow and rate-limited, so we refresh at most every REAL_CACHE_TTL seconds
+        and reuse the result for briefs in between."""
+        now = time.time()
+        if self._real_cache and now - self._real_cache[0] < REAL_CACHE_TTL:
+            return self._real_cache[1], self._real_cache[2]
+        import realworld
+        cands, index, _label = realworld.real_candidates()
+        self._real_cache = (now, cands, index)
+        return cands, index
 
     def _serialize(self, rid, rank, p, week):
         sig = p["signals"]
@@ -160,6 +185,7 @@ class EngineService:
     def status(self):
         s = store.summary(self.engine)
         s["model_updates"] = self.bandit.n_updates
+        s["data_mode"] = DATA_MODE
         return s
 
     def reset(self):
