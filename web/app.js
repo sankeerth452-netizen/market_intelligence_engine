@@ -40,10 +40,29 @@ function convictionSVG(value, unc) {
   </svg>`;
 }
 
+/* update an existing card's conviction meter in place, so the dot + band visibly
+   glide to the engine's revised belief after a result is recorded */
+function setConviction(el, value, unc, roi) {
+  const X = (v) => 10 + v * 280;
+  const lo = Math.max(0, value - unc), hi = Math.min(1, value + unc);
+  const band = el.querySelector(".cv__band");
+  const pt = el.querySelector(".cv__pt");
+  if (band) {
+    band.setAttribute("x", X(lo).toFixed(1));
+    band.setAttribute("width", (X(hi) - X(lo)).toFixed(1));
+  }
+  if (pt) pt.setAttribute("cx", X(value).toFixed(1));
+  const roiEl = el.querySelector(".conv__roi");
+  if (roiEl) roiEl.textContent = roi.toFixed(2);
+  const readout = el.querySelector(".conv__readout");
+  if (readout) readout.innerHTML = `est <b>${value.toFixed(2)}</b> ± ${unc.toFixed(2)}`;
+}
+
 /* ---- opportunity cards --------------------------------------------------- */
 function cardEl(c) {
   const el = document.createElement("article");
   el.className = "card";
+  el.dataset.id = c.id;
   el.style.animationDelay = (c.rank - 1) * 0.06 + "s";
 
   const chips = c.evidence
@@ -105,11 +124,39 @@ async function recordOutcome(recId, reward, el, btn, range) {
     btn.textContent = "Recorded \u2713";
     if (range) range.disabled = true;          // lock the pick once its result is in
     toast(`Result fed back \u2014 the engine has now learned from <b>${r.model_updates}</b> outcomes`);
-    await Promise.all([loadWeights(), loadStatus()]);
+    // Watch it learn: weights, gauges AND the live conviction meters all move.
+    await Promise.all([loadWeights(), loadStatus(), refreshBriefInPlace()]);
   } catch (e) {
     toast("Something went wrong recording that result.");
     btn.disabled = false;
   }
+}
+
+/* After a result is recorded, slide the visible cards' conviction meters to the
+   engine's updated beliefs (the same cards stay in place). If the recorded result
+   reshuffled the ranking, fall back to a clean re-render of the new plan. */
+async function refreshBriefInPlace() {
+  try {
+    const data = await api(`/api/brief?week=${state.week}&k=3`);
+    const host = $("cards");
+    const shown = [...host.querySelectorAll(".card")];
+    const shownIds = shown.map((e) => Number(e.dataset.id)).sort((a, b) => a - b);
+    const newIds = data.map((c) => c.id).sort((a, b) => a - b);
+    const same = shownIds.length === newIds.length &&
+                 shownIds.every((v, i) => v === newIds[i]);
+    if (!same) {                       // ranking shifted -> show the new plan
+      host.innerHTML = "";
+      data.forEach((c) => host.appendChild(cardEl(c)));
+      return;
+    }
+    data.forEach((c) => {
+      const el = shown.find((e) => Number(e.dataset.id) === c.id);
+      if (!el) return;
+      setConviction(el, c.value, c.uncertainty, c.roi);
+      el.classList.add("is-learning");
+      setTimeout(() => el.classList.remove("is-learning"), 800);
+    });
+  } catch (e) { /* keep the current cards if the refresh fails */ }
 }
 
 async function loadBrief() {
@@ -136,19 +183,37 @@ function loadWeights() {
     const items = data.learned;
     const maxAbs = Math.max(...items.map((d) => Math.abs(d.weight)), 0.01);
     const host = $("weights");
-    host.innerHTML = items
-      .map((d) => {
-        const w = Math.abs(d.weight) / maxAbs * 48; // % of half-track
+    const rows = {};
+    host.querySelectorAll(".wrow").forEach((r) => (rows[r.dataset.name] = r));
+    const canUpdate = items.length === Object.keys(rows).length &&
+                      items.every((d) => rows[d.name]);
+
+    if (canUpdate) {
+      // Update existing bars in place so they GLIDE to their new lengths.
+      items.forEach((d) => {
+        const r = rows[d.name];
         const neg = d.weight < 0;
-        const distrust = neg && d.name === "tiktok_velocity";
-        return `<div class="wrow${distrust ? " is-distrust" : ""}">
-          <div class="wrow__label">${d.name}</div>
-          <div class="wbar"><div class="wbar__zero"></div>
-            <div class="wbar__fill ${neg ? "neg" : "pos"}" style="width:${w.toFixed(1)}%"></div></div>
-          <div class="wrow__val">${signed(d.weight)}</div>
-        </div>`;
-      })
-      .join("");
+        const fill = r.querySelector(".wbar__fill");
+        fill.className = "wbar__fill " + (neg ? "neg" : "pos");
+        fill.style.width = (Math.abs(d.weight) / maxAbs * 48).toFixed(1) + "%";
+        r.querySelector(".wrow__val").textContent = signed(d.weight);
+        r.classList.toggle("is-distrust", neg && d.name === "tiktok_velocity");
+      });
+    } else {
+      host.innerHTML = items
+        .map((d) => {
+          const w = Math.abs(d.weight) / maxAbs * 48; // % of half-track
+          const neg = d.weight < 0;
+          const distrust = neg && d.name === "tiktok_velocity";
+          return `<div class="wrow${distrust ? " is-distrust" : ""}" data-name="${d.name}">
+            <div class="wrow__label">${d.name}</div>
+            <div class="wbar"><div class="wbar__zero"></div>
+              <div class="wbar__fill ${neg ? "neg" : "pos"}" style="width:${w.toFixed(1)}%"></div></div>
+            <div class="wrow__val">${signed(d.weight)}</div>
+          </div>`;
+        })
+        .join("");
+    }
 
     const tiktok = items.find((d) => d.name === "tiktok_velocity");
     if (data.model_updates >= 6 && tiktok && tiktok.weight < 0) {

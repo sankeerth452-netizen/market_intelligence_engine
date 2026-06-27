@@ -26,8 +26,8 @@ after that keeps teaching it.
   is. A wide band tagged `probe` means it's exploring on purpose to learn.
 - Record result — the slider starts **neutral**; drag it to what the page
   *actually* delivered (0% = the build was wasted, 100% = a top performer) and hit
-  Save. This feeds straight back into the model — watch the weights panel and
-  gauges move.
+  Save. This feeds straight back into the model — watch the cards' conviction
+  meters slide, the weight bars shift, and the gauges climb, all at once.
 - What it trusts & distrusts — the weights the engine learned from outcomes. The
   amber `tiktok_velocity` bar pointing left is the engine having taught itself to
   distrust loud single-channel hype.

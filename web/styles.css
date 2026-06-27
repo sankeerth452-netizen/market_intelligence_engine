@@ -253,8 +253,9 @@ body {
 .cv { width: 100%; height: 26px; margin: 7px 0 4px; display: block; }
 .cv__track { stroke: var(--line); stroke-width: 2; }
 .cv__grid  { stroke: var(--line-soft); stroke-width: 1.5; }
-.cv__band  { fill: var(--teal-wash); }
-.cv__pt    { fill: var(--teal); }
+/* the band + dot glide when the engine revises its belief after a recorded result */
+.cv__band  { fill: var(--teal-wash); transition: x .55s cubic-bezier(.2,.7,.2,1), width .55s cubic-bezier(.2,.7,.2,1); }
+.cv__pt    { fill: var(--teal); transition: cx .55s cubic-bezier(.2,.7,.2,1); }
 .conv__readout {
   font-family: var(--mono);
   font-size: 12px;
@@ -304,6 +305,9 @@ body {
 .btn:focus-visible { outline: 2px solid var(--teal-bright); outline-offset: 2px; }
 .card.is-logged { border-color: rgba(15,118,110,.4); }
 .card.is-logged .result__label { color: var(--teal); }
+/* a brief pulse on the ROI when the engine revises this card after a result */
+.card.is-learning .conv__roi { animation: roipulse .8s ease; }
+@keyframes roipulse { 0%, 40% { color: var(--teal-bright); } 100% { color: var(--teal); } }
 
 /* ---- Analysis panels --------------------------------------------------- */
 .panels {
