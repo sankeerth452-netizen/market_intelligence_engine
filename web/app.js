@@ -268,6 +268,35 @@ function proofSVG(d) {
   </svg>`;
 }
 
+/* ---- ablation: what each upgrade adds (hand-built bars, no chart lib) ----- */
+function renderAblation(rows) {
+  if (!rows || !rows.length) return;
+  const friendly = {
+    P0: "The original scorer",
+    P1: "+ Weigh effort (ROI)",
+    P2: "+ Avoid overlap",
+    P3: "+ Learn from results",
+    P4: "+ Explore the unknown",
+  };
+  const maxMean = Math.max(...rows.map((r) => r.mean));
+  $("ablation").innerHTML = rows
+    .map((r) => {
+      const code = r.name.trim().split(/\s+/)[0];        // "P0".."P4"
+      const closed = code === "P3" || code === "P4";     // learning is on
+      const w = (r.mean / maxMean * 100).toFixed(1);
+      const delta = r.delta == null ? ""
+        : `<span class="${r.delta > 0 ? "up" : ""}">${r.delta > 0 ? "+" : "−"}${Math.abs(r.delta).toFixed(1)}</span>`;
+      return `<div class="ablrow ${closed ? "closed" : "open"}">
+        <div class="ablrow__label">${friendly[code] || r.name}</div>
+        <div class="ablbar"><div class="ablbar__fill" style="width:${w}%"></div></div>
+        <div class="ablrow__val">${r.mean.toFixed(1)} ${delta}</div>
+      </div>`;
+    })
+    .join("");
+  $("ablationNote").innerHTML =
+    `Each rung turns on one more idea, measured across the same 30 markets. The big jumps are <b>weighing effort</b> and <b>learning from results</b> (which also collapses junk pages from ~9 to ~1). Grey rungs are still open-loop; teal is the engine learning from outcomes.`;
+}
+
 function loadProof() {
   const sim = api("/api/simulate").then((d) => {
     $("proof").innerHTML = proofSVG(d);
@@ -286,6 +315,7 @@ function loadProof() {
          <div class="robust__cap">more real value than the original scorer, averaged across
            <b>${b.n} independent markets</b> — and the closed loop won <b>${b.wins}/${b.n}</b> of them.
            Junk pages built: <b>${Math.round(b.decoys_static_mean)} → ${Math.round(b.decoys_loop_mean)}</b>.</div>`;
+      renderAblation(r.ablation);
     })
     .catch(() => {});
 
