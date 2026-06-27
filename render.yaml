@@ -1,0 +1,22 @@
+# Render Blueprint — provisions the web service AND a managed Postgres, wired
+# together automatically. To deploy: push this repo to GitHub, then in Render
+# choose  New +  ->  Blueprint  ->  pick this repo. Render reads this file and
+# creates both resources; DATABASE_URL is injected into the web service for you.
+services:
+  - type: web
+    name: market-intelligence-engine
+    runtime: docker            # builds the Dockerfile in this repo
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true           # redeploy on every push to the default branch
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mie-db
+          property: connectionString
+
+databases:
+  - name: mie-db
+    plan: free                 # NOTE: Render's free Postgres expires after 90 days
+    databaseName: mie
+    user: mie

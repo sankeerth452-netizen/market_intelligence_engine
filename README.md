@@ -174,15 +174,19 @@ pip install -r requirements-dev.txt && pytest   # 23 tests, incl. the golden-mas
 
 ## Path to production
 
+**Done:** a polished API + dashboard (see `README_WEBAPP.md`), and
+**Postgres-backed persistence** that ships as a Docker image with a Render
+Blueprint — the learned model and the audit log both survive restarts. Deploy
+guide: **[DEPLOY.md](DEPLOY.md)**.
+
+**What's left:**
+
 1. **Swap the synthetic world for real adapters** — keep `observe()`'s output
    shape; back it with Google Trends, Reddit/TikTok (Apify), News RSS, and a site
    crawl. Everything downstream is unchanged.
 2. **Attribute outcomes honestly** — the loop is only as good as its reward
    signal. Prefer geo/time-split A/B rollouts (ship a change in some regions,
    compare) so you measure *causal* lift, not "the topic was rising anyway."
-3. **Persist & schedule** — move `store.py` to Postgres, run the weekly cycle on
-   a scheduler, snapshot the bandit state.
-4. **Serve** — wrap `cli.py`'s brief in a small API + dashboard.
 
 Build order matters: get outcome tracking working *first*, then exploration, then
 the fancier signal processing. Skip straight to ML before the loop exists and you

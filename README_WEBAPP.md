@@ -69,20 +69,24 @@ Interactive API docs are auto-generated at <http://localhost:8000/docs>.
 | `web/styles.css` | the visual design system |
 | `web/app.js` | fetches data, draws conviction meters + charts, closes the loop |
 
-State lives in `webapp.db` (audit log) and `bandit_state.json` (the learned
-model). Delete both to start completely fresh.
+State lives entirely in `webapp.db` — the audit log *and* the learned model (in a
+`model_state` table) — so deleting that one file resets everything locally (in
+production it all lives in Postgres instead). Or just hit **Reset learning** in the UI.
 
-## Toward online deployment
+## Online deployment
 
-This runs as a normal ASGI app, so any of these work with almost no change:
+Wired for **Render + Postgres** out of the box: `store.py` runs on SQLite locally
+and Postgres in the cloud (chosen by `DATABASE_URL`), the learned model persists
+to the database so it survives restarts, a `Dockerfile` builds the image, and
+`render.yaml` provisions the web service + database together.
+
+See **[DEPLOY.md](DEPLOY.md)** for the click-by-click guide. The short version:
 
 ```bash
-# production server
-pip install gunicorn
-gunicorn -k uvicorn.workers.UvicornWorker app:app --bind 0.0.0.0:8000
+# run the production image locally first
+docker build -t mie:local . && docker run --rm -p 8011:8000 mie:local   # http://localhost:8011
 ```
 
-For a real deployment: move `webapp.db` to managed Postgres, put the bandit state
-in that DB (or object storage), run behind the gunicorn/uvicorn combo above, and
-host on Render / Railway / Fly.io / a container on any cloud. Swap the synthetic
-`world.py` for real data adapters and you have a live product.
+Then push to GitHub and point Render at the repo (New → Blueprint) — it reads
+`render.yaml` and creates everything. Swap the synthetic `world.py` for real data
+adapters and you have a live product.

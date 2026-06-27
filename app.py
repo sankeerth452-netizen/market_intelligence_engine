@@ -69,6 +69,12 @@ def get_robustness():
     return ENGINE.robustness()
 
 
+@app.get("/api/health")
+def health():
+    """Liveness probe for the hosting platform's health check."""
+    return {"status": "ok", "model_updates": ENGINE.bandit.n_updates}
+
+
 @app.post("/api/reset")
 def post_reset():
     return ENGINE.reset()

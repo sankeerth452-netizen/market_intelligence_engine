@@ -2,9 +2,10 @@
 engine_service.py
 -----------------
 A stateful, thread-safe wrapper that turns the offline engine into a live
-service the web app can drive. It holds the market world and the learning
-bandit in memory, persists recommendations + outcomes to SQLite, and saves the
-learned model to disk so progress survives a restart.
+service the web app can drive. It holds the market world and the learning bandit
+in memory, and persists recommendations, outcomes AND the learned model to the
+database (SQLite locally, Postgres in production) so progress survives a restart
+even on an ephemeral filesystem.
 
 Recording a result here genuinely closes the loop: the realised reward is fed
 straight into bandit.update(), so the next brief reflects what was learned.
@@ -22,8 +23,12 @@ from engine_core import iter_candidates, run_loop_training, run_head_to_head
 import recommender as rec
 import store
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "webapp.db")
-STATE_PATH = os.path.join(os.path.dirname(__file__), "bandit_state.json")
+# Web-app database: Postgres in production (via DATABASE_URL), else a local
+# SQLite file. Kept separate from the CLI/sim's mie.db on purpose.
+DB_URL = os.environ.get(
+    "DATABASE_URL",
+    "sqlite:///" + os.path.join(os.path.dirname(__file__), "webapp.db"))
+MODEL_KEY = "bandit"
 EVAL_PATH = os.path.join(os.path.dirname(__file__), "evaluation.json")
 
 
@@ -31,16 +36,16 @@ class EngineService:
     def __init__(self):
         self.lock = threading.Lock()
         self.topics, self.index, _ = build_world()
-        self.conn = store.connect(DB_PATH)
+        self.engine = store.connect(DB_URL)
         self.bandit = self._load_bandit()   # ships pre-trained on first boot
         self._sim_cache = None
 
     # ---------------------------------------------------------- persistence ----
     def _load_bandit(self) -> LinUCB:
-        if os.path.exists(STATE_PATH):
+        data = store.load_model(self.engine, MODEL_KEY)
+        if data:
             try:
-                with open(STATE_PATH) as f:
-                    loaded = LinUCB.from_dict(json.load(f))
+                loaded = LinUCB.from_dict(data)
                 # Guard: a model saved under a different feature schema would
                 # mis-align with today's context vectors and crash at predict
                 # time. If the dimensions don't match, retrain instead.
@@ -48,11 +53,10 @@ class EngineService:
                     return loaded
             except Exception:
                 pass
-        # First boot (or a stale/incompatible state): pre-train on the synthetic
+        # First boot (or a stale/incompatible model): pre-train on the synthetic
         # history and log it, so the dashboard opens with informed opinions.
         bandit = self._train_initial()
-        with open(STATE_PATH, "w") as f:
-            json.dump(bandit.to_dict(), f)
+        store.save_model(self.engine, MODEL_KEY, json.dumps(bandit.to_dict()))
         return bandit
 
     def _train_initial(self) -> LinUCB:
@@ -64,20 +68,19 @@ class EngineService:
 
         def persist(week, p, reward):
             rid = store.save_recommendation(
-                self.conn, week, p["topic"].name, p["topic"].category,
+                self.engine, week, p["topic"].name, p["topic"].category,
                 p["topic"].kind, p["roi"], p["pred"]["mean"],
                 p["pred"]["uncertainty"], p["topic"].effort,
                 rec.rationale(p["signals"], p["pred"], p["topic"].effort,
                               p["exploring"]),
                 context_json=json.dumps(p["x"]))
-            store.record_outcome(self.conn, rid, reward)
+            store.record_outcome(self.engine, rid, reward)
 
         return run_loop_training(self.topics, self.index, s["weeks"],
                                  s["weekly_budget"], rng, bandit, on_pick=persist)
 
     def _save_bandit(self) -> None:
-        with open(STATE_PATH, "w") as f:
-            json.dump(self.bandit.to_dict(), f)
+        store.save_model(self.engine, MODEL_KEY, json.dumps(self.bandit.to_dict()))
 
     # ----------------------------------------------------------------- brief ----
     def brief(self, week: int, k: int):
@@ -91,7 +94,7 @@ class EngineService:
             out = []
             for i, p in enumerate(picks, 1):
                 rid = store.save_recommendation(
-                    self.conn, week, p["topic"].name, p["topic"].category,
+                    self.engine, week, p["topic"].name, p["topic"].category,
                     p["topic"].kind, p["roi"], p["pred"]["mean"],
                     p["pred"]["uncertainty"], p["topic"].effort,
                     rec.rationale(p["signals"], p["pred"], p["topic"].effort,
@@ -131,12 +134,12 @@ class EngineService:
     # --------------------------------------------------------------- outcome ----
     def record_outcome(self, rec_id: int, reward: float):
         with self.lock:
-            x = store.get_context(self.conn, rec_id)
+            x = store.get_context(self.engine, rec_id)
             if x is None:
                 return {"ok": False,
                         "error": f"No recommendation #{rec_id} to attach a result to."}
             self.bandit.update(np.asarray(x, dtype=float), float(reward))
-            store.record_outcome(self.conn, rec_id, float(reward))
+            store.record_outcome(self.engine, rec_id, float(reward))
             self._save_bandit()
             self._sim_cache = None
             return {"ok": True, "model_updates": self.bandit.n_updates}
@@ -155,7 +158,7 @@ class EngineService:
 
     # ---------------------------------------------------------------- status ----
     def status(self):
-        s = store.summary(self.conn)
+        s = store.summary(self.engine)
         s["model_updates"] = self.bandit.n_updates
         return s
 
@@ -163,9 +166,7 @@ class EngineService:
         with self.lock:
             self.bandit = LinUCB(config.N_FEATURES,
                                  alpha=config.SETTINGS["linucb_alpha"])
-            self.conn.execute("DELETE FROM outcomes")
-            self.conn.execute("DELETE FROM recommendations")
-            self.conn.commit()
+            store.reset_all(self.engine)
             self._save_bandit()
             self._sim_cache = None
             return {"ok": True}

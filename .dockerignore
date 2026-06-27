@@ -1,0 +1,26 @@
+# Keep the build context (and image) small and the runtime state fresh.
+.venv/
+venv/
+.git/
+.gitignore
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Runtime state — regenerated on first boot by design (pre-train), so never bake
+# a stale copy into the image.
+*.db
+bandit_state.json
+
+# Editor / tooling / local-only.
+.idea/
+.vscode/
+.claude/
+
+# Not needed at runtime (evaluation.json IS kept — the dashboard reads it).
+tests/
+results.png
+evaluation.png
+*.md
