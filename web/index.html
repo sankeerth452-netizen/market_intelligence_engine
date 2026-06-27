@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market Intelligence Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- left rail: the instrument's controls + gauges -->
+    <aside class="rail">
+      <div>
+        <div class="brand"><span class="brand__mark">◐</span><span class="brand__name">MIE</span></div>
+        <div class="brand__sub">Market Intelligence Engine</div>
+      </div>
+
+      <div class="week">
+        <div class="eyebrow">Planning week</div>
+        <div class="week__ctl">
+          <button id="weekDown" class="step" aria-label="Previous week">◀</button>
+          <span id="weekVal" class="week__val">08</span>
+          <button id="weekUp" class="step" aria-label="Next week">▶</button>
+        </div>
+        <p class="week__hint">Step forward to watch slow-burn topics surface before they're obvious.</p>
+      </div>
+
+      <div class="gauges">
+        <div class="eyebrow" style="margin-bottom:6px">Feedback loop</div>
+        <div class="gauge"><span>Recommendations</span><b id="gRecs">—</b></div>
+        <div class="gauge"><span>Results recorded</span><b id="gOuts">—</b></div>
+        <div class="gauge"><span>Model updates</span><b id="gUpd">—</b></div>
+        <div class="gauge"><span>Avg result</span><b id="gAvg">—</b></div>
+        <button id="resetBtn" class="reset">Reset learning</button>
+      </div>
+    </aside>
+
+    <!-- main column -->
+    <main class="main">
+      <header class="head">
+        <div class="eyebrow" id="briefEyebrow">Morning brief · Week 08</div>
+        <h1 class="headline">This morning's plan</h1>
+        <p class="lede">Ranked by value per unit of effort. Each card shows how sure the engine
+          is, not just a score — and every result you record teaches it for tomorrow.</p>
+      </header>
+
+      <section class="cards" id="cards" aria-live="polite"></section>
+
+      <section class="panels">
+        <div class="panel">
+          <div class="panel__head">
+            <div class="eyebrow">Learned from real results, not hand-set</div>
+            <h2 class="panel__title">What it trusts &amp; distrusts</h2>
+          </div>
+          <div id="weights" class="weights"></div>
+          <p class="panel__note" id="weightsNote"></p>
+        </div>
+
+        <div class="panel">
+          <div class="panel__head">
+            <div class="eyebrow">Closed loop vs the original static scorer</div>
+            <h2 class="panel__title">Why the loop wins</h2>
+          </div>
+          <div id="proof" class="proof"></div>
+          <div class="legend">
+            <span><i class="dot dot--loop"></i> Closed-loop</span>
+            <span><i class="dot dot--static"></i> Original (static)</span>
+          </div>
+          <p class="panel__note" id="proofNote"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

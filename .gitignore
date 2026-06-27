@@ -1,0 +1,28 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+
+# ---- IDE ----
+.idea/
+.vscode/
+
+# ---- Claude Code local settings (machine-specific permissions) ----
+.claude/settings.local.json
+
+# ---- Runtime state (regenerated on first boot / run) ----
+# The web app pre-trains and persists these on first boot by design;
+# a fresh clone should regenerate them, not inherit a stale copy.
+*.db
+bandit_state.json
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
