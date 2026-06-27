@@ -23,8 +23,14 @@ from dataclasses import dataclass, field
 import numpy as np
 
 import config
+import demo_client
 from trend_detection import trend_features
 from semantic import SemanticIndex
+
+# NOTE: this is the SYNTHETIC PROOF world — a fixed mechanism demonstration for the
+# head-to-head (+40%) result, not client-facing data. Real client signals flow
+# through realworld.py + the adapters. Its topic category labels default to the
+# demo client's framework purely for display.
 
 
 @dataclass
@@ -94,10 +100,14 @@ def _agreement(trend_s: float, reddit_g: float, tiktok_v: float, news_r: float) 
     return float(np.clip(0.5 * frac_high + 0.5 * dispersion, 0.0, 1.0))
 
 
-def build_world(seed: int = None):
-    """Construct topics + a semantic index over the (already-built) site pages."""
+def build_world(seed: int = None, categories=None):
+    """Construct topics + a semantic index over the (already-built) site pages.
+
+    `categories` are display labels for the synthetic topics; they default to the
+    demo client's framework and do not affect the proof numbers."""
     seed = config.SETTINGS["seed"] if seed is None else seed
     rng = np.random.default_rng(seed)
+    cats = list(categories) if categories is not None else demo_client.DEMO_CLIENT.categories
 
     topics, name_id = [], 0
 
@@ -105,7 +115,7 @@ def build_world(seed: int = None):
         nonlocal name_id
         for _ in range(n):
             theme = _THEMES[kind][rng.integers(len(_THEMES[kind]))]
-            cat = config.CATEGORIES[rng.integers(len(config.CATEGORIES))]
+            cat = cats[rng.integers(len(cats))]
             topics.append(Topic(
                 id=name_id,
                 name=f"{cat}: {' '.join(theme.split()[:3])}",

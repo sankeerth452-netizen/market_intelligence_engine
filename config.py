@@ -4,12 +4,10 @@ Central configuration for the Market Intelligence Engine (upgraded).
 Everything tunable lives here so the rest of the code stays clean.
 """
 
-# ----- Client category framework (Home Builder example from the original spec) -----
-CATEGORIES = [
-    "Home Builder", "House and Land Packages", "Display Homes", "Knockdown Rebuild",
-    "Townhouse Builder", "Home Designs", "Single Storey Homes", "Double Storey Homes",
-    "Custom Homes", "First Home Buyers", "Building Costs", "Sustainable Homes",
-]
+# ----- Client category framework -----
+# The category framework is CLIENT configuration, not an engine constant — each
+# client has their own. It lives on ClientConfig (see client_config.py); the demo
+# client's Home Builder example (from the original spec) is in demo_client.py.
 
 # ----- Context-feature schema used by the learning engine -----
 # The order here is the order of the context vector x fed to the bandit.

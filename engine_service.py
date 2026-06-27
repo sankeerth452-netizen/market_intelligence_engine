@@ -18,6 +18,7 @@ import time
 import numpy as np
 
 import config
+import client_config
 from world import build_world
 from bandit import LinUCB
 from engine_core import iter_candidates, run_loop_training, run_head_to_head
@@ -186,6 +187,12 @@ class EngineService:
         s = store.summary(self.engine)
         s["model_updates"] = self.bandit.n_updates
         s["data_mode"] = DATA_MODE
+        c = client_config.active_client()
+        s["client"] = {
+            "name": c.name, "industry": c.industry,
+            "categories": len(c.categories), "site_source": c.site_source,
+            "is_demo": c.is_demo,
+        }
         return s
 
     def reset(self):

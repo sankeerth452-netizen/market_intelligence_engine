@@ -145,19 +145,24 @@ both panels; the numbers live in `evaluation.json`.)
 
 | File | Role |
 |---|---|
-| `config.py` | categories, feature schema, the original spec's fixed weights, settings |
+| `config.py` | engine settings: feature schema, the spec's fixed baseline weights, reward scale (no business) |
+| `client_config.py` | **`ClientConfig`** — a client = categories + `site_url` + industry (+ priority weights); resolved from env, demo fallback |
+| `demo_client.py` | isolated, clearly-labelled demo client (the spec's Home Builder example) — used only when nothing is configured |
+| `crawler.py` | generic, robots-aware website crawler (any URL → page text); business-free |
+| `adapters.py` | off-site signal adapters — Google News live (Trends/Reddit/TikTok next); fail-soft |
+| `realworld.py` | assembles real candidates for the active client (live news + content-gap) in the engine's shape |
 | `trend_detection.py` | seasonality removal, robust surprise, CUSUM change-point |
 | `semantic.py` | TF-IDF embeddings + cosine content-gap |
-| `world.py` | synthetic market (genuine / decoy / sleeper topics) + reward |
+| `world.py` | synthetic **proof** world (genuine / decoy / sleeper topics) + reward — the +40% demo |
 | `bandit.py` | **LinUCB** — learning, exploration, uncertainty |
 | `recommender.py` | ROI scoring, portfolio selection, rationale, static baseline |
-| `store.py` | SQLite persistence (recommendations + outcomes) |
+| `store.py` | persistence (SQLite local / Postgres prod): recs, outcomes, learned model |
 | `engine_core.py` | the shared week-by-week loop (training + head-to-head), used everywhere |
 | `policies.py` | ablation ladder (static → +effort → +portfolio → +learning → +exploration) |
 | `simulate.py` | single-market head-to-head proof + chart (`results.png`) |
 | `evaluate.py` | multi-seed robustness + ablation study (`evaluation.png`, `evaluation.json`) |
 | `cli.py` | day-to-day commands (`brief`, `outcome`, `status`) |
-| `tests/` | pytest suite, incl. a golden-master that locks the proof numbers |
+| `tests/` | pytest suite (36 tests), incl. a golden-master that locks the proof numbers |
 
 ## Run it
 
@@ -169,7 +174,7 @@ python cli.py brief --week 8  # this week's ranked opportunities
 python cli.py outcome 1 0.72  # record a realised result (closes the loop)
 python cli.py status          # what the loop has learned so far
 
-pip install -r requirements-dev.txt && pytest   # 23 tests, incl. the golden-master proof lock
+pip install -r requirements-dev.txt && pytest   # 36 tests, incl. the golden-master proof lock
 ```
 
 ## Path to production

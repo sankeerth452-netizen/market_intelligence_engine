@@ -1,22 +1,23 @@
 """
 realworld.py
 ------------
-Assembles REAL candidates for the engine from the live adapters, in exactly the
-shape recommender.recommend() expects — so the same bandit + recommender that run
-on the synthetic world run on real signals, with nothing downstream changed.
+Assembles REAL candidates for the engine from the live adapters + the client's
+website, in the exact shape recommender.recommend() expects — so the same
+synthetic-trained bandit + recommender run on real signals, unchanged.
 
-Live now: news_relevance (Google News), semantic_gap (site crawl / demo site).
-Not-yet-wired signals (trends, reddit, tiktok) default to a neutral 0.5 and are
-flagged, so the engine simply has less to go on for those until they're added.
-Synthetic mode stays the default; real mode is opt-in (DATA_MODE=real).
+Everything client-specific comes from the active ClientConfig (categories, site
+URL); the engine stays client-agnostic. Live signals: news_relevance (Google
+News) and semantic_gap (the client's crawled site, or the demo site when no
+SITE_URL is configured). Trends/Reddit/TikTok default to a neutral 0.5 until
+wired. Synthetic mode stays the default; real mode is opt-in (DATA_MODE=real).
 """
-import os
-
-import numpy as np
-
 import config
-from world import Topic
+import client_config
+import crawler
+import demo_client
 import adapters
+from semantic import SemanticIndex
+from world import Topic
 
 NEUTRAL = 0.5  # "unknown / not yet wired" for signals we don't have live yet
 
@@ -26,15 +27,30 @@ def _effort_for(gap: float) -> str:
     return "high" if gap > 0.75 else ("med" if gap > 0.45 else "low")
 
 
-def real_candidates(site_url=None):
-    """Fetch live signals for each monitored category, assembled as candidates."""
-    site_url = site_url or os.environ.get("SITE_URL")
-    demands = [c.lower() for c in config.CATEGORIES]
-    index, site_label = adapters.build_site_index(site_url, extra_corpus=demands)
+def site_index(client, extra_corpus=None):
+    """Build a SemanticIndex over the client's site content. Crawls client.site_url
+    when set (falling back to the demo site on any failure / empty crawl), else
+    uses the built-in demo site. Returns (index, human-readable source label)."""
+    pages, label = None, None
+    if client.site_url:
+        crawled = crawler.crawl(client.site_url)
+        if crawled:
+            pages, label = crawled, f"live crawl of {client.site_url} ({len(crawled)} pages)"
+    if pages is None:
+        pages, label = demo_client.DEMO_SITE_PAGES, "demo site (built-in; set SITE_URL for a real client)"
+    corpus = list(pages) + list(extra_corpus or [])
+    return SemanticIndex(pages, fit_corpus=corpus), label
+
+
+def real_candidates(client=None):
+    """Live candidates for the active client's category framework."""
+    client = client or client_config.active_client()
+    demands = [c.lower() for c in client.categories]
+    index, label = site_index(client, extra_corpus=demands)
 
     cands = []
-    for i, cat in enumerate(config.CATEGORIES):
-        gap = adapters.semantic_gap(cat.lower(), index)
+    for i, cat in enumerate(client.categories):
+        gap = index.gap(cat.lower())
         news = adapters.news_relevance(cat)
         news = NEUTRAL if news is None else news
         signals = {
@@ -52,13 +68,13 @@ def real_candidates(site_url=None):
                       latent_value=0.0, effort=_effort_for(gap),
                       demand_text=cat.lower())
         cands.append({"topic": topic, "x": x, "signals": signals, "gap": gap})
-    return cands, index, site_label
+    return cands, index, label
 
 
-def real_brief(bandit, k=3, site_url=None):
+def real_brief(bandit, k=3, client=None):
     """Rank the real candidates with the (already-trained) bandit + recommender."""
     import recommender as rec
-    cands, index, label = real_candidates(site_url)
+    cands, index, label = real_candidates(client)
     return rec.recommend(cands, bandit, index, k), label
 
 
@@ -69,8 +85,7 @@ if __name__ == "__main__":   # end-to-end: synthetic-trained bandit on REAL sign
     from engine_core import run_loop_training
     import recommender as rec
 
-    # Train the bandit on the synthetic world (as the app does), then point it at
-    # live data — this is the real morning brief the deployed app would produce.
+    client = client_config.active_client()
     topics, index, _ = build_world()
     rng = np.random.default_rng(config.SETTINGS["seed"] + 1)
     bandit = LinUCB(config.N_FEATURES, alpha=config.SETTINGS["linucb_alpha"])
@@ -78,7 +93,8 @@ if __name__ == "__main__":   # end-to-end: synthetic-trained bandit on REAL sign
                       config.SETTINGS["weekly_budget"], rng, bandit)
 
     picks, label = real_brief(bandit, k=5)
-    print(f"\nREAL morning brief  (site: {label})\n" + "-" * 64)
+    print(f"\nClient: {client.name}  ({client.industry})")
+    print(f"REAL morning brief  (site: {label})\n" + "-" * 64)
     for i, p in enumerate(picks, 1):
         s = p["signals"]
         print(f"{i}. {p['topic'].name}   [ROI {p['roi']:.2f}, gap {s['semantic_gap']:.2f}, "

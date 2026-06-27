@@ -71,22 +71,30 @@ The GitHub CLI (`gh`) is the smoothest path and isn't installed yet.
 
 ---
 
-## Switching to real data (optional)
+## Configuring a client / switching to real data (all optional)
 
-The deployed app defaults to the **synthetic demo world** (the polished demo with
-the proof + learning story). To make the morning brief use **live signals**, set
-two env vars in the Render dashboard (Service → **Environment**):
+The platform is **client-agnostic** — it carries no business in its code. A client
+is defined entirely by configuration (a `ClientConfig`, resolved from env vars);
+with nothing set, the built-in **demo client** (the spec's Home Builder example,
+in `demo_client.py`) runs so everything works out of the box.
 
-- `DATA_MODE` = `real` — uses **Google News** (relevance) + a **site crawl**
-  (content gap) for the Home Builder categories. Trends/Reddit/TikTok stay neutral
-  until wired, and the synthetic world is the automatic fallback, so a source
-  outage can't break the page.
-- `SITE_URL` = `https://your-site.example` *(optional)* — the site whose content
-  gaps to measure. Leave unset to use the built-in demo home-builder site.
+Set these in the Render dashboard (Service → **Environment**) — no code changes:
 
-Saving triggers a redeploy. The first real brief fetches ~12 live sources (~15s)
-then caches for 30 minutes. No code change or extra dependency needed — the
-adapters are pure standard library.
+| Env var | Effect |
+|---|---|
+| `DATA_MODE=real` | use live signals (Google News + site crawl) instead of the synthetic demo world |
+| `SITE_URL` | the client's website to crawl for content-gap analysis (unset → demo site) |
+| `CLIENT_NAME` | client display name |
+| `CLIENT_INDUSTRY` | e.g. `home_builder`, `saas`, `automotive` |
+| `CLIENT_CATEGORIES` | comma-separated category framework for this client |
+| `CLIENT_PRIORITY_WEIGHTS` | optional JSON `{category: weight}` (reserved; the spec's "Business Priority") |
+
+Onboarding a new client = set `CLIENT_*` (+ `SITE_URL`) and `DATA_MODE=real`. The
+same crawler runs against their site; the same engine ranks their categories.
+Saving triggers a redeploy. The first real brief fetches live sources (~15s) then
+caches for 30 minutes. The synthetic world is always the automatic fallback, so a
+source outage can't break the page. No extra dependency — adapters + crawler are
+pure standard library.
 
 ---
 
