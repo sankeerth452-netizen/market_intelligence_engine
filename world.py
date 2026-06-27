@@ -197,4 +197,4 @@ def realised_reward(topic: Topic, gap: float, rng: np.random.Generator) -> float
     """
     captured = topic.latent_value * (0.40 + 0.60 * gap)
     net = captured - config.EFFORT_COST[topic.effort] + rng.normal(0, 0.04)
-    return float(np.clip(net, -0.15, 1.0))
+    return float(np.clip(net, config.REWARD_MIN, config.REWARD_MAX))

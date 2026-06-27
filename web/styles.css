@@ -275,7 +275,10 @@ body {
   flex-wrap: wrap;
 }
 .result__label { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: var(--mute); text-transform: uppercase; }
+.result__hint { flex-basis: 100%; font-size: 11px; color: var(--mute-2); margin-top: 2px; line-height: 1.4; }
+.result__hint em { font-style: italic; color: var(--mute); }
 .result input[type=range] { flex: 1; min-width: 140px; accent-color: var(--teal); }
+.result input[type=range]:disabled { accent-color: var(--mute-2); opacity: .7; }
 .result__pct {
   font-family: var(--mono);
   font-weight: 600;

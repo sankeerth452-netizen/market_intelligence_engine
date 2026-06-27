@@ -42,6 +42,13 @@ STATIC_WEIGHTS = {
 # ----- Effort model (the original spec scores value but ignores effort) -----
 EFFORT_COST = {"low": 0.03, "med": 0.07, "high": 0.12}
 
+# ----- Reward scale: the NET realised value one action can produce -----
+# Acting on a worthless, high-effort topic is a net LOSS, so the floor is below
+# zero. The live API and dashboard use this same range, so a recorded "flop" is
+# a genuine loss — exactly the signal the model was trained on.
+REWARD_MIN = -0.15
+REWARD_MAX = 1.0
+
 # ----- Engine / simulation settings -----
 SETTINGS = {
     "seed": 7,

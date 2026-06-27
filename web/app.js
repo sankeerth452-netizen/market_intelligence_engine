@@ -6,6 +6,11 @@ const $ = (id) => document.getElementById(id);
 const pad2 = (n) => String(n).padStart(2, "0");
 const signed = (x) => (x >= 0 ? "+" : "\u2212") + Math.abs(x).toFixed(3);
 
+// Live reward scale \u2014 must match config.REWARD_MIN / REWARD_MAX. A recorded
+// result of 0% is a genuine loss (the build was wasted); 100% is a top performer.
+const REWARD = { lo: -0.15, hi: 1.0 };
+const pctToReward = (pct) => REWARD.lo + (REWARD.hi - REWARD.lo) * (pct / 100);
+
 async function api(path, opts) {
   const res = await fetch(path, opts);
   if (!res.ok) throw new Error(await res.text());
@@ -73,20 +78,21 @@ function cardEl(c) {
     </div>
     <div class="result">
       <span class="result__label">Record result</span>
-      <input type="range" min="0" max="100" value="${Math.round(c.value * 100)}" aria-label="Result for ${c.topic}">
-      <span class="result__pct">${Math.round(c.value * 100)}%</span>
+      <input type="range" min="0" max="100" value="50" aria-label="Actual result for ${c.topic}">
+      <span class="result__pct">50%</span>
       <button class="btn">Save result</button>
+      <div class="result__hint">0% = flopped (the build was wasted) · 100% = a top performer — record what <em>actually</em> happened</div>
     </div>`;
 
   const range = el.querySelector("input");
   const pct = el.querySelector(".result__pct");
   const btn = el.querySelector(".btn");
   range.addEventListener("input", () => (pct.textContent = range.value + "%"));
-  btn.addEventListener("click", () => recordOutcome(c.id, range.value / 100, el, btn));
+  btn.addEventListener("click", () => recordOutcome(c.id, pctToReward(range.value), el, btn, range));
   return el;
 }
 
-async function recordOutcome(recId, reward, el, btn) {
+async function recordOutcome(recId, reward, el, btn, range) {
   btn.disabled = true;
   try {
     const r = await api("/api/outcome", {
@@ -97,11 +103,11 @@ async function recordOutcome(recId, reward, el, btn) {
     if (!r.ok) { toast(r.error || "Could not record that result."); btn.disabled = false; return; }
     el.classList.add("is-logged");
     btn.textContent = "Recorded \u2713";
+    if (range) range.disabled = true;          // lock the pick once its result is in
     toast(`Result fed back \u2014 the engine has now learned from <b>${r.model_updates}</b> outcomes`);
     await Promise.all([loadWeights(), loadStatus()]);
   } catch (e) {
     toast("Something went wrong recording that result.");
-  } finally {
     btn.disabled = false;
   }
 }

@@ -23,6 +23,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import config
 from engine_service import ENGINE
 
 app = FastAPI(title="Market Intelligence Engine")
@@ -31,7 +32,8 @@ WEB_DIR = os.path.join(os.path.dirname(__file__), "web")
 
 class Outcome(BaseModel):
     rec_id: int
-    reward: float = Field(ge=0.0, le=1.0)
+    # Net realised value, including the negative tail (a flop is a real loss).
+    reward: float = Field(ge=config.REWARD_MIN, le=config.REWARD_MAX)
 
 
 @app.get("/api/brief")

@@ -38,8 +38,16 @@ def test_simulate_returns_proof_shape():
 
 
 def test_outcome_rejects_out_of_range_reward():
-    r = client.post("/api/outcome", json={"rec_id": 1, "reward": 5.0})
-    assert r.status_code == 422          # pydantic bounds reward to [0, 1]
+    # Above the max and well below the (negative) min are both rejected.
+    assert client.post("/api/outcome", json={"rec_id": 1, "reward": 5.0}).status_code == 422
+    assert client.post("/api/outcome", json={"rec_id": 1, "reward": -1.0}).status_code == 422
+
+
+def test_outcome_accepts_a_flop_within_range():
+    # A small negative net value (a flop) is a valid result, not a 422.
+    r = client.post("/api/outcome", json={"rec_id": 999999, "reward": -0.15})
+    assert r.status_code == 200
+    assert r.json()["ok"] is False       # valid reward, but no such recommendation
 
 
 def test_outcome_unknown_id_is_handled_gracefully():

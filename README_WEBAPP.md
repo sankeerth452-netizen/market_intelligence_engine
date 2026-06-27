@@ -24,9 +24,10 @@ after that keeps teaching it.
 - Morning brief — the ranked plan. Each card shows value-per-effort (ROI) and a
   **conviction meter**: the dot is the estimate, the band is how unsure the engine
   is. A wide band tagged `probe` means it's exploring on purpose to learn.
-- Record result — drag the slider to the value a page actually delivered and hit
-  Save result. This feeds straight back into the model; watch the weights panel
-  and gauges move.
+- Record result — the slider starts **neutral**; drag it to what the page
+  *actually* delivered (0% = the build was wasted, 100% = a top performer) and hit
+  Save. This feeds straight back into the model — watch the weights panel and
+  gauges move.
 - What it trusts & distrusts — the weights the engine learned from outcomes. The
   amber `tiktok_velocity` bar pointing left is the engine having taught itself to
   distrust loud single-channel hype.
@@ -38,8 +39,11 @@ after that keeps teaching it.
 
 1. Open the dashboard — note the learned weights (TikTok already negative).
 2. Click **Reset learning** in the rail. Everything zeroes; the model forgets.
-3. Step through a few weeks and Save a result on each card. Watch the weights
-   separate from zero and the gauges climb — the engine relearning in real time.
+3. Step through a few weeks recording *honest* results — drag cards with
+   **multi-source** evidence high, and ones tagged **single-channel only** low
+   (0% = the build was wasted). Watch the weights separate from zero and
+   `tiktok_velocity` dive — the engine relearning, in real time, that loud
+   single-channel hype doesn't pay.
 
 ## Endpoints (for wiring a different frontend or automating)
 
