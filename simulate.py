@@ -18,8 +18,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import config
-from world import build_world, observe, realised_reward
+from world import build_world
 from bandit import LinUCB
+from engine_core import run_head_to_head
 import recommender as rec
 import store
 
@@ -34,54 +35,21 @@ def run():
     bandit = LinUCB(config.N_FEATURES, alpha=s["linucb_alpha"])
     conn = store.connect("mie.db")
 
-    done_static, done_loop = set(), set()
-    cum_static, cum_loop = [], []
-    decoys_static, decoys_loop = 0, 0
-    tot_static = tot_loop = 0.0
-    last_loop_picks = []
+    # Persist every executed closed-loop recommendation (and its realised result)
+    # so the proof run also populates the audit log, exactly as before.
+    def persist(week, p, reward):
+        rid = store.save_recommendation(
+            conn, week, p["topic"].name, p["topic"].category, p["topic"].kind,
+            p["roi"], p["pred"]["mean"], p["pred"]["uncertainty"], p["topic"].effort,
+            rec.rationale(p["signals"], p["pred"], p["topic"].effort, p["exploring"]))
+        store.record_outcome(conn, rid, reward)
 
-    for week in range(weeks):
-        # Observe every not-yet-built topic this week (separately per policy pool).
-        def candidates(done):
-            out = []
-            for t in topics:
-                if t.id in done:
-                    continue
-                o = observe(t, index, week, rng)
-                out.append({"topic": t, "x": o["x"], "signals": o["signals"],
-                            "gap": o["gap"]})
-            return out
-
-        # ---- Static policy (the original design) ----
-        cand_s = candidates(done_static)
-        picks_s = rec.static_select(cand_s, k)
-        for p in picks_s:
-            r = realised_reward(p["topic"], p["gap"], rng)
-            tot_static += r
-            done_static.add(p["topic"].id)
-            if p["topic"].kind == "decoy":
-                decoys_static += 1
-        cum_static.append(tot_static)
-
-        # ---- Closed-loop policy (the upgrade) ----
-        cand_l = candidates(done_loop)
-        picks_l = rec.recommend(cand_l, bandit, index, k)
-        last_loop_picks = picks_l
-        for p in picks_l:
-            r = realised_reward(p["topic"], p["gap"], rng)
-            tot_loop += r
-            done_loop.add(p["topic"].id)
-            if p["topic"].kind == "decoy":
-                decoys_loop += 1
-            # CLOSE THE LOOP: learn from the realised outcome.
-            bandit.update(p["x"], r)
-            rid = store.save_recommendation(
-                conn, week, p["topic"].name, p["topic"].category, p["topic"].kind,
-                p["roi"], p["pred"]["mean"], p["pred"]["uncertainty"],
-                p["topic"].effort,
-                rec.rationale(p["signals"], p["pred"], p["topic"].effort, p["exploring"]))
-            store.record_outcome(conn, rid, r)
-        cum_loop.append(tot_loop)
+    # The whole head-to-head now lives in one shared, tested function.
+    res = run_head_to_head(topics, index, weeks, k, rng, bandit, on_loop_pick=persist)
+    tot_static, tot_loop = res["total_static"], res["total_loop"]
+    decoys_static, decoys_loop = res["decoys_static"], res["decoys_loop"]
+    cum_static, cum_loop = res["static"], res["loop"]
+    last_loop_picks = res["last_loop_picks"]
 
     # ---------------------------------------------------------------- report ----
     print("=" * 70)
