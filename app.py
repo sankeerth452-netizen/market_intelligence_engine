@@ -13,6 +13,7 @@ Endpoints
     GET  /api/weights           what the engine has learned to weigh
     GET  /api/status            feedback-loop counters
     GET  /api/simulate          head-to-head proof data (cached)
+    GET  /api/robustness        multi-seed robustness + ablation (from evaluate.py)
     POST /api/reset             forget the learned model (demo reset)
 """
 import os
@@ -58,6 +59,12 @@ def get_status():
 @app.get("/api/simulate")
 def get_simulate():
     return ENGINE.simulate()
+
+
+@app.get("/api/robustness")
+def get_robustness():
+    """Multi-seed robustness + ablation (from evaluate.py); null if not yet run."""
+    return ENGINE.robustness()
 
 
 @app.post("/api/reset")

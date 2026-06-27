@@ -30,7 +30,9 @@ after that keeps teaching it.
 - What it trusts & distrusts — the weights the engine learned from outcomes. The
   amber `tiktok_velocity` bar pointing left is the engine having taught itself to
   distrust loud single-channel hype.
-- Why the loop wins — the head-to-head: closed-loop vs the original static design.
+- Why the loop wins — a bold headline (**+40% ± 1% across 30 independent markets,
+  winning all 30**, computed by `evaluate.py`), then the head-to-head curve for one
+  representative market.
 
 ## Try this to feel the loop
 
@@ -47,7 +49,8 @@ after that keeps teaching it.
 | POST | `/api/outcome` | `{rec_id, reward}` → closes the loop |
 | GET | `/api/weights` | learned signal weights |
 | GET | `/api/status` | loop counters |
-| GET | `/api/simulate` | head-to-head proof data |
+| GET | `/api/simulate` | head-to-head proof data (one market) |
+| GET | `/api/robustness` | multi-seed robustness + ablation (from `evaluate.py`) |
 | POST | `/api/reset` | forget the learned model |
 
 Interactive API docs are auto-generated at <http://localhost:8000/docs>.

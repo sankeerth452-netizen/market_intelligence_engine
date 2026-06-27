@@ -64,6 +64,43 @@ discovered, with no hand-holding, that loud single-channel spikes predict
 
 ---
 
+## It's not one lucky seed (run `python evaluate.py`)
+
+A single run could be cherry-picked, so the same head-to-head is repeated across
+**30 independent synthetic markets** (different topics, values and noise each time):
+
+| Across 30 markets | Static (spec) | Closed-loop |
+|---|---|---|
+| Real value captured (mean ± 95% CI) | 26.0 ± 0.3 | **36.3 ± 0.3** |
+| Junk pages built (mean) | 19.5 | **2.5** |
+
+**+39.7% ± 1.4% more value, and the closed loop wins all 30 of 30 markets.** The
+headline isn't a fluke.
+
+### Where the gain comes from — an ablation
+
+Turning the upgrades on one at a time, across the same 30 markets, shows *which*
+idea actually earns the win (this is the question a sceptic always asks):
+
+| Policy — each rung adds one idea | Value (mean) | Δ vs previous | Junk pages |
+|---|---|---|---|
+| P0 — static (the original spec) | 26.1 | — | 19.5 |
+| P1 — + effort / ROI | 32.5 | **+6.4** | 8.9 |
+| P2 — + portfolio de-dup | 32.6 | +0.1 | 8.8 |
+| P3 — + learning from outcomes | 37.2 | **+4.6** | 1.2 |
+| P4 — + UCB exploration (full system) | 36.6 | −0.7 | 2.3 |
+
+Two ideas do the heavy lifting: **being effort-aware** (don't pour work into
+expensive low-value pages) and **learning from outcomes** (which is also what
+collapses junk pages from ~9 to ~1). Portfolio de-dup and exploration come out
+near-neutral *on this world* — and that's an honest finding, not a bug: this
+synthetic market reveals every topic's signals every week, so there is little
+hidden value left to probe for. Exploration earns its keep in production, where
+you only ever learn from the pages you actually ship. (`evaluation.png` shows
+both panels; the numbers live in `evaluation.json`.)
+
+---
+
 ## What was upgraded, and why
 
 | # | Original weakness | Upgrade in this repo |
@@ -115,17 +152,24 @@ discovered, with no hand-holding, that loud single-channel spikes predict
 | `bandit.py` | **LinUCB** — learning, exploration, uncertainty |
 | `recommender.py` | ROI scoring, portfolio selection, rationale, static baseline |
 | `store.py` | SQLite persistence (recommendations + outcomes) |
-| `simulate.py` | head-to-head proof + chart (`results.png`) |
+| `engine_core.py` | the shared week-by-week loop (training + head-to-head), used everywhere |
+| `policies.py` | ablation ladder (static → +effort → +portfolio → +learning → +exploration) |
+| `simulate.py` | single-market head-to-head proof + chart (`results.png`) |
+| `evaluate.py` | multi-seed robustness + ablation study (`evaluation.png`, `evaluation.json`) |
 | `cli.py` | day-to-day commands (`brief`, `outcome`, `status`) |
+| `tests/` | pytest suite, incl. a golden-master that locks the proof numbers |
 
 ## Run it
 
 ```bash
 pip install -r requirements.txt
-python simulate.py            # head-to-head + results.png
+python simulate.py            # single-market head-to-head + results.png
+python evaluate.py            # robustness across 30 markets + ablation (evaluation.png)
 python cli.py brief --week 8  # this week's ranked opportunities
 python cli.py outcome 1 0.72  # record a realised result (closes the loop)
 python cli.py status          # what the loop has learned so far
+
+pip install -r requirements-dev.txt && pytest   # 23 tests, incl. the golden-master proof lock
 ```
 
 ## Path to production

@@ -198,11 +198,27 @@ function proofSVG(d) {
 }
 
 function loadProof() {
-  return api("/api/simulate").then((d) => {
+  const sim = api("/api/simulate").then((d) => {
     $("proof").innerHTML = proofSVG(d);
     $("proofNote").innerHTML =
-      `Same market, same budget, 20 weeks. The closed-loop engine captured <b>+${d.lift_pct}%</b> more real value while building <b>${d.decoys_static - d.decoys_loop} fewer</b> junk pages (${d.decoys_loop} vs ${d.decoys_static}).`;
+      `This curve is <b>one representative market</b>, same budget, 20 weeks: the closed-loop engine captured <b>+${d.lift_pct}%</b> more value while building <b>${d.decoys_static - d.decoys_loop} fewer</b> junk pages (${d.decoys_loop} vs ${d.decoys_static}).`;
   });
+
+  // The credible headline: the same comparison repeated across many markets.
+  const rob = api("/api/robustness")
+    .then((r) => {
+      if (!r || !r.robustness) return;
+      const b = r.robustness;
+      $("robustStat").innerHTML =
+        `<div class="robust__big">+${Math.round(b.lift_mean)}%
+           <span>± ${b.lift_ci.toFixed(1)}% · 95% CI</span></div>
+         <div class="robust__cap">more real value than the original scorer, averaged across
+           <b>${b.n} independent markets</b> — and the closed loop won <b>${b.wins}/${b.n}</b> of them.
+           Junk pages built: <b>${Math.round(b.decoys_static_mean)} → ${Math.round(b.decoys_loop_mean)}</b>.</div>`;
+    })
+    .catch(() => {});
+
+  return Promise.all([sim, rob]);
 }
 
 /* ---- wiring ------------------------------------------------------------- */

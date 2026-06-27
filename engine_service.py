@@ -24,6 +24,7 @@ import store
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "webapp.db")
 STATE_PATH = os.path.join(os.path.dirname(__file__), "bandit_state.json")
+EVAL_PATH = os.path.join(os.path.dirname(__file__), "evaluation.json")
 
 
 class EngineService:
@@ -163,6 +164,19 @@ class EngineService:
             self._save_bandit()
             self._sim_cache = None
             return {"ok": True}
+
+    # ------------------------------------------- robustness (precomputed) ----
+    def robustness(self):
+        """The multi-seed robustness + ablation result produced by evaluate.py.
+
+        Read from evaluation.json so a single web request never has to run the
+        2-minute sweep. Returns None when the file is absent, so the dashboard
+        degrades gracefully to just the single-market proof curve."""
+        try:
+            with open(EVAL_PATH) as f:
+                return json.load(f)
+        except (FileNotFoundError, ValueError):
+            return None
 
     # ------------------------------------------- head-to-head proof (cached) ----
     def simulate(self):

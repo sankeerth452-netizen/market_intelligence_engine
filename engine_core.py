@@ -64,6 +64,29 @@ def run_loop_training(topics, index, weeks: int, k: int,
     return bandit
 
 
+def run_single_policy(topics, index, weeks: int, k: int,
+                      rng: np.random.Generator, policy) -> dict:
+    """Run ONE policy over the world and report what it captured.
+
+    Used by the ablation study (evaluate.py), where many policies are each run
+    on the same world + noise stream so the only thing that differs is the
+    policy itself. A `policy` exposes `.select(candidates, k)` and
+    `.learn(pick, reward)` (a no-op for non-learning policies).
+    """
+    done = set()
+    total = 0.0
+    decoys = 0
+    for week in range(weeks):
+        cands = iter_candidates(topics, index, week, rng, done)
+        for p in policy.select(cands, k):
+            reward = realised_reward(p["topic"], p["gap"], rng)
+            total += reward
+            decoys += (p["topic"].kind == "decoy")
+            policy.learn(p, reward)
+            done.add(p["topic"].id)
+    return {"total": total, "decoys": decoys}
+
+
 def run_head_to_head(topics, index, weeks: int, k: int,
                      rng: np.random.Generator, bandit,
                      on_loop_pick: Optional[Callable] = None) -> dict:
