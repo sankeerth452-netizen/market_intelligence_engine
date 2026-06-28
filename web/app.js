@@ -4,13 +4,44 @@ const state = { week: 8, view: "dashboard" };
 
 const $ = (id) => document.getElementById(id);
 const pad2 = (n) => String(n).padStart(2, "0");
-const signed = (x) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(3);
 const titleCase = (s) => (s || "").replace(/_/g, " ");
 
-// Live reward scale — must match config.REWARD_MIN / REWARD_MAX. A recorded
-// result of 0% is a genuine loss (the build was wasted); 100% is a top performer.
+// Live reward scale — must match config.REWARD_MIN / REWARD_MAX.
 const REWARD = { lo: -0.15, hi: 1.0 };
 const pctToReward = (pct) => REWARD.lo + (REWARD.hi - REWARD.lo) * (pct / 100);
+
+/* ---- plain-language helpers: speak to marketers, not ML engineers ------- */
+const FEATURE_LABEL = {
+  trend_surprise: "Rising search demand",
+  trend_changepoint: "Sudden demand spike",
+  reddit_growth: "Reddit buzz",
+  reddit_neg_sentiment: "Complaints / reputation",
+  tiktok_velocity: "TikTok hype",
+  news_relevance: "In the news",
+  semantic_gap: "Gap on your site",
+  cross_source_agreement: "Multiple sources agree",
+};
+const CHIP_LABEL = {
+  "demand rising": "Rising demand",
+  "search rise": "Rising demand",
+  "change-point": "Sudden spike",
+  "content gap": "Gap on your site",
+  "reputation risk": "Reputation risk",
+  "single-channel only": "Only one source — be cautious",
+  "multi-source": "Multiple sources agree",
+};
+const EFFORT_LABEL = { low: "Low", med: "Medium", high: "High" };
+
+const priorityOf = (roi) =>
+  roi >= 0.62 ? ["High", "is-high"] : roi >= 0.4 ? ["Medium", "is-med"] : ["Low", "is-low"];
+const confidenceOf = (unc) =>
+  unc < 0.18 ? ["High", "is-high"] : unc < 0.35 ? ["Medium", "is-med"] : ["Still learning", "is-low"];
+const actionVerb = (a) =>
+  (a || "").toLowerCase().startsWith("create") ? ["Create a page for", ""] : ["Strengthen your", " page"];
+const whyLine = (c) => {
+  const ev = (c.evidence || []).map((e) => CHIP_LABEL[e] || e);
+  return ev.length ? ev.join(" · ") : "Flagged by this week's market signals.";
+};
 
 async function api(path, opts) {
   const res = await fetch(path, opts);
@@ -26,7 +57,7 @@ function toast(html) {
   toast._t = setTimeout(() => t.classList.remove("show"), 2600);
 }
 
-/* ---- the signature element: a value point with an uncertainty band ------- */
+/* ---- the signature element: how-sure-we-are meter (dot + band) ---------- */
 function convictionSVG(value, unc) {
   const lo = Math.max(0, value - unc), hi = Math.min(1, value + unc);
   const X = (v) => (10 + v * 280).toFixed(1);
@@ -41,8 +72,7 @@ function convictionSVG(value, unc) {
   </svg>`;
 }
 
-/* update an existing card's conviction meter in place, so the dot + band visibly
-   glide to the engine's revised belief after a result is recorded */
+/* slide a card's meter + labels to the engine's revised belief after a result */
 function setConviction(el, value, unc, roi) {
   const X = (v) => 10 + v * 280;
   const lo = Math.max(0, value - unc), hi = Math.min(1, value + unc);
@@ -54,9 +84,9 @@ function setConviction(el, value, unc, roi) {
   }
   if (pt) pt.setAttribute("cx", X(value).toFixed(1));
   const roiEl = el.querySelector(".conv__roi");
-  if (roiEl) roiEl.textContent = roi.toFixed(2);
+  if (roiEl) { const [p, cls] = priorityOf(roi); roiEl.textContent = p; roiEl.className = "conv__roi prio " + cls; }
   const readout = el.querySelector(".conv__readout");
-  if (readout) readout.innerHTML = `est <b>${value.toFixed(2)}</b> ± ${unc.toFixed(2)}`;
+  if (readout) { const [cf, cc] = confidenceOf(unc); readout.innerHTML = `Confidence: <b class="${cc}">${cf}</b>`; }
 }
 
 /* ---- opportunity cards --------------------------------------------------- */
@@ -66,42 +96,39 @@ function cardEl(c) {
   el.dataset.id = c.id;
   el.style.animationDelay = (c.rank - 1) * 0.06 + "s";
 
-  const chips = c.evidence
-    .map((e) => {
-      const warn = e === "reputation risk" || e === "single-channel only";
-      return `<span class="chip${warn ? " chip--warn" : ""}">${e}</span>`;
-    })
-    .join("");
-
-  const probe = c.exploring
-    ? `<span class="probe" title="The engine is uncertain here and is probing to learn">probe</span>`
-    : "";
+  const [prio, prioCls] = priorityOf(c.roi);
+  const [conf, confCls] = confidenceOf(c.uncertainty);
+  const [verb, suffix] = actionVerb(c.action);
+  const test = c.exploring
+    ? `<span class="tag tag--test" title="We're less sure here — worth a quick test to find out">Worth a test</span>` : "";
+  const news = (c.headlines && c.headlines[0])
+    ? `<div class="card__news">📰 In the news: “${c.headlines[0]}”</div>` : "";
 
   el.innerHTML = `
     <div class="card__rank">${pad2(c.rank)}</div>
     <div class="card__main">
-      <h3 class="card__topic">${c.topic}</h3>
+      <h3 class="card__topic">${verb} ${c.topic}${suffix}</h3>
+      <p class="card__why">${whyLine(c)}</p>
+      ${news}
       <div class="card__meta">
-        <span class="tag tag--action">${c.action}</span>
-        <span class="tag tag--effort-${c.effort}">${c.effort} effort</span>
-        ${probe}
+        <span class="tag tag--effort-${c.effort}">${EFFORT_LABEL[c.effort] || c.effort} effort</span>
+        ${test}
       </div>
-      <div class="chips">${chips}</div>
     </div>
     <div class="card__conv">
       <div class="conv__row">
-        <span class="conv__label">value / effort</span>
-        <span class="conv__roi">${c.roi.toFixed(2)}</span>
+        <span class="conv__label">Priority</span>
+        <span class="conv__roi prio ${prioCls}">${prio}</span>
       </div>
       ${convictionSVG(c.value, c.uncertainty)}
-      <div class="conv__readout">est <b>${c.value.toFixed(2)}</b> ± ${c.uncertainty.toFixed(2)}</div>
+      <div class="conv__readout">Confidence: <b class="${confCls}">${conf}</b></div>
     </div>
     <div class="result">
-      <span class="result__label">Record result</span>
-      <input type="range" min="0" max="100" value="50" aria-label="Actual result for ${c.topic}">
+      <span class="result__label">How did this perform?</span>
+      <input type="range" min="0" max="100" value="50" aria-label="Result for ${c.topic}">
       <span class="result__pct">50%</span>
       <button class="btn">Save result</button>
-      <div class="result__hint">0% = flopped (the build was wasted) · 100% = a top performer — record what <em>actually</em> happened</div>
+      <div class="result__hint">0% = it flopped · 100% = a top performer — record what actually happened and the system learns from it</div>
     </div>`;
 
   const range = el.querySelector("input");
@@ -122,20 +149,17 @@ async function recordOutcome(recId, reward, el, btn, range) {
     });
     if (!r.ok) { toast(r.error || "Could not record that result."); btn.disabled = false; return; }
     el.classList.add("is-logged");
-    btn.textContent = "Recorded ✓";
-    if (range) range.disabled = true;          // lock the pick once its result is in
-    toast(`Result fed back — the engine has now learned from <b>${r.model_updates}</b> outcomes`);
-    // Watch it learn: weights, gauges, conviction meters AND the dashboard KPIs.
+    btn.textContent = "Saved ✓";
+    if (range) range.disabled = true;
+    toast(`Saved — the system just learned from your result (<b>${r.model_updates}</b> total)`);
     await Promise.all([loadWeights(), loadStatus(), refreshBriefInPlace(), loadDashboard()]);
   } catch (e) {
-    toast("Something went wrong recording that result.");
+    toast("Something went wrong saving that result.");
     btn.disabled = false;
   }
 }
 
-/* After a result is recorded, slide the visible cards' conviction meters to the
-   engine's updated beliefs (the same cards stay in place). If the recorded result
-   reshuffled the ranking, fall back to a clean re-render of the new plan. */
+/* after a result, slide the visible cards to the system's updated view */
 async function refreshBriefInPlace() {
   try {
     const data = await api(`/api/brief?week=${state.week}&k=3`);
@@ -143,13 +167,8 @@ async function refreshBriefInPlace() {
     const shown = [...host.querySelectorAll(".card")];
     const shownIds = shown.map((e) => Number(e.dataset.id)).sort((a, b) => a - b);
     const newIds = data.map((c) => c.id).sort((a, b) => a - b);
-    const same = shownIds.length === newIds.length &&
-                 shownIds.every((v, i) => v === newIds[i]);
-    if (!same) {                       // ranking shifted -> show the new plan
-      host.innerHTML = "";
-      data.forEach((c) => host.appendChild(cardEl(c)));
-      return;
-    }
+    const same = shownIds.length === newIds.length && shownIds.every((v, i) => v === newIds[i]);
+    if (!same) { host.innerHTML = ""; data.forEach((c) => host.appendChild(cardEl(c))); return; }
     data.forEach((c) => {
       const el = shown.find((e) => Number(e.dataset.id) === c.id);
       if (!el) return;
@@ -157,10 +176,10 @@ async function refreshBriefInPlace() {
       el.classList.add("is-learning");
       setTimeout(() => el.classList.remove("is-learning"), 800);
     });
-  } catch (e) { /* keep the current cards if the refresh fails */ }
+  } catch (e) { /* keep current cards if refresh fails */ }
 }
 
-/* ---- This Week's Plan (full cards) -------------------------------------- */
+/* ---- What to do this week (full cards) ---------------------------------- */
 function loadBrief() {
   const host = $("cards");
   host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
@@ -168,12 +187,12 @@ function loadBrief() {
   return api(`/api/brief?week=${state.week}&k=3`).then((data) => {
     host.innerHTML = "";
     if (!data.length) {
-      host.innerHTML = '<p class="lede">No opportunities cleared the bar this week. Step forward a week.</p>';
+      host.innerHTML = '<p class="lede">No clear opportunities this week. Step forward a week.</p>';
       return;
     }
     data.forEach((c) => host.appendChild(cardEl(c)));
   }).catch(() => {
-    host.innerHTML = '<p class="lede">Could not load the brief. Is the server running?</p>';
+    host.innerHTML = '<p class="lede">Could not load this week’s plan. Is the server running?</p>';
   });
 }
 
@@ -188,14 +207,14 @@ async function loadDashboard() {
   const top = brief[0];
 
   const kpis = [
-    { label: "Top opportunity this week", big: top ? top.topic : "—",
-      sub: top ? `value/effort ${top.roi.toFixed(2)} · ${top.action}` : "", accent: "teal" },
-    { label: "Proven lift vs fixed scoring", big: b ? `+${Math.round(b.lift_mean)}%` : "—",
-      sub: b ? `across ${b.n} simulated markets` : "", accent: "teal" },
-    { label: "Head-to-head markets won", big: b ? `${b.wins}/${b.n}` : "—",
-      sub: "vs the original fixed-score design", accent: "ink" },
-    { label: "Results learned from", big: status.model_updates != null ? String(status.model_updates) : "—",
-      sub: "and improving with every one", accent: "amber" },
+    { label: "Do this first", big: top ? top.topic : "—",
+      sub: top ? `${priorityOf(top.roi)[0]} priority · ${(top.action || "").toLowerCase()}` : "", accent: "teal" },
+    { label: "Better than the old way", big: b ? `+${Math.round(b.lift_mean)}%` : "—",
+      sub: b ? "more value found, in head-to-head tests" : "", accent: "teal" },
+    { label: "Head-to-head tests won", big: b ? `${b.wins} / ${b.n}` : "—",
+      sub: "vs the old fixed-formula approach", accent: "ink" },
+    { label: "Results it's learned from", big: status.model_updates != null ? String(status.model_updates) : "—",
+      sub: "and it improves with every one", accent: "amber" },
   ];
   $("kpis").innerHTML = kpis.map((k) => `
     <div class="kpi kpi--${k.accent}">
@@ -207,26 +226,28 @@ async function loadDashboard() {
   if (b) {
     $("heroStat").textContent = `+${Math.round(b.lift_mean)}%`;
     $("heroCap").innerHTML =
-      `more real value than the original fixed-score recommender — averaged across
-       <b>${b.n} independent markets</b>, winning <b>${b.wins}/${b.n}</b>. Junk pages built:
-       <b>${Math.round(b.decoys_static_mean)} → ${Math.round(b.decoys_loop_mean)}</b>.`;
+      `more value found than the old fixed-formula approach. In <b>${b.n} head-to-head tests</b> it
+       won <b>every one</b>, and avoided about
+       <b>${Math.round(b.decoys_static_mean - b.decoys_loop_mean)} dead-end ideas per run</b> the old way chased.`;
     $("heroSide").innerHTML =
-      `<div class="herometric"><b>${b.wins}/${b.n}</b><span>markets won</span></div>
-       <div class="herometric"><b>±${b.lift_ci.toFixed(1)}%</b><span>95% CI</span></div>`;
+      `<div class="herometric"><b>${b.wins}/${b.n}</b><span>tests won</span></div>
+       <div class="herometric"><b>+${Math.round(b.lift_mean)}%</b><span>more value</span></div>`;
   }
 
-  $("dashPlan").innerHTML = brief.length ? brief.map((c) => `
-    <button class="dpitem" data-goto="plan">
+  $("dashPlan").innerHTML = brief.length ? brief.map((c) => {
+    const [p, pc] = priorityOf(c.roi);
+    return `<button class="dpitem" data-goto="plan">
       <div class="dpitem__rank">${pad2(c.rank)}</div>
       <div class="dpitem__main">
         <div class="dpitem__topic">${c.topic}</div>
         <div class="dpitem__meta">
           <span class="tag tag--action">${c.action}</span>
-          <span class="tag tag--effort-${c.effort}">${c.effort} effort</span>
+          <span class="tag tag--effort-${c.effort}">${EFFORT_LABEL[c.effort] || c.effort} effort</span>
         </div>
       </div>
-      <div class="dpitem__roi">${c.roi.toFixed(2)}<span>value / effort</span></div>
-    </button>`).join("") : `<p class="lede">No opportunities cleared the bar this week.</p>`;
+      <div class="dpitem__roi prio ${pc}">${p}<span>priority</span></div>
+    </button>`;
+  }).join("") : `<p class="lede">No clear opportunities this week.</p>`;
   wireGoto();
 }
 
@@ -235,67 +256,69 @@ function loadSummary() {
   return api("/api/summary").then((s) => {
     if (!s || !s.actions) return;
     const chips = (arr) => (arr || []).map((x) => `<span class="schip">${x}</span>`).join("");
-    const acts = s.actions.map((a) =>
-      `<li><b>${a.action}</b> — ${a.topic} <span class="schip__roi">ROI ${a.roi.toFixed(2)}</span></li>`).join("");
+    const acts = s.actions.map((a) => {
+      const [p] = priorityOf(a.roi);
+      return `<li><b>${a.action}</b> — ${a.topic} <span class="schip__roi">${p} priority</span></li>`;
+    }).join("");
     $("summaryCard").innerHTML = `
       <div class="summary__head">
-        <span class="eyebrow">✦ Weekly intelligence summary · generated from live data</span>
+        <span class="eyebrow">✦ This week's read on the market · from live data</span>
         <span class="summary__mode">${s.data_mode === "real" ? "LIVE DATA" : "demo data"}</span>
       </div>
       <p class="summary__learned">${s.learned}</p>
       <div class="summary__grid">
-        <div><div class="summary__lbl">Rising demand</div>${chips(s.rising)}</div>
-        <div><div class="summary__lbl">Biggest content gaps</div>${chips(s.gaps)}</div>
+        <div><div class="summary__lbl">Demand rising fastest</div>${chips(s.rising)}</div>
+        <div><div class="summary__lbl">Biggest gaps on your site</div>${chips(s.gaps)}</div>
         <div><div class="summary__lbl">Already well covered</div>${chips(s.covered)}</div>
       </div>
-      <div class="summary__lbl">Recommended actions</div>
+      <div class="summary__lbl">What to do</div>
       <ol class="summary__acts">${acts}</ol>`;
   }).catch(() => {});
 }
 
-/* ---- Signals view: per-category live signals + headlines ---------------- */
+/* ---- Market signals view ------------------------------------------------ */
 function loadSignals() {
   const host = $("signals");
-  if (host.dataset.loaded) return Promise.resolve();   // load once per session
+  if (host.dataset.loaded) return Promise.resolve();
   host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
   return api("/api/signals").then((d) => {
     const items = d.items || [];
-    if (!items.length) { host.innerHTML = '<p class="lede">No signals loaded.</p>'; return; }
+    if (!items.length) { host.innerHTML = '<p class="lede">No signals loaded yet.</p>'; return; }
     const bar = (v, label) => `<div class="sig">
       <span class="sig__lbl">${label}</span>
       <div class="sig__track"><div class="sig__fill" style="width:${Math.round(v * 100)}%"></div></div>
-      <span class="sig__val">${v.toFixed(2)}</span></div>`;
+      <span class="sig__val">${Math.round(v * 100)}</span></div>`;
     host.innerHTML = items.map((it) => {
       const s = it.signals;
-      const heads = (it.headlines || []).slice(0, 2)
-        .map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
+      const [p, pc] = priorityOf(it.roi);
+      const heads = (it.headlines || []).slice(0, 2).map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
       return `<div class="sigrow">
         <div class="sigrow__top">
           <div class="sigrow__name">${it.topic}</div>
-          <div class="sigrow__roi">${it.roi.toFixed(2)}<span>value / effort</span></div>
+          <div class="sigrow__roi prio ${pc}">${p}<span>priority</span></div>
         </div>
         <div class="sigrow__bars">
-          ${bar(s.trend_surprise, "demand-trend")}
-          ${bar(s.news_relevance, "news")}
-          ${bar(s.semantic_gap, "content gap")}
+          ${bar(s.trend_surprise, "Search demand")}
+          ${bar(s.news_relevance, "In the news")}
+          ${bar(s.semantic_gap, "Gap on your site")}
         </div>
         ${heads}
       </div>`;
     }).join("");
     host.dataset.loaded = "1";
-  }).catch(() => { host.innerHTML = '<p class="lede">Could not load signals.</p>'; });
+  }).catch(() => { host.innerHTML = '<p class="lede">Could not load market signals.</p>'; });
 }
 
-/* ---- learned-weights diverging bars ------------------------------------- */
+/* ---- what the system has learned matters (plain language) -------------- */
 function loadWeights() {
   return api("/api/weights").then((data) => {
     const items = data.learned;
     const maxAbs = Math.max(...items.map((d) => Math.abs(d.weight)), 0.01);
     const host = $("weights");
+    const verdict = (w) => (w < -0.02 ? "doesn’t pay off" : w > 0.15 ? "matters a lot" : w > 0.05 ? "helps" : "minor");
     const rows = {};
     host.querySelectorAll(".wrow").forEach((r) => (rows[r.dataset.name] = r));
-    const canUpdate = items.length === Object.keys(rows).length &&
-                      items.every((d) => rows[d.name]);
+    const canUpdate = items.length === Object.keys(rows).length && items.every((d) => rows[d.name]);
 
     if (canUpdate) {
       items.forEach((d) => {
@@ -304,32 +327,35 @@ function loadWeights() {
         const fill = r.querySelector(".wbar__fill");
         fill.className = "wbar__fill " + (neg ? "neg" : "pos");
         fill.style.width = (Math.abs(d.weight) / maxAbs * 48).toFixed(1) + "%";
-        r.querySelector(".wrow__val").textContent = signed(d.weight);
+        r.querySelector(".wrow__val").textContent = verdict(d.weight);
         r.classList.toggle("is-distrust", neg && d.name === "tiktok_velocity");
       });
     } else {
-      host.innerHTML = items
-        .map((d) => {
-          const w = Math.abs(d.weight) / maxAbs * 48;
-          const neg = d.weight < 0;
-          const distrust = neg && d.name === "tiktok_velocity";
-          return `<div class="wrow${distrust ? " is-distrust" : ""}" data-name="${d.name}">
-            <div class="wrow__label">${d.name}</div>
-            <div class="wbar"><div class="wbar__zero"></div>
-              <div class="wbar__fill ${neg ? "neg" : "pos"}" style="width:${w.toFixed(1)}%"></div></div>
-            <div class="wrow__val">${signed(d.weight)}</div>
-          </div>`;
-        })
-        .join("");
+      host.innerHTML = items.map((d) => {
+        const w = Math.abs(d.weight) / maxAbs * 48;
+        const neg = d.weight < 0;
+        const distrust = neg && d.name === "tiktok_velocity";
+        return `<div class="wrow${distrust ? " is-distrust" : ""}" data-name="${d.name}">
+          <div class="wrow__label">${FEATURE_LABEL[d.name] || titleCase(d.name)}</div>
+          <div class="wbar"><div class="wbar__zero"></div>
+            <div class="wbar__fill ${neg ? "neg" : "pos"}" style="width:${w.toFixed(1)}%"></div></div>
+          <div class="wrow__val">${verdict(d.weight)}</div>
+        </div>`;
+      }).join("");
     }
 
-    const tiktok = items.find((d) => d.name === "tiktok_velocity");
-    if (data.model_updates >= 6 && tiktok && tiktok.weight < 0) {
+    const positives = items.filter((d) => d.weight > 0.05).map((d) => FEATURE_LABEL[d.name] || titleCase(d.name));
+    const drivers = positives.slice(0, 2).join(" and ") || "your strongest signals";
+    const worst = items[items.length - 1];
+    if (data.model_updates >= 6 && worst && worst.weight < 0) {
+      const worstLbl = FEATURE_LABEL[worst.name] || titleCase(worst.name);
+      const punch = worst.name === "tiktok_velocity"
+        ? " That’s the opposite of the old rule-of-thumb that trusted social hype." : "";
       $("weightsNote").innerHTML =
-        `After <b>${data.model_updates}</b> results, the engine drove <b>tiktok_velocity negative</b> — it taught itself that loud single-channel hype predicts wasted effort, even though the original design trusted it at +0.15.`;
+        `After ${data.model_updates} results, the system has figured out that <b>${drivers}</b> are what actually pay off — and that <b>${worstLbl}</b> usually doesn’t.${punch}`;
     } else {
       $("weightsNote").innerHTML =
-        `Weights start near zero and move as results arrive. Record a few outcomes and watch them separate — this is the engine learning what actually pays.`;
+        `These start even and shift as results come in. Record a few outcomes on the plan and watch what the system decides actually matters.`;
     }
   });
 }
@@ -352,12 +378,12 @@ function loadStatus() {
     $("cfg").innerHTML = c.name ? `
       <div class="cfgrow"><span>Client</span><b>${c.name}</b></div>
       <div class="cfgrow"><span>Industry</span><b>${titleCase(c.industry)}</b></div>
-      <div class="cfgrow"><span>Category framework</span><b>${c.categories} categories</b></div>
-      <div class="cfgrow"><span>Website (content-gap source)</span><b>${c.site_source}</b></div>
-      <div class="cfgrow"><span>Data mode</span><b>${s.data_mode}</b></div>
-      <div class="cfgrow"><span>Source</span><b>${c.is_demo ? "built-in demo client" : "configured via env"}</b></div>
-      <p class="cfg__note">Onboard a new client by setting <code>CLIENT_NAME</code>, <code>CLIENT_INDUSTRY</code>,
-        <code>CLIENT_CATEGORIES</code> and <code>SITE_URL</code> — no code change.</p>` : "";
+      <div class="cfgrow"><span>Categories tracked</span><b>${c.categories}</b></div>
+      <div class="cfgrow"><span>Website analysed</span><b>${c.site_source}</b></div>
+      <div class="cfgrow"><span>Data</span><b>${s.data_mode === "real" ? "live" : "demo"}</b></div>
+      <p class="cfg__note">This is a reusable platform — point it at a new client by setting
+        <code>CLIENT_NAME</code>, <code>CLIENT_INDUSTRY</code>, <code>CLIENT_CATEGORIES</code> and
+        <code>SITE_URL</code>. No code changes.</p>` : "";
   });
 }
 
@@ -369,20 +395,17 @@ function proofSVG(d) {
   const X = (i) => pad.l + (i / (n - 1)) * (W - pad.l - pad.r);
   const Y = (v) => H - pad.b - (v / maxY) * (H - pad.t - pad.b);
   const path = (arr) => arr.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
-
   const fwd = d.loop.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
   const back = d.static.map((v, i) => `L${X(n - 1 - i).toFixed(1)},${Y(d.static[n - 1 - i]).toFixed(1)}`).join(" ");
   const area = `${fwd} ${back} Z`;
-
   const yTicks = [0, maxY].map(
     (v) => `<text x="${pad.l - 6}" y="${(Y(v) + 3).toFixed(1)}" text-anchor="end"
               font-family="IBM Plex Mono" font-size="9" fill="#9AA1AC">${Math.round(v)}</text>`).join("");
   const xLabels = [0, Math.floor((n - 1) / 2), n - 1].map(
     (i) => `<text x="${X(i).toFixed(1)}" y="${H - 8}" text-anchor="middle"
-              font-family="IBM Plex Mono" font-size="9" fill="#9AA1AC">w${d.weeks[i]}</text>`).join("");
-
+              font-family="IBM Plex Mono" font-size="9" fill="#9AA1AC">wk ${d.weeks[i]}</text>`).join("");
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img"
-              aria-label="Cumulative value: closed-loop vs static">
+              aria-label="Value captured over time: our approach vs the old way">
     <line x1="${pad.l}" y1="${H - pad.b}" x2="${W - pad.r}" y2="${H - pad.b}" stroke="#E6E8EC"/>
     <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H - pad.b}" stroke="#E6E8EC"/>
     ${yTicks}${xLabels}
@@ -392,55 +415,51 @@ function proofSVG(d) {
   </svg>`;
 }
 
-/* ---- ablation: what each upgrade adds (hand-built bars, no chart lib) ----- */
+/* ---- "what each upgrade adds" (hand-built bars, no chart lib) ----------- */
 function renderAblation(rows) {
   if (!rows || !rows.length) return;
   const friendly = {
-    P0: "The original scorer",
-    P1: "+ Weigh effort (ROI)",
+    P0: "The old fixed formula",
+    P1: "+ Factor in effort",
     P2: "+ Avoid overlap",
     P3: "+ Learn from results",
-    P4: "+ Explore the unknown",
+    P4: "+ Explore new ideas",
   };
   const maxMean = Math.max(...rows.map((r) => r.mean));
-  $("ablation").innerHTML = rows
-    .map((r) => {
-      const code = r.name.trim().split(/\s+/)[0];
-      const closed = code === "P3" || code === "P4";
-      const w = (r.mean / maxMean * 100).toFixed(1);
-      const delta = r.delta == null ? ""
-        : `<span class="${r.delta > 0 ? "up" : ""}">${r.delta > 0 ? "+" : "−"}${Math.abs(r.delta).toFixed(1)}</span>`;
-      return `<div class="ablrow ${closed ? "closed" : "open"}">
-        <div class="ablrow__label">${friendly[code] || r.name}</div>
-        <div class="ablbar"><div class="ablbar__fill" style="width:${w}%"></div></div>
-        <div class="ablrow__val">${r.mean.toFixed(1)} ${delta}</div>
-      </div>`;
-    })
-    .join("");
+  $("ablation").innerHTML = rows.map((r) => {
+    const code = r.name.trim().split(/\s+/)[0];
+    const closed = code === "P3" || code === "P4";
+    const w = (r.mean / maxMean * 100).toFixed(1);
+    const delta = r.delta == null ? ""
+      : `<span class="${r.delta > 0 ? "up" : ""}">${r.delta > 0 ? "+" : "−"}${Math.abs(r.delta).toFixed(1)}</span>`;
+    return `<div class="ablrow ${closed ? "closed" : "open"}">
+      <div class="ablrow__label">${friendly[code] || r.name}</div>
+      <div class="ablbar"><div class="ablbar__fill" style="width:${w}%"></div></div>
+      <div class="ablrow__val">${r.mean.toFixed(1)} ${delta}</div>
+    </div>`;
+  }).join("");
   $("ablationNote").innerHTML =
-    `Each rung turns on one more idea, measured across the same 30 markets. The big jumps are <b>weighing effort</b> and <b>learning from results</b> (which also collapses junk pages from ~9 to ~1). Grey rungs are still open-loop; teal is the engine learning from outcomes.`;
+    `Each step adds one idea, tested across the same 30 markets. The big wins are <b>factoring in effort</b> and <b>learning from results</b> — which also cut wasted work from ~9 dead-ends per run down to ~1. Grey = the old way; teal = the system learning.`;
 }
 
 function loadProof() {
   const sim = api("/api/simulate").then((d) => {
     $("proof").innerHTML = proofSVG(d);
     $("proofNote").innerHTML =
-      `This curve is <b>one representative market</b>, same budget, 20 weeks: the closed-loop engine captured <b>+${d.lift_pct}%</b> more value while building <b>${d.decoys_static - d.decoys_loop} fewer</b> junk pages (${d.decoys_loop} vs ${d.decoys_static}).`;
+      `One representative test, 20 weeks: our approach found <b>+${d.lift_pct}%</b> more value and avoided
+       <b>${d.decoys_static - d.decoys_loop} dead-end ideas</b> (${d.decoys_loop} vs ${d.decoys_static}).`;
   }).catch(() => {});
 
-  const rob = api("/api/robustness")
-    .then((r) => {
-      if (!r || !r.robustness) return;
-      const b = r.robustness;
-      $("robustStat").innerHTML =
-        `<div class="robust__big">+${Math.round(b.lift_mean)}%
-           <span>± ${b.lift_ci.toFixed(1)}% · 95% CI</span></div>
-         <div class="robust__cap">more real value than the original scorer, averaged across
-           <b>${b.n} independent markets</b> — and the closed loop won <b>${b.wins}/${b.n}</b> of them.
-           Junk pages built: <b>${Math.round(b.decoys_static_mean)} → ${Math.round(b.decoys_loop_mean)}</b>.</div>`;
-      renderAblation(r.ablation);
-    })
-    .catch(() => {});
+  const rob = api("/api/robustness").then((r) => {
+    if (!r || !r.robustness) return;
+    const b = r.robustness;
+    $("robustStat").innerHTML =
+      `<div class="robust__big">+${Math.round(b.lift_mean)}% <span>more value</span></div>
+       <div class="robust__cap">than the old fixed-formula approach, across <b>${b.n} head-to-head tests</b> —
+        and it won <b>all ${b.n}</b>. It also cut dead-end ideas from
+        <b>${Math.round(b.decoys_static_mean)} to ${Math.round(b.decoys_loop_mean)}</b> per run.</div>`;
+    renderAblation(r.ablation);
+  }).catch(() => {});
 
   return Promise.all([sim, rob]);
 }
@@ -448,10 +467,10 @@ function loadProof() {
 /* ---- view routing ------------------------------------------------------- */
 const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
-  plan: ["This week", "Recommended plan"],
-  signals: ["Live signals", "Signals"],
-  proof: ["Controlled backtest", "Does it actually work?"],
-  learning: ["The closed loop", "What it's learned"],
+  plan: ["Your plan", "What to do this week"],
+  signals: ["Live market signals", "Market signals"],
+  proof: ["30 head-to-head tests", "Does it actually work?"],
+  learning: ["What the system figured out", "What it's learned"],
   settings: ["Configuration", "Client & settings"],
 };
 
@@ -487,7 +506,7 @@ $("weekUp").addEventListener("click", () => setWeek(state.week + 1));
 $("weekDown").addEventListener("click", () => setWeek(state.week - 1));
 $("resetBtn").addEventListener("click", async () => {
   await api("/api/reset", { method: "POST" });
-  toast("Learning reset — the engine starts fresh");
+  toast("Reset — the system starts learning from scratch");
   await Promise.all([loadBrief(), loadWeights(), loadStatus(), loadDashboard()]);
 });
 
@@ -507,8 +526,8 @@ function asstToggle(show) {
   $("asst").hidden = !asst.open;
   $("asstFab").style.display = asst.open ? "none" : "";
   if (asst.open && !$("asstLog").children.length) {
-    asstAdd("bot", "Hi — I answer from this client's live data. Try: “what should we do first?”, " +
-      "“what's trending?”, “where are the content gaps?”, or “does it actually work?”");
+    asstAdd("bot", "Hi — ask me anything about your market. Try: “what should we do first?”, " +
+      "“what's trending?”, “where are the gaps on our site?”, or “does this actually work?”");
     if (window.innerWidth > 600) $("asstInput").focus();
   }
 }

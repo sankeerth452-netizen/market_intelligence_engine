@@ -24,6 +24,21 @@ FEATURE_NAMES = [
 ]
 N_FEATURES = len(FEATURE_NAMES)
 
+# Plain-language labels for non-technical (marketer / client) audiences. Single
+# source of truth shared by the API summary and the assistant so wording never
+# drifts from the web app.
+FEATURE_LABELS = {
+    "bias": "baseline",
+    "trend_surprise": "rising search demand",
+    "trend_changepoint": "sudden demand spikes",
+    "reddit_growth": "Reddit buzz",
+    "reddit_neg_sentiment": "complaints / reputation",
+    "tiktok_velocity": "TikTok hype",
+    "news_relevance": "news coverage",
+    "semantic_gap": "gaps on your site",
+    "cross_source_agreement": "multiple sources agreeing",
+}
+
 # ----- The ORIGINAL design's hand-picked weights (used by the baseline policy) -----
 # Mapped from the spec's "Opportunity Scoring System":
 #   Search Demand 30%, Website Gap 25%, Reddit 15%, TikTok 15%, News 10%, Business 5%.

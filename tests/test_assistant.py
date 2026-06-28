@@ -22,7 +22,7 @@ def test_proof_question_cites_the_lift():
 
 def test_learning_question_cites_weights():
     a = assistant._rule_answer("what has it learned?", _CTX)
-    assert "semantic gap" in a.lower()
+    assert "gaps on your site" in a.lower()   # plain label for semantic_gap
 
 
 def test_gaps_question_names_the_gap_category():
@@ -32,7 +32,7 @@ def test_gaps_question_names_the_gap_category():
 
 def test_category_question_is_answered():
     a = assistant._rule_answer("how is TVs doing?", _CTX)
-    assert "TVs" in a and "0.72" in a
+    assert "TVs" in a and "priority" in a.lower()
 
 
 def test_empty_question_offers_help():

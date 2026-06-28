@@ -14,6 +14,18 @@ import json
 import os
 import urllib.request
 
+import config
+
+# plain-language names for signals, so the assistant speaks like a marketer
+_LABELS = config.FEATURE_LABELS
+def _label(name):
+    return _LABELS.get(name, name.replace("_", " "))
+def _prio(roi):
+    return "High" if roi >= 0.62 else "Medium" if roi >= 0.40 else "Low"
+def _level(label, v):
+    band = "strong" if v >= 0.66 else "moderate" if v >= 0.33 else "low"
+    return f"{band} {label}"
+
 
 # ----------------------------------------------------------------- LLM tier ----
 def _llm_answer(question, ctx):
@@ -22,10 +34,14 @@ def _llm_answer(question, ctx):
         return None
     model = os.environ.get("ASSISTANT_MODEL", "claude-haiku-4-5-20251001")
     system = (
-        "You are the assistant inside a Market Intelligence Engine dashboard. "
-        "Answer ONLY from the JSON CONTEXT (real, live data). Be concise (2-4 "
-        "sentences), concrete, and cite the actual numbers. If the answer isn't in "
-        "the context, say you don't have that data. Never invent figures."
+        "You are the 'Market Intelligence AI' assistant inside a marketing dashboard. "
+        "Your reader is a non-technical marketer or business owner: speak in plain, "
+        "friendly business language and never use ML or developer jargon. Answer ONLY "
+        "from the JSON CONTEXT (real, live data); if it isn't there, say you don't have "
+        "that data, and never invent figures. Be concise (2-4 sentences). Translate signal "
+        "names to plain words: semantic_gap = 'gaps on your site', trend_surprise = 'rising "
+        "search demand', news_relevance = 'news coverage', tiktok_velocity = 'TikTok hype', "
+        "reddit_growth = 'Reddit buzz'. Prefer 'High/Medium/Low priority' over raw scores."
     )
     body = json.dumps({
         "model": model, "max_tokens": 400, "system": system,
@@ -64,10 +80,11 @@ def _rule_answer(question, ctx):
         name = it["topic"].lower()
         if name in q or (it["category"] and it["category"].lower() in q):
             s = it["signals"]
-            return (f"{it['topic']}: ROI {it['roi']:.2f} (est value {it['value']:.2f}). "
-                    f"Content gap {s['semantic_gap']:.2f}, news {s['news_relevance']:.2f}, "
-                    f"demand-trend {s['trend_surprise']:.2f}. "
-                    f"Suggested action: {'create a new page' if s['semantic_gap'] >= 0.45 else 'optimise the existing page'}.")
+            return (f"{it['topic']}: {_prio(it['roi'])} priority. "
+                    f"{_level('search demand', s['trend_surprise'])}, "
+                    f"{_level('news coverage', s['news_relevance'])}, "
+                    f"{_level('gap on your site', s['semantic_gap'])}. "
+                    f"Suggested: {'create a new page' if s['semantic_gap'] >= 0.45 else 'strengthen the existing page'}.")
 
     if not q or any(w in q for w in ("help", "what can you", "how do you", "hello", "hi ")):
         return ("I answer from the live data. Try: \"what should we do first?\", "
@@ -78,31 +95,31 @@ def _rule_answer(question, ctx):
         top = items[:3]
         if not top:
             return "No opportunities are loaded yet."
-        lines = [f"{i+1}. {t['topic']} (ROI {t['roi']:.2f}, "
-                 f"{'create' if t['signals']['semantic_gap'] >= 0.45 else 'optimise'})"
+        lines = [f"{i+1}. {t['topic']} — {_prio(t['roi'])} priority "
+                 f"({'create a new page' if t['signals']['semantic_gap'] >= 0.45 else 'strengthen the page'})"
                  for i, t in enumerate(top)]
-        return "Top opportunities right now:\n" + "\n".join(lines)
+        return "Here's what to do first:\n" + "\n".join(lines)
 
     if any(w in q for w in ("learn", "weight", "trust", "distrust", "value most")):
         w = ctx.get("weights", [])
         if not w:
             return "No learned weights yet."
         top, bot = w[0], w[-1]
-        return (f"It has learned to value {top['name'].replace('_', ' ')} most "
-                f"({top['weight']:+.2f}) and to distrust {bot['name'].replace('_', ' ')} "
-                f"({bot['weight']:+.2f}) — learned from {ctx.get('model_updates', 0)} real results.")
+        return (f"It has learned that {_label(top['name'])} is what most reliably pays off, "
+                f"while {_label(bot['name'])} usually doesn't — figured out from "
+                f"{ctx.get('model_updates', 0)} real results.")
 
     if any(w in q for w in ("proof", "work", "better", "beat", "lift", "%", "vs", "improve")):
         if rob:
-            return (f"Across {rob.get('n')} controlled markets it captured "
-                    f"+{round(rob.get('lift_mean', 0))}% more value than a fixed-score "
-                    f"recommender, winning {rob.get('wins')}/{rob.get('n')}. That's a "
-                    f"backtest; live lift is measured via A/B over time.")
+            return (f"We tested it head-to-head {rob.get('n')} times against the old "
+                    f"fixed-formula approach — it found +{round(rob.get('lift_mean', 0))}% more "
+                    f"value and won {rob.get('wins')}/{rob.get('n')}. (That's a controlled test; "
+                    f"real-world lift is confirmed with live A/B testing.)")
         return "The proof data isn't loaded right now."
 
     if any(w in q for w in ("gap", "missing", "cover", "content", "create")):
         g = top_by("semantic_gap")
-        return "Biggest content gaps (least covered on-site): " + _fmt_list(t["topic"] for t in g) + "."
+        return "Biggest gaps on your site (what you're missing): " + _fmt_list(t["topic"] for t in g) + "."
 
     if any(w in q for w in ("trend", "rising", "demand", "hot", "momentum", "growing")):
         t = top_by("trend_surprise")

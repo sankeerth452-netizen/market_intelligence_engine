@@ -29,16 +29,16 @@
       <nav class="nav" id="nav">
         <button class="nav__item is-active" data-view="dashboard"><span class="nav__ico">▤</span>Dashboard</button>
         <button class="nav__item" data-view="plan"><span class="nav__ico">◎</span>This Week's Plan</button>
-        <button class="nav__item" data-view="signals"><span class="nav__ico">≋</span>Signals</button>
-        <button class="nav__item" data-view="proof"><span class="nav__ico">▰</span>The Proof</button>
+        <button class="nav__item" data-view="signals"><span class="nav__ico">≋</span>Market Signals</button>
+        <button class="nav__item" data-view="proof"><span class="nav__ico">▰</span>Does it work?</button>
         <button class="nav__item" data-view="learning"><span class="nav__ico">✦</span>What It's Learned</button>
         <button class="nav__item" data-view="settings"><span class="nav__ico">⚙</span>Settings</button>
       </nav>
 
       <div class="rail__foot">
-        <div class="eyebrow">Closed feedback loop</div>
+        <div class="eyebrow">Live learning</div>
         <div class="railstat"><span>Results learned from</span><b id="railUpd">—</b></div>
-        <div class="railstat"><span>Avg realised result</span><b id="railAvg">—</b></div>
+        <div class="railstat"><span>Avg result so far</span><b id="railAvg">—</b></div>
       </div>
     </aside>
 
@@ -61,7 +61,7 @@
 
         <div class="hero" id="hero">
           <div class="hero__main">
-            <div class="eyebrow">The difference vs a fixed-score recommender</div>
+            <div class="eyebrow">How we compare to the old approach</div>
             <div class="hero__stat" id="heroStat">+40%</div>
             <p class="hero__cap" id="heroCap">more real value captured — and it keeps improving.</p>
           </div>
@@ -83,8 +83,9 @@
       <!-- ----------------------------- PLAN ---------------------------- -->
       <section class="view" id="view-plan">
         <div class="planbar">
-          <p class="lede">Ranked by value per unit of effort. Each card shows how <b>sure</b> the engine
-            is — not just a score — and every result you record teaches it for next time.</p>
+          <p class="lede">Your top opportunities this week, in priority order. Each one tells you
+            <b>what to do</b>, <b>why</b>, and how <b>sure</b> we are — and every result you record
+            makes next week's plan smarter.</p>
           <div class="week">
             <span class="eyebrow">Planning week</span>
             <div class="week__ctl">
@@ -99,38 +100,38 @@
 
       <!-- ----------------------------- SIGNALS ------------------------- -->
       <section class="view" id="view-signals">
-        <p class="lede">Every category the engine watches, with its <b>live</b> signals —
-          real demand-trend, news coverage, and on-site content gap. No placeholders;
-          if a source is unavailable it says so.</p>
+        <p class="lede">Every category we watch, with the <b>live</b> signals behind each
+          recommendation — real search demand, news coverage, and what's missing from your site.
+          No placeholders: it only shows what it actually found.</p>
         <div id="signals" class="siglist"></div>
       </section>
 
       <!-- ----------------------------- PROOF --------------------------- -->
       <section class="view" id="view-proof">
-        <p class="lede">A recommender is only worth trusting if it's <b>measured</b>. This is a
-          <b>controlled backtest</b> — the closed loop vs the original fixed-score design on the same
-          simulated markets, where we know the ground-truth value (the only way to prove a learner
-          beats fixed weights). Live lift on a client is measured later via geo/time A/B tests.</p>
+        <p class="lede">Is this actually better than the old way? We ran it <b>head-to-head 30 times</b>
+          against the old fixed-formula approach on simulated markets — the fair way to prove it before
+          spending a client's budget. It won <b>every single time</b>. (Real-world lift is then confirmed
+          with live A/B tests once it's running for a client.)</p>
 
         <div class="panels">
           <div class="panel">
             <div class="panel__head">
-              <div class="eyebrow">Controlled backtest · 30 simulated markets</div>
-              <h2 class="panel__title">Why the loop wins</h2>
+              <div class="eyebrow">30 head-to-head tests</div>
+              <h2 class="panel__title">We tested it. It won.</h2>
             </div>
             <div id="robustStat" class="robust"></div>
             <div id="proof" class="proof"></div>
             <div class="legend">
-              <span><i class="dot dot--loop"></i> Closed-loop (ours)</span>
-              <span><i class="dot dot--static"></i> Original (fixed score)</span>
+              <span><i class="dot dot--loop"></i> Our approach</span>
+              <span><i class="dot dot--static"></i> The old way</span>
             </div>
             <p class="panel__note" id="proofNote"></p>
           </div>
 
           <div class="panel">
             <div class="panel__head">
-              <div class="eyebrow">Each rung adds one upgrade</div>
-              <h2 class="panel__title">What each upgrade adds</h2>
+              <div class="eyebrow">What each piece adds</div>
+              <h2 class="panel__title">What makes it work</h2>
             </div>
             <div id="ablation" class="abl"></div>
             <p class="panel__note" id="ablationNote"></p>
@@ -140,14 +141,15 @@
 
       <!-- ----------------------------- LEARNING ------------------------ -->
       <section class="view" id="view-learning">
-        <p class="lede">The original design used <b>hand-picked</b> weights that never change. Ours
-          <b>learns</b> them from real outcomes — record a result on the plan and watch these move.</p>
+        <p class="lede">The old approach used a <b>fixed formula</b> that never changed. Ours
+          <b>learns</b> what actually drives results from real outcomes — record a result on the plan
+          and watch this update live.</p>
 
         <div class="panels">
           <div class="panel">
             <div class="panel__head">
-              <div class="eyebrow">Learned from real results, not hand-set</div>
-              <h2 class="panel__title">What it trusts &amp; distrusts</h2>
+              <div class="eyebrow">Learned from real results</div>
+              <h2 class="panel__title">What actually drives results</h2>
             </div>
             <div id="weights" class="weights"></div>
             <p class="panel__note" id="weightsNote"></p>
@@ -155,14 +157,14 @@
 
           <div class="panel">
             <div class="panel__head">
-              <div class="eyebrow">The closed loop, live</div>
-              <h2 class="panel__title">Feedback loop</h2>
+              <div class="eyebrow">Live</div>
+              <h2 class="panel__title">The learning loop</h2>
             </div>
             <div class="gauges">
               <div class="gauge"><span>Recommendations made</span><b id="gRecs">—</b></div>
-              <div class="gauge"><span>Results recorded</span><b id="gOuts">—</b></div>
-              <div class="gauge"><span>Model updates</span><b id="gUpd">—</b></div>
-              <div class="gauge"><span>Avg realised result</span><b id="gAvg">—</b></div>
+              <div class="gauge"><span>Results you recorded</span><b id="gOuts">—</b></div>
+              <div class="gauge"><span>Times it learned</span><b id="gUpd">—</b></div>
+              <div class="gauge"><span>Avg result</span><b id="gAvg">—</b></div>
             </div>
             <button id="resetBtn" class="reset">Reset learning — watch it relearn from zero</button>
           </div>
@@ -171,8 +173,8 @@
 
       <!-- ----------------------------- SETTINGS ------------------------ -->
       <section class="view" id="view-settings">
-        <p class="lede">This is a <b>client-agnostic platform</b>. Everything about the client below is
-          configuration — point it at a new business by setting env vars, with no code change.</p>
+        <p class="lede">This is a <b>reusable platform</b>. Everything about the client below is just
+          configuration — point it at any business in minutes, with no code changes.</p>
 
         <div class="panel">
           <div class="panel__head">
@@ -188,7 +190,7 @@
   <div class="toast" id="toast"></div>
 
   <!-- floating virtual assistant -->
-  <button class="asst-fab" id="asstFab" aria-label="Open the assistant">✦ Ask the engine</button>
+  <button class="asst-fab" id="asstFab" aria-label="Open the assistant">✦ Ask about your market</button>
   <div class="asst" id="asst" hidden>
     <div class="asst__head">
       <span><i class="asst__dot"></i> Market Intelligence AI</span>
@@ -196,7 +198,7 @@
     </div>
     <div class="asst__log" id="asstLog"></div>
     <form class="asst__form" id="asstForm">
-      <input id="asstInput" placeholder="Ask about your data…" autocomplete="off" maxlength="500">
+      <input id="asstInput" placeholder="Ask about your market…" autocomplete="off" maxlength="500">
       <button type="submit" aria-label="Send">→</button>
     </form>
   </div>

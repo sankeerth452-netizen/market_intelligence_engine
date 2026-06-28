@@ -166,6 +166,7 @@ class EngineService:
             "uncertainty": round(float(p["pred"]["uncertainty"]), 3),
             "exploring": bool(p["exploring"]),
             "evidence": chips,
+            "headlines": p.get("headlines", [])[:2],
             "signals": {k: round(float(v), 3) for k, v in sig.items()},
         }
 
@@ -283,8 +284,10 @@ class EngineService:
                     "action": "Create new page" if i["signals"]["semantic_gap"] >= 0.45
                     else "Optimise existing page",
                     "roi": i["roi"]} for i in items[:3]]
-        top_w = weights[0]["name"].replace("_", " ") if weights else "—"
-        learned = (f"After {n} recorded results, the engine most values {top_w}."
+        top_w = (config.FEATURE_LABELS.get(weights[0]["name"], weights[0]["name"])
+                 if weights else "—")
+        learned = (f"After learning from {n} results, the system has found that {top_w} "
+                   f"is what most reliably pays off."
                    if n else "No results recorded yet — record outcomes on the plan to start learning.")
         return {"client": client.name, "industry": client.industry, "data_mode": DATA_MODE,
                 "rising": by("trend_surprise", True), "gaps": by("semantic_gap", True),
