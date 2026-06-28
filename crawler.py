@@ -161,6 +161,74 @@ def crawl(url: str, max_pages: int = 8, delay: float = 0.3):
     return pages
 
 
+_ASSET_RE = re.compile(r"\.(jpg|jpeg|png|gif|svg|webp|avif|pdf|xml|css|js|ico|mp4|woff2?)(\?|$)", re.I)
+
+
+def _slug_text(url: str) -> str:
+    """Turn a URL's last path segment into space-separated words (the 'content'
+    a sitemap reveals about a page — e.g. /products/sony-4k-oled-tv -> 'sony 4k oled tv')."""
+    seg = urllib.parse.urlparse(url).path.rstrip("/").split("/")[-1]
+    seg = re.sub(r"\.(html?|aspx?|php)$", "", seg)
+    words = [w for w in re.split(r"[-_/+.]+", seg) if w and not w.isdigit() and len(w) > 1]
+    return " ".join(words)
+
+
+def sitemap_corpus(url: str, max_urls: int = 2500, max_sitemaps: int = 6):
+    """Build a content-coverage corpus from a site's SITEMAP (no page scraping).
+
+    Sitemaps are published precisely so crawlers can discover what a site covers,
+    so this is robots-friendly and works even on JS-rendered / scraper-blocked
+    retailers (JB Hi-Fi, etc.) where fetching page bodies fails. We read only the
+    public URL slugs and turn them into text — a real map of what the site sells.
+    Returns a de-duplicated list of slug 'documents', or [] if no sitemap.
+    """
+    start = url if "://" in url else "https://" + url
+    parts = urllib.parse.urlparse(start)
+    host = parts.netloc
+    raw = _fetch(f"{parts.scheme}://{host}/sitemap.xml")
+    if not raw:
+        return []
+    try:
+        root = ET.fromstring(raw)
+    except Exception:
+        return []
+    locs = [e.text.strip() for e in root.iter() if e.tag.endswith("}loc") and e.text]
+
+    page_urls = []
+    if root.tag.endswith("sitemapindex"):          # index -> sample child sitemaps
+        # Sample children EVENLY across the index so the corpus spans the whole
+        # catalog (old + new), not just the first chunk.
+        step = max(1, len(locs) // max_sitemaps)
+        chosen = locs[::step][:max_sitemaps]
+        per_map = max(100, (max_urls * 3) // max(1, len(chosen)))
+        for sm in chosen:
+            sraw = _fetch(sm)
+            if not sraw:
+                continue
+            try:
+                sroot = ET.fromstring(sraw)
+                page_urls += [e.text.strip() for e in sroot.iter()
+                              if e.tag.endswith("}loc") and e.text][:per_map]
+            except Exception:
+                pass
+    else:
+        page_urls = locs
+
+    docs, seen = [], set()
+    for u in page_urls:
+        pu = urllib.parse.urlparse(u)
+        if (pu.netloc and pu.netloc != host) or _ASSET_RE.search(pu.path):
+            continue                                # skip CDNs/images/assets
+        t = _slug_text(u)
+        if len(t) < 3 or t in seen:
+            continue
+        seen.add(t)
+        docs.append(t)
+        if len(docs) >= max_urls:
+            break
+    return docs
+
+
 if __name__ == "__main__":   # smoke test: a permissive public page (robots allows)
     got = crawl("https://example.com", max_pages=2, delay=0)
     print(f"crawled {len(got)} page(s) from example.com")

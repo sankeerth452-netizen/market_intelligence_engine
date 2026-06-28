@@ -21,13 +21,19 @@ import numpy as np
 
 
 class SemanticIndex:
-    def __init__(self, page_texts, fit_corpus=None):
+    def __init__(self, page_texts, fit_corpus=None, char_ngrams=False):
+        """char_ngrams=True uses character n-grams instead of words — robust to
+        morphology (laptop/laptops, tv/tvs) when matching real catalog slugs. The
+        default (word TF-IDF) is unchanged, so the synthetic proof is unaffected."""
         self.pages = list(page_texts)
         corpus = list(fit_corpus) if fit_corpus else list(self.pages)
         if not corpus:
             corpus = ["placeholder"]
         # Fit vocabulary over the union of site + demand text so both are comparable.
-        self.vec = TfidfVectorizer(stop_words="english").fit(corpus)
+        if char_ngrams:
+            self.vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5)).fit(corpus)
+        else:
+            self.vec = TfidfVectorizer(stop_words="english").fit(corpus)
         self.page_mat = self.vec.transform(self.pages) if self.pages else None
 
     def gap(self, demand_text: str) -> float:

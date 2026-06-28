@@ -33,13 +33,18 @@ def site_index(client, extra_corpus=None):
     uses the built-in demo site. Returns (index, human-readable source label)."""
     pages, label = None, None
     if client.site_url:
-        crawled = crawler.crawl(client.site_url)
-        if crawled:
-            pages, label = crawled, f"live crawl of {client.site_url} ({len(crawled)} pages)"
+        slugs = crawler.sitemap_corpus(client.site_url)      # broad, robots-friendly
+        if slugs:
+            pages, label = slugs, f"{client.site_url} — {len(slugs)} pages from sitemap"
+        else:
+            crawled = crawler.crawl(client.site_url)          # fall back to page text
+            if crawled:
+                pages, label = crawled, f"{client.site_url} — {len(crawled)} pages crawled"
     if pages is None:
         pages, label = demo_client.DEMO_SITE_PAGES, "demo site (built-in; set SITE_URL for a real client)"
     corpus = list(pages) + list(extra_corpus or [])
-    return SemanticIndex(pages, fit_corpus=corpus), label
+    # char n-grams: robust to plural/morphology when matching real catalog slugs
+    return SemanticIndex(pages, fit_corpus=corpus, char_ngrams=True), label
 
 
 def real_candidates(client=None):

@@ -17,6 +17,14 @@ def test_gap_smaller_for_a_covered_topic():
     assert idx.gap(covered) < idx.gap(uncovered)
 
 
+def test_char_ngrams_match_morphology():
+    """char n-grams match singular/plural (laptop vs laptops) that word TF-IDF misses."""
+    pages = ["ultrabook laptops fourteen inch", "wireless noise cancelling headphones"]
+    word = SemanticIndex(pages, fit_corpus=pages, char_ngrams=False)
+    char = SemanticIndex(pages, fit_corpus=pages, char_ngrams=True)
+    assert char.gap("laptop") < word.gap("laptop")     # char bridges the plural
+
+
 def test_similarity_is_one_for_identical_text_and_symmetric():
     idx = SemanticIndex(["alpha beta gamma delta"],
                         fit_corpus=["alpha beta gamma delta",

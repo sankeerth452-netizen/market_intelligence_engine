@@ -32,3 +32,9 @@ def test_parse_never_raises_on_garbage():
 
 def test_crawl_fails_soft_with_no_host():
     assert crawler.crawl("") == []          # no host -> empty, no network attempted
+
+
+def test_slug_text_turns_a_product_url_into_words():
+    t = crawler._slug_text("https://shop.example/products/sony-wh-1000xm5-noise-cancelling-headphones")
+    assert "noise" in t and "cancelling" in t and "headphones" in t
+    assert crawler._slug_text("https://x.example/p/12345") == ""   # numeric-only dropped
