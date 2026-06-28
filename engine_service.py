@@ -50,6 +50,16 @@ class EngineService:
         self.bandit = self._load_bandit()   # ships pre-trained on first boot
         self._sim_cache = None
         self._real_cache = None             # (timestamp, candidates, index)
+        if DATA_MODE == "real":             # warm the live-data cache off the request path
+            threading.Thread(target=self._warm_real_cache, daemon=True).start()
+
+    def _warm_real_cache(self):
+        """Pre-fetch live signals after boot so the first request isn't slow.
+        Runs in the background; the health check stays instant either way."""
+        try:
+            self._real_candidates()
+        except Exception:
+            pass
 
     # ---------------------------------------------------------- persistence ----
     def _load_bandit(self) -> LinUCB:

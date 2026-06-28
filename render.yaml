@@ -14,17 +14,19 @@ services:
         fromDatabase:
           name: mie-db
           property: connectionString
+      # ---- Live demo: JB Hi-Fi, all real (no synthetic in the product) ----
       - key: DATA_MODE
-        value: synthetic        # set to "real" for live Google News + site-crawl signals
-      # ---- Client configuration (all optional; unset = built-in demo client) ----
-      - key: SITE_URL
-        sync: false             # the client's website to crawl for content gaps
+        value: real             # live Google News + demand-trend + sitemap content-gap
       - key: CLIENT_NAME
-        sync: false             # client display name
+        value: JB Hi-Fi
       - key: CLIENT_INDUSTRY
-        sync: false             # e.g. home_builder, saas, automotive
+        value: electronics retail
       - key: CLIENT_CATEGORIES
-        sync: false             # comma-separated category framework
+        value: TVs,Laptops,Headphones,Phones,Cameras,Speakers,Tablets,Smartwatches,Gaming,Soundbars
+      - key: SITE_URL
+        value: https://www.jbhifi.com.au
+      - key: ANTHROPIC_API_KEY
+        sync: false             # optional: set to enable the free-form assistant
 
 databases:
   - name: mie-db
