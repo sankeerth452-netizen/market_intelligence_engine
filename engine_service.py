@@ -67,10 +67,11 @@ class EngineService:
         if data:
             try:
                 loaded = LinUCB.from_dict(data)
-                # Guard: a model saved under a different feature schema would
-                # mis-align with today's context vectors and crash at predict
-                # time. If the dimensions don't match, retrain instead.
-                if loaded.d == config.N_FEATURES:
+                # Guard: ignore a stale model from a different feature schema
+                # (would mis-align with today's context vectors), OR an UNTRAINED
+                # one (0 updates — e.g. left behind by a reset). Either way,
+                # re-pretrain so the app always boots with informed weights.
+                if loaded.d == config.N_FEATURES and loaded.n_updates > 0:
                     return loaded
             except Exception:
                 pass
