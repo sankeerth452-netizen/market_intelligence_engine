@@ -19,76 +19,156 @@
 </head>
 <body>
   <div class="app">
-    <!-- left rail: the instrument's controls + gauges -->
+    <!-- ============================ left rail ============================ -->
     <aside class="rail">
-      <div>
+      <div class="brand-block">
         <div class="brand"><span class="brand__mark">◐</span><span class="brand__name">MIE</span></div>
-        <div class="brand__sub">Market Intelligence Engine</div>
+        <div class="brand__sub" id="railClient">Market Intelligence Engine</div>
       </div>
 
-      <div class="week">
-        <div class="eyebrow">Planning week</div>
-        <div class="week__ctl">
-          <button id="weekDown" class="step" aria-label="Previous week">◀</button>
-          <span id="weekVal" class="week__val">08</span>
-          <button id="weekUp" class="step" aria-label="Next week">▶</button>
-        </div>
-        <p class="week__hint">Step forward to watch slow-burn topics surface before they're obvious.</p>
-      </div>
+      <nav class="nav" id="nav">
+        <button class="nav__item is-active" data-view="dashboard"><span class="nav__ico">▤</span>Dashboard</button>
+        <button class="nav__item" data-view="plan"><span class="nav__ico">◎</span>This Week's Plan</button>
+        <button class="nav__item" data-view="proof"><span class="nav__ico">▰</span>The Proof</button>
+        <button class="nav__item" data-view="learning"><span class="nav__ico">✦</span>What It's Learned</button>
+        <button class="nav__item" data-view="settings"><span class="nav__ico">⚙</span>Settings</button>
+      </nav>
 
-      <div class="gauges">
-        <div class="eyebrow" style="margin-bottom:6px">Feedback loop</div>
-        <div class="gauge"><span>Recommendations</span><b id="gRecs">—</b></div>
-        <div class="gauge"><span>Results recorded</span><b id="gOuts">—</b></div>
-        <div class="gauge"><span>Model updates</span><b id="gUpd">—</b></div>
-        <div class="gauge"><span>Avg result</span><b id="gAvg">—</b></div>
-        <button id="resetBtn" class="reset">Reset learning</button>
+      <div class="rail__foot">
+        <div class="eyebrow">Closed feedback loop</div>
+        <div class="railstat"><span>Results learned from</span><b id="railUpd">—</b></div>
+        <div class="railstat"><span>Avg realised result</span><b id="railAvg">—</b></div>
       </div>
     </aside>
 
-    <!-- main column -->
+    <!-- ============================ main column ========================== -->
     <main class="main">
-      <header class="head">
-        <div class="eyebrow" id="briefEyebrow">Morning brief · Week 08</div>
-        <h1 class="headline">This morning's plan</h1>
-        <p class="lede">Ranked by value per unit of effort. Each card shows how sure the engine
-          is, not just a score — and every result you record teaches it for tomorrow.</p>
+      <header class="topbar">
+        <div>
+          <div class="eyebrow" id="viewEyebrow">Overview</div>
+          <h1 class="topbar__title" id="viewTitle">Dashboard</h1>
+        </div>
+        <div class="topbar__right">
+          <span class="clientchip" id="clientChip" title="Active client (configurable — no code change)">…</span>
+        </div>
       </header>
 
-      <section class="cards" id="cards" aria-live="polite"></section>
+      <!-- ----------------------------- DASHBOARD ----------------------- -->
+      <section class="view view--active" id="view-dashboard">
+        <div class="kpis" id="kpis"></div>
 
-      <section class="panels">
-        <div class="panel">
-          <div class="panel__head">
-            <div class="eyebrow">Learned from real results, not hand-set</div>
-            <h2 class="panel__title">What it trusts &amp; distrusts</h2>
+        <div class="hero" id="hero">
+          <div class="hero__main">
+            <div class="eyebrow">The difference vs a fixed-score recommender</div>
+            <div class="hero__stat" id="heroStat">+40%</div>
+            <p class="hero__cap" id="heroCap">more real value captured — and it keeps improving.</p>
           </div>
-          <div id="weights" class="weights"></div>
-          <p class="panel__note" id="weightsNote"></p>
+          <div class="hero__side" id="heroSide"></div>
         </div>
 
         <div class="panel">
-          <div class="panel__head">
-            <div class="eyebrow">Closed loop vs the original static scorer</div>
-            <h2 class="panel__title">Why the loop wins</h2>
+          <div class="panel__head row-between">
+            <div>
+              <div class="eyebrow">Top opportunities right now</div>
+              <h2 class="panel__title">This week's plan</h2>
+            </div>
+            <button class="linkbtn" data-goto="plan">Open full plan →</button>
           </div>
-          <div id="robustStat" class="robust"></div>
-          <div id="proof" class="proof"></div>
-          <div class="legend">
-            <span><i class="dot dot--loop"></i> Closed-loop</span>
-            <span><i class="dot dot--static"></i> Original (static)</span>
-          </div>
-          <p class="panel__note" id="proofNote"></p>
+          <div id="dashPlan" class="dashplan"></div>
         </div>
       </section>
 
-      <section class="panel ablation-panel" id="ablationPanel">
-        <div class="panel__head">
-          <div class="eyebrow">Every upgrade, measured across 30 markets</div>
-          <h2 class="panel__title">What each upgrade adds</h2>
+      <!-- ----------------------------- PLAN ---------------------------- -->
+      <section class="view" id="view-plan">
+        <div class="planbar">
+          <p class="lede">Ranked by value per unit of effort. Each card shows how <b>sure</b> the engine
+            is — not just a score — and every result you record teaches it for next time.</p>
+          <div class="week">
+            <span class="eyebrow">Planning week</span>
+            <div class="week__ctl">
+              <button id="weekDown" class="step" aria-label="Previous week">◀</button>
+              <span id="weekVal" class="week__val">08</span>
+              <button id="weekUp" class="step" aria-label="Next week">▶</button>
+            </div>
+          </div>
         </div>
-        <div id="ablation" class="abl"></div>
-        <p class="panel__note" id="ablationNote"></p>
+        <section class="cards" id="cards" aria-live="polite"></section>
+      </section>
+
+      <!-- ----------------------------- PROOF --------------------------- -->
+      <section class="view" id="view-proof">
+        <p class="lede">A recommender is only worth trusting if it's <b>measured</b>. Here it is, head-to-head
+          against the original fixed-score design — on the same markets, same budget.</p>
+
+        <div class="panels">
+          <div class="panel">
+            <div class="panel__head">
+              <div class="eyebrow">Across 30 independent simulated markets</div>
+              <h2 class="panel__title">Why the loop wins</h2>
+            </div>
+            <div id="robustStat" class="robust"></div>
+            <div id="proof" class="proof"></div>
+            <div class="legend">
+              <span><i class="dot dot--loop"></i> Closed-loop (ours)</span>
+              <span><i class="dot dot--static"></i> Original (fixed score)</span>
+            </div>
+            <p class="panel__note" id="proofNote"></p>
+          </div>
+
+          <div class="panel">
+            <div class="panel__head">
+              <div class="eyebrow">Each rung adds one upgrade</div>
+              <h2 class="panel__title">What each upgrade adds</h2>
+            </div>
+            <div id="ablation" class="abl"></div>
+            <p class="panel__note" id="ablationNote"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ----------------------------- LEARNING ------------------------ -->
+      <section class="view" id="view-learning">
+        <p class="lede">The original design used <b>hand-picked</b> weights that never change. Ours
+          <b>learns</b> them from real outcomes — record a result on the plan and watch these move.</p>
+
+        <div class="panels">
+          <div class="panel">
+            <div class="panel__head">
+              <div class="eyebrow">Learned from real results, not hand-set</div>
+              <h2 class="panel__title">What it trusts &amp; distrusts</h2>
+            </div>
+            <div id="weights" class="weights"></div>
+            <p class="panel__note" id="weightsNote"></p>
+          </div>
+
+          <div class="panel">
+            <div class="panel__head">
+              <div class="eyebrow">The closed loop, live</div>
+              <h2 class="panel__title">Feedback loop</h2>
+            </div>
+            <div class="gauges">
+              <div class="gauge"><span>Recommendations made</span><b id="gRecs">—</b></div>
+              <div class="gauge"><span>Results recorded</span><b id="gOuts">—</b></div>
+              <div class="gauge"><span>Model updates</span><b id="gUpd">—</b></div>
+              <div class="gauge"><span>Avg realised result</span><b id="gAvg">—</b></div>
+            </div>
+            <button id="resetBtn" class="reset">Reset learning — watch it relearn from zero</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ----------------------------- SETTINGS ------------------------ -->
+      <section class="view" id="view-settings">
+        <p class="lede">This is a <b>client-agnostic platform</b>. Everything about the client below is
+          configuration — point it at a new business by setting env vars, with no code change.</p>
+
+        <div class="panel">
+          <div class="panel__head">
+            <div class="eyebrow">Active client configuration</div>
+            <h2 class="panel__title">Client</h2>
+          </div>
+          <div class="cfg" id="cfg"></div>
+        </div>
       </section>
     </main>
   </div>

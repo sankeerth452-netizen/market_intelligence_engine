@@ -1,12 +1,13 @@
 /* Market Intelligence Engine — dashboard logic (vanilla JS, no build step) */
 
-const state = { week: 8 };
+const state = { week: 8, view: "dashboard" };
 
 const $ = (id) => document.getElementById(id);
 const pad2 = (n) => String(n).padStart(2, "0");
-const signed = (x) => (x >= 0 ? "+" : "\u2212") + Math.abs(x).toFixed(3);
+const signed = (x) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(3);
+const titleCase = (s) => (s || "").replace(/_/g, " ");
 
-// Live reward scale \u2014 must match config.REWARD_MIN / REWARD_MAX. A recorded
+// Live reward scale — must match config.REWARD_MIN / REWARD_MAX. A recorded
 // result of 0% is a genuine loss (the build was wasted); 100% is a top performer.
 const REWARD = { lo: -0.15, hi: 1.0 };
 const pctToReward = (pct) => REWARD.lo + (REWARD.hi - REWARD.lo) * (pct / 100);
@@ -93,7 +94,7 @@ function cardEl(c) {
         <span class="conv__roi">${c.roi.toFixed(2)}</span>
       </div>
       ${convictionSVG(c.value, c.uncertainty)}
-      <div class="conv__readout">est <b>${c.value.toFixed(2)}</b> \u00b1 ${c.uncertainty.toFixed(2)}</div>
+      <div class="conv__readout">est <b>${c.value.toFixed(2)}</b> ± ${c.uncertainty.toFixed(2)}</div>
     </div>
     <div class="result">
       <span class="result__label">Record result</span>
@@ -121,11 +122,11 @@ async function recordOutcome(recId, reward, el, btn, range) {
     });
     if (!r.ok) { toast(r.error || "Could not record that result."); btn.disabled = false; return; }
     el.classList.add("is-logged");
-    btn.textContent = "Recorded \u2713";
+    btn.textContent = "Recorded ✓";
     if (range) range.disabled = true;          // lock the pick once its result is in
-    toast(`Result fed back \u2014 the engine has now learned from <b>${r.model_updates}</b> outcomes`);
-    // Watch it learn: weights, gauges AND the live conviction meters all move.
-    await Promise.all([loadWeights(), loadStatus(), refreshBriefInPlace()]);
+    toast(`Result fed back — the engine has now learned from <b>${r.model_updates}</b> outcomes`);
+    // Watch it learn: weights, gauges, conviction meters AND the dashboard KPIs.
+    await Promise.all([loadWeights(), loadStatus(), refreshBriefInPlace(), loadDashboard()]);
   } catch (e) {
     toast("Something went wrong recording that result.");
     btn.disabled = false;
@@ -159,22 +160,74 @@ async function refreshBriefInPlace() {
   } catch (e) { /* keep the current cards if the refresh fails */ }
 }
 
-async function loadBrief() {
+/* ---- This Week's Plan (full cards) -------------------------------------- */
+function loadBrief() {
   const host = $("cards");
   host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
   $("weekVal").textContent = pad2(state.week);
-  $("briefEyebrow").textContent = `Morning brief \u00b7 Week ${pad2(state.week)}`;
-  try {
-    const data = await api(`/api/brief?week=${state.week}&k=3`);
+  return api(`/api/brief?week=${state.week}&k=3`).then((data) => {
     host.innerHTML = "";
     if (!data.length) {
       host.innerHTML = '<p class="lede">No opportunities cleared the bar this week. Step forward a week.</p>';
       return;
     }
     data.forEach((c) => host.appendChild(cardEl(c)));
-  } catch (e) {
-    host.innerHTML = '<p class="lede">Could not load the brief. Is the server running on port 8000?</p>';
+  }).catch(() => {
+    host.innerHTML = '<p class="lede">Could not load the brief. Is the server running?</p>';
+  });
+}
+
+/* ---- Dashboard overview (KPIs + hero + plan preview) -------------------- */
+async function loadDashboard() {
+  const [status, rob, brief] = await Promise.all([
+    api("/api/status").catch(() => ({})),
+    api("/api/robustness").catch(() => null),
+    api(`/api/brief?week=${state.week}&k=3`).catch(() => []),
+  ]);
+  const b = rob && rob.robustness;
+  const top = brief[0];
+
+  const kpis = [
+    { label: "Top opportunity this week", big: top ? top.topic : "—",
+      sub: top ? `value/effort ${top.roi.toFixed(2)} · ${top.action}` : "", accent: "teal" },
+    { label: "Proven lift vs fixed scoring", big: b ? `+${Math.round(b.lift_mean)}%` : "—",
+      sub: b ? `across ${b.n} simulated markets` : "", accent: "teal" },
+    { label: "Head-to-head markets won", big: b ? `${b.wins}/${b.n}` : "—",
+      sub: "vs the original fixed-score design", accent: "ink" },
+    { label: "Results learned from", big: status.model_updates != null ? String(status.model_updates) : "—",
+      sub: "and improving with every one", accent: "amber" },
+  ];
+  $("kpis").innerHTML = kpis.map((k) => `
+    <div class="kpi kpi--${k.accent}">
+      <div class="kpi__label">${k.label}</div>
+      <div class="kpi__big">${k.big}</div>
+      <div class="kpi__sub">${k.sub}</div>
+    </div>`).join("");
+
+  if (b) {
+    $("heroStat").textContent = `+${Math.round(b.lift_mean)}%`;
+    $("heroCap").innerHTML =
+      `more real value than the original fixed-score recommender — averaged across
+       <b>${b.n} independent markets</b>, winning <b>${b.wins}/${b.n}</b>. Junk pages built:
+       <b>${Math.round(b.decoys_static_mean)} → ${Math.round(b.decoys_loop_mean)}</b>.`;
+    $("heroSide").innerHTML =
+      `<div class="herometric"><b>${b.wins}/${b.n}</b><span>markets won</span></div>
+       <div class="herometric"><b>±${b.lift_ci.toFixed(1)}%</b><span>95% CI</span></div>`;
   }
+
+  $("dashPlan").innerHTML = brief.length ? brief.map((c) => `
+    <button class="dpitem" data-goto="plan">
+      <div class="dpitem__rank">${pad2(c.rank)}</div>
+      <div class="dpitem__main">
+        <div class="dpitem__topic">${c.topic}</div>
+        <div class="dpitem__meta">
+          <span class="tag tag--action">${c.action}</span>
+          <span class="tag tag--effort-${c.effort}">${c.effort} effort</span>
+        </div>
+      </div>
+      <div class="dpitem__roi">${c.roi.toFixed(2)}<span>value / effort</span></div>
+    </button>`).join("") : `<p class="lede">No opportunities cleared the bar this week.</p>`;
+  wireGoto();
 }
 
 /* ---- learned-weights diverging bars ------------------------------------- */
@@ -189,7 +242,6 @@ function loadWeights() {
                       items.every((d) => rows[d.name]);
 
     if (canUpdate) {
-      // Update existing bars in place so they GLIDE to their new lengths.
       items.forEach((d) => {
         const r = rows[d.name];
         const neg = d.weight < 0;
@@ -202,7 +254,7 @@ function loadWeights() {
     } else {
       host.innerHTML = items
         .map((d) => {
-          const w = Math.abs(d.weight) / maxAbs * 48; // % of half-track
+          const w = Math.abs(d.weight) / maxAbs * 48;
           const neg = d.weight < 0;
           const distrust = neg && d.name === "tiktok_velocity";
           return `<div class="wrow${distrust ? " is-distrust" : ""}" data-name="${d.name}">
@@ -218,21 +270,38 @@ function loadWeights() {
     const tiktok = items.find((d) => d.name === "tiktok_velocity");
     if (data.model_updates >= 6 && tiktok && tiktok.weight < 0) {
       $("weightsNote").innerHTML =
-        `After <b>${data.model_updates}</b> results, the engine drove <b>tiktok_velocity negative</b> \u2014 it taught itself that loud single-channel hype predicts wasted effort, even though the original design trusted it at +0.15.`;
+        `After <b>${data.model_updates}</b> results, the engine drove <b>tiktok_velocity negative</b> — it taught itself that loud single-channel hype predicts wasted effort, even though the original design trusted it at +0.15.`;
     } else {
       $("weightsNote").innerHTML =
-        `Weights start near zero and move as results arrive. Record a few outcomes and watch them separate \u2014 this is the engine learning what actually pays.`;
+        `Weights start near zero and move as results arrive. Record a few outcomes and watch them separate — this is the engine learning what actually pays.`;
     }
   });
 }
 
-/* ---- feedback-loop gauges ----------------------------------------------- */
+/* ---- status: gauges + rail + client chip + settings -------------------- */
 function loadStatus() {
   return api("/api/status").then((s) => {
     $("gRecs").textContent = s.recommendations;
     $("gOuts").textContent = s.outcomes;
     $("gUpd").textContent = s.model_updates;
-    $("gAvg").textContent = s.avg_reward == null ? "\u2014" : s.avg_reward.toFixed(2);
+    $("gAvg").textContent = s.avg_reward == null ? "—" : s.avg_reward.toFixed(2);
+    $("railUpd").textContent = s.model_updates == null ? "—" : s.model_updates;
+    $("railAvg").textContent = s.avg_reward == null ? "—" : s.avg_reward.toFixed(2);
+
+    const c = s.client || {};
+    if (c.name) {
+      $("clientChip").textContent = c.name + (c.industry ? " · " + titleCase(c.industry) : "");
+      $("railClient").textContent = c.name;
+    }
+    $("cfg").innerHTML = c.name ? `
+      <div class="cfgrow"><span>Client</span><b>${c.name}</b></div>
+      <div class="cfgrow"><span>Industry</span><b>${titleCase(c.industry)}</b></div>
+      <div class="cfgrow"><span>Category framework</span><b>${c.categories} categories</b></div>
+      <div class="cfgrow"><span>Website (content-gap source)</span><b>${c.site_source}</b></div>
+      <div class="cfgrow"><span>Data mode</span><b>${s.data_mode}</b></div>
+      <div class="cfgrow"><span>Source</span><b>${c.is_demo ? "built-in demo client" : "configured via env"}</b></div>
+      <p class="cfg__note">Onboard a new client by setting <code>CLIENT_NAME</code>, <code>CLIENT_INDUSTRY</code>,
+        <code>CLIENT_CATEGORIES</code> and <code>SITE_URL</code> — no code change.</p>` : "";
   });
 }
 
@@ -245,7 +314,6 @@ function proofSVG(d) {
   const Y = (v) => H - pad.b - (v / maxY) * (H - pad.t - pad.b);
   const path = (arr) => arr.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
 
-  // area between the two curves (where loop leads)
   const fwd = d.loop.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
   const back = d.static.map((v, i) => `L${X(n - 1 - i).toFixed(1)},${Y(d.static[n - 1 - i]).toFixed(1)}`).join(" ");
   const area = `${fwd} ${back} Z`;
@@ -281,8 +349,8 @@ function renderAblation(rows) {
   const maxMean = Math.max(...rows.map((r) => r.mean));
   $("ablation").innerHTML = rows
     .map((r) => {
-      const code = r.name.trim().split(/\s+/)[0];        // "P0".."P4"
-      const closed = code === "P3" || code === "P4";     // learning is on
+      const code = r.name.trim().split(/\s+/)[0];
+      const closed = code === "P3" || code === "P4";
       const w = (r.mean / maxMean * 100).toFixed(1);
       const delta = r.delta == null ? ""
         : `<span class="${r.delta > 0 ? "up" : ""}">${r.delta > 0 ? "+" : "−"}${Math.abs(r.delta).toFixed(1)}</span>`;
@@ -302,9 +370,8 @@ function loadProof() {
     $("proof").innerHTML = proofSVG(d);
     $("proofNote").innerHTML =
       `This curve is <b>one representative market</b>, same budget, 20 weeks: the closed-loop engine captured <b>+${d.lift_pct}%</b> more value while building <b>${d.decoys_static - d.decoys_loop} fewer</b> junk pages (${d.decoys_loop} vs ${d.decoys_static}).`;
-  });
+  }).catch(() => {});
 
-  // The credible headline: the same comparison repeated across many markets.
   const rob = api("/api/robustness")
     .then((r) => {
       if (!r || !r.robustness) return;
@@ -322,17 +389,48 @@ function loadProof() {
   return Promise.all([sim, rob]);
 }
 
+/* ---- view routing ------------------------------------------------------- */
+const VIEW_META = {
+  dashboard: ["Overview", "Dashboard"],
+  plan: ["This week", "Recommended plan"],
+  proof: ["The evidence", "Why it works"],
+  learning: ["The closed loop", "What it's learned"],
+  settings: ["Configuration", "Client & settings"],
+};
+
+function showView(name) {
+  if (!VIEW_META[name]) name = "dashboard";
+  state.view = name;
+  document.querySelectorAll(".view").forEach((v) => v.classList.toggle("view--active", v.id === "view-" + name));
+  document.querySelectorAll(".nav__item").forEach((n) => n.classList.toggle("is-active", n.dataset.view === name));
+  const [eb, t] = VIEW_META[name];
+  $("viewEyebrow").textContent = eb;
+  $("viewTitle").textContent = t;
+  if (name === "dashboard") loadDashboard();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function wireGoto() {
+  document.querySelectorAll("[data-goto]").forEach((b) => {
+    if (b._wired) return;
+    b._wired = true;
+    b.addEventListener("click", () => showView(b.dataset.goto));
+  });
+}
+
 /* ---- wiring ------------------------------------------------------------- */
 function setWeek(w) {
   state.week = Math.max(0, Math.min(19, w));
   loadBrief();
 }
+document.querySelectorAll(".nav__item").forEach((n) =>
+  n.addEventListener("click", () => showView(n.dataset.view)));
 $("weekUp").addEventListener("click", () => setWeek(state.week + 1));
 $("weekDown").addEventListener("click", () => setWeek(state.week - 1));
 $("resetBtn").addEventListener("click", async () => {
   await api("/api/reset", { method: "POST" });
-  toast("Learning reset \u2014 the engine starts fresh");
-  await Promise.all([loadBrief(), loadWeights(), loadStatus()]);
+  toast("Learning reset — the engine starts fresh");
+  await Promise.all([loadBrief(), loadWeights(), loadStatus(), loadDashboard()]);
 });
 
 // initial load
@@ -340,3 +438,6 @@ loadBrief();
 loadWeights();
 loadStatus();
 loadProof();
+loadDashboard();
+wireGoto();
+showView("dashboard");
