@@ -19,6 +19,7 @@ import numpy as np
 
 import config
 import client_config
+import assistant as assistant_mod
 from world import build_world
 from bandit import LinUCB
 from engine_core import iter_candidates, run_loop_training, run_head_to_head
@@ -216,6 +217,79 @@ class EngineService:
                 return json.load(f)
         except (FileNotFoundError, ValueError):
             return None
+
+    # ------------------------------------ signals / summary / assistant ----
+    def _all_scored(self):
+        """All current candidates, scored by the bandit, sorted by ROI. Real mode
+        uses the live adapters (cached); synthetic uses the seeded world."""
+        if DATA_MODE == "real":
+            cands, _index = self._real_candidates()
+        else:
+            rng = np.random.default_rng(config.SETTINGS["seed"] * 1000 + 8)
+            cands = iter_candidates(self.topics, self.index, 8, rng)
+        out = []
+        for c in cands:
+            pred = self.bandit.predict(c["x"])
+            out.append({
+                "topic": c["topic"].name, "category": c["topic"].category,
+                "effort": c["topic"].effort,
+                "signals": {k: round(float(v), 3) for k, v in c["signals"].items()},
+                "roi": round(float(rec.roi_score(pred, c["topic"].effort)), 3),
+                "value": round(float(pred["mean"]), 3),
+                "uncertainty": round(float(pred["uncertainty"]), 3),
+                "headlines": c.get("headlines", []),
+            })
+        out.sort(key=lambda s: s["roi"], reverse=True)
+        return out
+
+    def _weights_list(self):
+        theta = self.bandit.learned_weights()["theta"]
+        items = [{"name": n, "weight": round(float(w), 4)}
+                 for n, w in zip(config.FEATURE_NAMES, theta) if n != "bias"]
+        items.sort(key=lambda d: d["weight"], reverse=True)
+        return items
+
+    def signals(self, k: int = 14):
+        with self.lock:
+            return {"data_mode": DATA_MODE,
+                    "client": client_config.active_client().name,
+                    "items": self._all_scored()[:k]}
+
+    def summary(self):
+        with self.lock:
+            items = self._all_scored()
+            weights = self._weights_list()
+            n = self.bandit.n_updates
+        client = client_config.active_client()
+        if not items:
+            return {"client": client.name, "data_mode": DATA_MODE,
+                    "actions": [], "rising": [], "gaps": [], "covered": [], "learned": ""}
+
+        def by(sig, rev):
+            return [i["topic"] for i in sorted(items, key=lambda i: i["signals"][sig], reverse=rev)[:3]]
+
+        actions = [{"topic": i["topic"],
+                    "action": "Create new page" if i["signals"]["semantic_gap"] >= 0.45
+                    else "Optimise existing page",
+                    "roi": i["roi"]} for i in items[:3]]
+        top_w = weights[0]["name"].replace("_", " ") if weights else "—"
+        learned = (f"After {n} recorded results, the engine most values {top_w}."
+                   if n else "No results recorded yet — record outcomes on the plan to start learning.")
+        return {"client": client.name, "industry": client.industry, "data_mode": DATA_MODE,
+                "rising": by("trend_surprise", True), "gaps": by("semantic_gap", True),
+                "covered": by("semantic_gap", False), "actions": actions, "learned": learned}
+
+    def assistant(self, question: str):
+        with self.lock:
+            ctx = {
+                "client": client_config.active_client().name,
+                "data_mode": DATA_MODE,
+                "items": self._all_scored()[:14],
+                "weights": self._weights_list(),
+                "model_updates": self.bandit.n_updates,
+                "robustness": (self.robustness() or {}).get("robustness"),
+            }
+        return {"answer": assistant_mod.answer(question, ctx)}
 
     # ------------------------------------------- head-to-head proof (cached) ----
     def simulate(self):

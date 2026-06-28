@@ -69,6 +69,29 @@ def get_robustness():
     return ENGINE.robustness()
 
 
+@app.get("/api/signals")
+def get_signals():
+    """Per-category live signals (news, demand-trend, content-gap) + the bandit's score."""
+    return ENGINE.signals()
+
+
+@app.get("/api/summary")
+def get_summary():
+    """A narrative weekly intelligence summary composed from the live signals."""
+    return ENGINE.summary()
+
+
+class Question(BaseModel):
+    question: str = Field(default="", max_length=500)
+
+
+@app.post("/api/assistant")
+def post_assistant(q: Question):
+    """Virtual assistant — answers grounded in the live data (free-form if an
+    ANTHROPIC_API_KEY is set, else rule-based)."""
+    return ENGINE.assistant(q.question)
+
+
 @app.get("/api/health")
 def health():
     """Liveness probe for the hosting platform's health check."""

@@ -73,7 +73,8 @@ def real_candidates(client=None):
         topic = Topic(id=i, name=cat, category=cat, kind="real",
                       latent_value=0.0, effort=_effort_for(gap),
                       demand_text=cat.lower())
-        cands.append({"topic": topic, "x": x, "signals": signals, "gap": gap})
+        cands.append({"topic": topic, "x": x, "signals": signals, "gap": gap,
+                      "headlines": d.get("headlines", [])})
     return cands, index, label
 
 

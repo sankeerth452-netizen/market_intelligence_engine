@@ -29,6 +29,7 @@
       <nav class="nav" id="nav">
         <button class="nav__item is-active" data-view="dashboard"><span class="nav__ico">▤</span>Dashboard</button>
         <button class="nav__item" data-view="plan"><span class="nav__ico">◎</span>This Week's Plan</button>
+        <button class="nav__item" data-view="signals"><span class="nav__ico">≋</span>Signals</button>
         <button class="nav__item" data-view="proof"><span class="nav__ico">▰</span>The Proof</button>
         <button class="nav__item" data-view="learning"><span class="nav__ico">✦</span>What It's Learned</button>
         <button class="nav__item" data-view="settings"><span class="nav__ico">⚙</span>Settings</button>
@@ -55,6 +56,7 @@
 
       <!-- ----------------------------- DASHBOARD ----------------------- -->
       <section class="view view--active" id="view-dashboard">
+        <div class="summary" id="summaryCard"></div>
         <div class="kpis" id="kpis"></div>
 
         <div class="hero" id="hero">
@@ -95,15 +97,25 @@
         <section class="cards" id="cards" aria-live="polite"></section>
       </section>
 
+      <!-- ----------------------------- SIGNALS ------------------------- -->
+      <section class="view" id="view-signals">
+        <p class="lede">Every category the engine watches, with its <b>live</b> signals —
+          real demand-trend, news coverage, and on-site content gap. No placeholders;
+          if a source is unavailable it says so.</p>
+        <div id="signals" class="siglist"></div>
+      </section>
+
       <!-- ----------------------------- PROOF --------------------------- -->
       <section class="view" id="view-proof">
-        <p class="lede">A recommender is only worth trusting if it's <b>measured</b>. Here it is, head-to-head
-          against the original fixed-score design — on the same markets, same budget.</p>
+        <p class="lede">A recommender is only worth trusting if it's <b>measured</b>. This is a
+          <b>controlled backtest</b> — the closed loop vs the original fixed-score design on the same
+          simulated markets, where we know the ground-truth value (the only way to prove a learner
+          beats fixed weights). Live lift on a client is measured later via geo/time A/B tests.</p>
 
         <div class="panels">
           <div class="panel">
             <div class="panel__head">
-              <div class="eyebrow">Across 30 independent simulated markets</div>
+              <div class="eyebrow">Controlled backtest · 30 simulated markets</div>
               <h2 class="panel__title">Why the loop wins</h2>
             </div>
             <div id="robustStat" class="robust"></div>
@@ -174,6 +186,21 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- floating virtual assistant -->
+  <button class="asst-fab" id="asstFab" aria-label="Open the assistant">✦ Ask the engine</button>
+  <div class="asst" id="asst" hidden>
+    <div class="asst__head">
+      <span><i class="asst__dot"></i> Market Intelligence AI</span>
+      <button class="asst__x" id="asstClose" aria-label="Close">✕</button>
+    </div>
+    <div class="asst__log" id="asstLog"></div>
+    <form class="asst__form" id="asstForm">
+      <input id="asstInput" placeholder="Ask about your data…" autocomplete="off" maxlength="500">
+      <button type="submit" aria-label="Send">→</button>
+    </form>
+  </div>
+
   <script src="/static/app.js"></script>
 </body>
 </html>

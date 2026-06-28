@@ -54,3 +54,21 @@ def test_outcome_unknown_id_is_handled_gracefully():
     r = client.post("/api/outcome", json={"rec_id": 999999, "reward": 0.5})
     assert r.status_code == 200
     assert r.json()["ok"] is False       # no such recommendation -> no model update
+
+
+def test_signals_returns_scored_items():
+    d = client.get("/api/signals").json()
+    assert d["items"]
+    it = d["items"][0]
+    assert "signals" in it and "roi" in it and "topic" in it
+
+
+def test_summary_has_narrative_fields():
+    s = client.get("/api/summary").json()
+    for k in ("rising", "gaps", "covered", "actions", "learned"):
+        assert k in s
+
+
+def test_assistant_answers_from_data():
+    a = client.post("/api/assistant", json={"question": "does it actually work?"}).json()
+    assert a.get("answer")

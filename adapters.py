@@ -204,13 +204,23 @@ def trend_signals(query: str):
     return {**m, "source": "news_momentum"} if m else None
 
 
+def _titles(xml_bytes, k: int = 3):
+    try:
+        root = ET.fromstring(xml_bytes)
+    except Exception:
+        return []
+    titles = [it.findtext("title") for it in root.iter("item")]
+    return [t for t in titles if t][:k]
+
+
 def demand_signals(query: str):
-    """One pass over the sources -> {news_relevance, trend}. Used by realworld so
-    a category needs a single Google News fetch (relevance + momentum) plus at
-    most one Trends attempt (circuit-broken after the first 429)."""
+    """One pass over the sources -> {news_relevance, trend, headlines}. Used by
+    realworld so a category needs a single Google News fetch (relevance + momentum
+    + headlines) plus at most one Trends attempt (circuit-broken after a 429)."""
     raw = _google_news_rss(query)
     dates = _item_dates(raw) if raw else []
     relevance = _relevance_from_dates(dates) if raw is not None else None
+    headlines = _titles(raw) if raw else []
 
     series = trend_series(query)
     if series:
@@ -218,7 +228,7 @@ def demand_signals(query: str):
     else:
         m = _news_momentum(dates)
         trend = {**m, "source": "news_momentum"} if m else None
-    return {"news_relevance": relevance, "trend": trend}
+    return {"news_relevance": relevance, "trend": trend, "headlines": headlines}
 
 
 if __name__ == "__main__":   # quick probe against the live sources

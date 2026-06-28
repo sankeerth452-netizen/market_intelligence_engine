@@ -230,6 +230,62 @@ async function loadDashboard() {
   wireGoto();
 }
 
+/* ---- weekly intelligence summary (Dashboard) --------------------------- */
+function loadSummary() {
+  return api("/api/summary").then((s) => {
+    if (!s || !s.actions) return;
+    const chips = (arr) => (arr || []).map((x) => `<span class="schip">${x}</span>`).join("");
+    const acts = s.actions.map((a) =>
+      `<li><b>${a.action}</b> — ${a.topic} <span class="schip__roi">ROI ${a.roi.toFixed(2)}</span></li>`).join("");
+    $("summaryCard").innerHTML = `
+      <div class="summary__head">
+        <span class="eyebrow">✦ Weekly intelligence summary · generated from live data</span>
+        <span class="summary__mode">${s.data_mode === "real" ? "LIVE DATA" : "demo data"}</span>
+      </div>
+      <p class="summary__learned">${s.learned}</p>
+      <div class="summary__grid">
+        <div><div class="summary__lbl">Rising demand</div>${chips(s.rising)}</div>
+        <div><div class="summary__lbl">Biggest content gaps</div>${chips(s.gaps)}</div>
+        <div><div class="summary__lbl">Already well covered</div>${chips(s.covered)}</div>
+      </div>
+      <div class="summary__lbl">Recommended actions</div>
+      <ol class="summary__acts">${acts}</ol>`;
+  }).catch(() => {});
+}
+
+/* ---- Signals view: per-category live signals + headlines ---------------- */
+function loadSignals() {
+  const host = $("signals");
+  if (host.dataset.loaded) return Promise.resolve();   // load once per session
+  host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  return api("/api/signals").then((d) => {
+    const items = d.items || [];
+    if (!items.length) { host.innerHTML = '<p class="lede">No signals loaded.</p>'; return; }
+    const bar = (v, label) => `<div class="sig">
+      <span class="sig__lbl">${label}</span>
+      <div class="sig__track"><div class="sig__fill" style="width:${Math.round(v * 100)}%"></div></div>
+      <span class="sig__val">${v.toFixed(2)}</span></div>`;
+    host.innerHTML = items.map((it) => {
+      const s = it.signals;
+      const heads = (it.headlines || []).slice(0, 2)
+        .map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
+      return `<div class="sigrow">
+        <div class="sigrow__top">
+          <div class="sigrow__name">${it.topic}</div>
+          <div class="sigrow__roi">${it.roi.toFixed(2)}<span>value / effort</span></div>
+        </div>
+        <div class="sigrow__bars">
+          ${bar(s.trend_surprise, "demand-trend")}
+          ${bar(s.news_relevance, "news")}
+          ${bar(s.semantic_gap, "content gap")}
+        </div>
+        ${heads}
+      </div>`;
+    }).join("");
+    host.dataset.loaded = "1";
+  }).catch(() => { host.innerHTML = '<p class="lede">Could not load signals.</p>'; });
+}
+
 /* ---- learned-weights diverging bars ------------------------------------- */
 function loadWeights() {
   return api("/api/weights").then((data) => {
@@ -393,7 +449,8 @@ function loadProof() {
 const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
   plan: ["This week", "Recommended plan"],
-  proof: ["The evidence", "Why it works"],
+  signals: ["Live signals", "Signals"],
+  proof: ["Controlled backtest", "Does it actually work?"],
   learning: ["The closed loop", "What it's learned"],
   settings: ["Configuration", "Client & settings"],
 };
@@ -407,6 +464,7 @@ function showView(name) {
   $("viewEyebrow").textContent = eb;
   $("viewTitle").textContent = t;
   if (name === "dashboard") loadDashboard();
+  if (name === "signals") loadSignals();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -433,11 +491,59 @@ $("resetBtn").addEventListener("click", async () => {
   await Promise.all([loadBrief(), loadWeights(), loadStatus(), loadDashboard()]);
 });
 
+/* ---- virtual assistant -------------------------------------------------- */
+const asst = { open: false, busy: false };
+function asstAdd(role, text) {
+  const log = $("asstLog");
+  const el = document.createElement("div");
+  el.className = "asstmsg asstmsg--" + role;
+  el.textContent = text;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+  return el;
+}
+function asstToggle(show) {
+  asst.open = show === undefined ? !asst.open : show;
+  $("asst").hidden = !asst.open;
+  $("asstFab").style.display = asst.open ? "none" : "";
+  if (asst.open && !$("asstLog").children.length) {
+    asstAdd("bot", "Hi — I answer from this client's live data. Try: “what should we do first?”, " +
+      "“what's trending?”, “where are the content gaps?”, or “does it actually work?”");
+    if (window.innerWidth > 600) $("asstInput").focus();
+  }
+}
+async function asstSend(q) {
+  if (!q || asst.busy) return;
+  asst.busy = true;
+  asstAdd("user", q);
+  const thinking = asstAdd("bot", "…");
+  try {
+    const r = await api("/api/assistant", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q }),
+    });
+    thinking.textContent = r.answer || "I don't have that in the data.";
+  } catch (e) {
+    thinking.textContent = "Sorry — something went wrong.";
+  }
+  asst.busy = false;
+}
+$("asstFab").addEventListener("click", () => asstToggle(true));
+$("asstClose").addEventListener("click", () => asstToggle(false));
+$("asstForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const i = $("asstInput");
+  const q = i.value.trim();
+  i.value = "";
+  asstSend(q);
+});
+
 // initial load
 loadBrief();
 loadWeights();
 loadStatus();
 loadProof();
 loadDashboard();
+loadSummary();
 wireGoto();
 showView("dashboard");
