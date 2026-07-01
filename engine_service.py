@@ -22,6 +22,7 @@ import client_config
 import assistant as assistant_mod
 import strategist as strategist_mod
 import competitors as competitors_mod
+import ahrefs
 from world import build_world
 from bandit import LinUCB
 from engine_core import iter_candidates, run_loop_training, run_head_to_head
@@ -55,6 +56,7 @@ class EngineService:
         self._plan_cache = {}               # topic -> AI action plan (stable per session)
         self._comp_cache = None             # (timestamp, competitor report)
         self._comp_refreshing = False
+        self._vol_cache = None              # (timestamp, {category_lower: volume})
         if DATA_MODE == "real":             # warm the live-data cache off the request path
             threading.Thread(target=self._warm_real_cache, daemon=True).start()
         if os.environ.get("COMPETITOR_CRAWL_ON_BOOT", "").strip() == "1":
@@ -268,11 +270,31 @@ class EngineService:
         items.sort(key=lambda d: d["weight"], reverse=True)
         return items
 
+    def _category_volumes(self):
+        """Real monthly search volume per category via Ahrefs (cached 24h; one
+        batched call). Empty {} unless AHREFS_API_KEY is set."""
+        if not ahrefs.enabled():
+            return {}
+        now = time.time()
+        if self._vol_cache and now - self._vol_cache[0] < 86400:
+            return self._vol_cache[1]
+        cats = client_config.active_client().categories
+        vols = ahrefs.search_volumes([c.lower() for c in cats])
+        self._vol_cache = (now, vols)
+        return vols
+
     def signals(self, k: int = 14):
         with self.lock:
-            return {"data_mode": DATA_MODE,
-                    "client": client_config.active_client().name,
-                    "items": self._all_scored()[:k]}
+            items = self._all_scored()[:k]
+        vols = self._category_volumes()          # outside the lock (network)
+        if vols:
+            for it in items:
+                v = vols.get((it.get("category") or it["topic"]).lower())
+                if v is not None:
+                    it["volume"] = v
+        return {"data_mode": DATA_MODE,
+                "client": client_config.active_client().name,
+                "items": items, "has_volume": bool(vols)}
 
     def summary(self):
         with self.lock:

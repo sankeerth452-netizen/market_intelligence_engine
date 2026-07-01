@@ -612,6 +612,7 @@ body {
 .sigrow { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px 18px; box-shadow: var(--shadow); }
 .sigrow__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .sigrow__name { font-family: var(--display); font-weight: 600; font-size: 16px; }
+.sigrow__vol { font-family: var(--mono); font-size: 11.5px; color: var(--teal); margin-top: 3px; }
 .sigrow__roi { font-family: var(--mono); font-weight: 600; font-size: 18px; color: var(--teal); text-align: right; }
 .sigrow__roi span { display: block; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); font-weight: 400; }
 .sigrow__bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -645,6 +646,7 @@ body {
 .comp__badge--new { color: #fff; background: var(--teal); }
 .comp__badge--blk { color: var(--amber); background: var(--amber-wash); border: 1px solid rgba(183,121,31,.3); }
 .comp__meta { font-family: var(--mono); font-size: 11px; color: var(--mute); margin-bottom: 10px; }
+.comp__src { color: var(--teal); }
 .comp__pages { margin: 0; padding-left: 18px; }
 .comp__pages li { font-size: 13px; line-height: 1.5; margin-bottom: 3px; }
 .comp__pages a { color: var(--teal); text-decoration: none; }

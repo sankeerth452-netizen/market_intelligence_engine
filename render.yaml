@@ -29,6 +29,12 @@ services:
         sync: false             # optional: enables the AI assistant + AI Strategist
       - key: APIFY_API_KEY
         sync: false             # optional: enables real TikTok velocity (Apify)
+      - key: AHREFS_API_KEY
+        sync: false             # optional: real search volume + competitor pages
+      - key: AHREFS_MONTHLY_UNIT_BUDGET
+        value: "40000"          # hard stop under the 50k key cap
+      - key: AHREFS_COUNTRY
+        value: au
       # ---- Competitor monitoring (weekly crawl below keeps this fresh) ----
       - key: COMPETITOR_URLS
         value: https://www.thegoodguys.com.au,https://www.officeworks.com.au,https://www.harveynorman.com.au

@@ -14,6 +14,7 @@ import os
 import time
 import urllib.parse
 
+import ahrefs
 import crawler
 import store
 
@@ -53,8 +54,14 @@ def refresh(engine, max_urls=MAX_URLS):
     out = []
     for s in sites():
         urls = crawler.sitemap_page_urls(s["url"], max_urls=max_urls)
+        note = ""
+        if not urls and ahrefs.enabled():          # bot-protected -> fall back to Ahrefs
+            urls = ahrefs.top_pages(s["url"], limit=100)
+            if urls:
+                note = "via Ahrefs"
         ok = len(urls) > 0
-        note = "" if ok else "bot-protected or no readable sitemap"
+        if not ok:
+            note = "bot-protected or no readable sitemap"
         stats = store.sync_site_pages(engine, s["host"], urls) if ok else {"found": 0, "added": 0}
         store.record_crawl_run(engine, s["host"], stats["found"], stats["added"], ok, note)
         out.append({**s, **stats, "ok": ok, "note": note})

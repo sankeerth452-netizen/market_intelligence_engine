@@ -342,9 +342,14 @@ function loadSignals() {
       const s = it.signals;
       const [p, pc] = priorityOf(it.roi);
       const heads = (it.headlines || []).slice(0, 2).map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
+      const vol = it.volume != null
+        ? `<div class="sigrow__vol">🔍 ${it.volume.toLocaleString()} searches/mo</div>` : "";
       return `<div class="sigrow">
         <div class="sigrow__top">
-          <div class="sigrow__name">${it.topic}</div>
+          <div>
+            <div class="sigrow__name">${it.topic}</div>
+            ${vol}
+          </div>
           <div class="sigrow__roi prio ${pc}">${p}<span>priority</span></div>
         </div>
         <div class="sigrow__bars">
@@ -543,7 +548,8 @@ function compCard(c) {
       <span class="comp__badge ${c.new_count ? "comp__badge--new" : ""}">${
         c.new_count ? c.new_count + " new" : "tracked"}</span>
     </div>
-    <div class="comp__meta">${(c.total || 0).toLocaleString()} pages tracked · crawled ${timeAgo(c.last_crawled)}</div>
+    <div class="comp__meta">${(c.total || 0).toLocaleString()} pages tracked · crawled ${timeAgo(c.last_crawled)}${
+      c.note ? ` · <span class="comp__src">${c.note}</span>` : ""}</div>
     ${pages}
   </div>`;
 }
