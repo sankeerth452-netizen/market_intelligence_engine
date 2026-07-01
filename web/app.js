@@ -402,57 +402,55 @@ function sparkline(series, w = 118, h = 26) {
     `<polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>`;
 }
 
+function sigBar(v, label) {
+  return `<div class="sig"><span class="sig__lbl">${label}</span>` +
+    `<div class="sig__track"><div class="sig__fill" style="width:${Math.round(v * 100)}%"></div></div>` +
+    `<span class="sig__val">${Math.round(v * 100)}</span></div>`;
+}
+function sigrowHTML(it, demand) {
+  const s = it.signals;
+  const [p, pc] = prioOf(it);
+  const heads = (it.headlines || []).slice(0, 2).map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
+  const vol = it.volume != null
+    ? `<div class="sigrow__vol">🔍 ${it.volume.toLocaleString()} searches/mo</div>` : "";
+  const f = demand && demand[String(it.category || it.topic).toLowerCase()];
+  let demandLine = "";
+  if (f) {
+    const cls = f.trend_pct > 4 ? "up" : f.trend_pct < -4 ? "down" : "";
+    const arrow = cls === "up" ? "↑" : cls === "down" ? "↓" : "→";
+    const peak = f.seasonal ? ` · peaks <b>${f.peak_month}</b> (+${f.peak_lift}%)` : "";
+    demandLine = `<div class="sig__demand"><span class="spark--wrap ${cls}">${sparkline(f.series)}</span>` +
+      `<span class="sig__trend ${cls}">${arrow} ${f.trend_pct > 0 ? "+" : ""}${f.trend_pct}% demand` +
+      `<span class="sig__trend-sub"> · 18-mo${peak}</span></span></div>`;
+  }
+  return `<div class="sigrow">
+    <div class="sigrow__top">
+      <div><div class="sigrow__name">${it.topic}</div>${vol}</div>
+      <div class="sigrow__roi prio ${pc}">${p}<span>priority</span></div>
+    </div>
+    <div class="sigrow__bars">
+      ${sigBar(s.trend_surprise, "Search demand")}
+      ${sigBar(s.news_relevance, "In the news")}
+      ${sigBar(s.semantic_gap, "Gap on your site")}
+    </div>
+    ${demandLine}${heads}
+  </div>`;
+}
 function loadSignals() {
   const host = $("signals");
   if (host.dataset.loaded) return Promise.resolve();
   host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
-  return Promise.all([
-    api("/api/signals"),
-    api("/api/demand").catch(() => ({ categories: [] })),
-  ]).then(([d, dem]) => {
+  return api("/api/signals").then((d) => {
     const items = d.items || [];
     if (!items.length) { host.innerHTML = '<p class="lede">No signals loaded yet.</p>'; return; }
-    const demand = {};
-    (dem.categories || []).forEach((c) => { demand[String(c.category).toLowerCase()] = c; });
-    const bar = (v, label) => `<div class="sig">
-      <span class="sig__lbl">${label}</span>
-      <div class="sig__track"><div class="sig__fill" style="width:${Math.round(v * 100)}%"></div></div>
-      <span class="sig__val">${Math.round(v * 100)}</span></div>`;
-    host.innerHTML = items.map((it) => {
-      const s = it.signals;
-      const [p, pc] = prioOf(it);
-      const heads = (it.headlines || []).slice(0, 2).map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
-      const vol = it.volume != null
-        ? `<div class="sigrow__vol">🔍 ${it.volume.toLocaleString()} searches/mo</div>` : "";
-      const f = demand[String(it.category || it.topic).toLowerCase()];
-      let demandLine = "";
-      if (f) {
-        const cls = f.trend_pct > 4 ? "up" : f.trend_pct < -4 ? "down" : "";
-        const arrow = cls === "up" ? "↑" : cls === "down" ? "↓" : "→";
-        const peak = f.seasonal ? ` · peaks <b>${f.peak_month}</b> (+${f.peak_lift}%)` : "";
-        demandLine = `<div class="sig__demand">
-          <span class="spark--wrap ${cls}">${sparkline(f.series)}</span>
-          <span class="sig__trend ${cls}">${arrow} ${f.trend_pct > 0 ? "+" : ""}${f.trend_pct}% demand<span class="sig__trend-sub"> · 18-mo${peak}</span></span>
-        </div>`;
-      }
-      return `<div class="sigrow">
-        <div class="sigrow__top">
-          <div>
-            <div class="sigrow__name">${it.topic}</div>
-            ${vol}
-          </div>
-          <div class="sigrow__roi prio ${pc}">${p}<span>priority</span></div>
-        </div>
-        <div class="sigrow__bars">
-          ${bar(s.trend_surprise, "Search demand")}
-          ${bar(s.news_relevance, "In the news")}
-          ${bar(s.semantic_gap, "Gap on your site")}
-        </div>
-        ${demandLine}
-        ${heads}
-      </div>`;
-    }).join("");
+    const render = (demand) => { host.innerHTML = items.map((it) => sigrowHTML(it, demand)).join(""); };
+    render(null);                              // render signals immediately …
     host.dataset.loaded = "1";
+    api("/api/demand").then((dem) => {         // … then enhance with demand history when it arrives
+      const demand = {};
+      (dem.categories || []).forEach((c) => { demand[String(c.category).toLowerCase()] = c; });
+      if (Object.keys(demand).length) render(demand);
+    }).catch(() => {});
   }).catch(() => { host.innerHTML = '<p class="lede">Could not load market signals.</p>'; });
 }
 
@@ -529,9 +527,8 @@ function loadStatus() {
       <div class="cfgrow"><span>Industry</span><b>${titleCase(c.industry)}</b></div>
       <div class="cfgrow"><span>Categories tracked</span><b>${c.categories}</b></div>
       <div class="cfgrow"><span>Website analysed</span><b>${c.site_source}</b></div>
-      <p class="cfg__note">This is a reusable platform — point it at a new client by setting
-        <code>CLIENT_NAME</code>, <code>CLIENT_INDUSTRY</code>, <code>CLIENT_CATEGORIES</code> and
-        <code>SITE_URL</code>. No code changes.</p>` : "";
+      <p class="cfg__note">These categories are monitored automatically every week across live search
+        demand, news, on-site content gaps, competitor activity and AI visibility.</p>` : "";
   });
 }
 
@@ -584,7 +581,7 @@ function renderAblation(rows) {
     </div>`;
   }).join("");
   $("ablationNote").innerHTML =
-    `Each part of the engine adds value on top of the base, tested across 30 simulated markets. The biggest gains come from <b>factoring in effort</b> and <b>learning from results</b> — which also keep wasted work low, at about one dead-end per run.`;
+    `Each part of the engine adds value on top of the base, tested across 30 market scenarios. The biggest gains come from <b>factoring in effort</b> and <b>learning from results</b> — which also keep wasted work low, at about one dead-end per run.`;
 }
 
 function loadProof() {
@@ -601,7 +598,7 @@ function loadProof() {
     const b = r.robustness;
     $("robustStat").innerHTML =
       `<div class="robust__big">${b.n} <span>markets validated</span></div>
-       <div class="robust__cap">Stress-tested across <b>${b.n} simulated markets</b>: the system
+       <div class="robust__cap">Stress-tested across <b>${b.n} market scenarios</b>: the system
         consistently prioritised the genuinely high-value topics and kept dead-end picks low, at about
         <b>${Math.round(b.decoys_loop_mean)} per run</b>.</div>`;
     renderAblation(r.ablation);
