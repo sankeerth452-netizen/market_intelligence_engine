@@ -8,7 +8,15 @@ const titleCase = (s) => (s || "").replace(/_/g, " ");
 
 // Live reward scale — must match config.REWARD_MIN / REWARD_MAX.
 const REWARD = { lo: -0.15, hi: 1.0 };
-const pctToReward = (pct) => REWARD.lo + (REWARD.hi - REWARD.lo) * (pct / 100);
+// 5-point agree/disagree verdict, mapped evenly across the reward scale.
+const _mix = (t) => Math.round((REWARD.lo + (REWARD.hi - REWARD.lo) * t) * 1000) / 1000;
+const LIKERT = [
+  ["Strongly disagree", "sd", _mix(0)],
+  ["Disagree", "d", _mix(0.25)],
+  ["Neutral", "n", _mix(0.5)],
+  ["Agree", "a", _mix(0.75)],
+  ["Strongly agree", "sa", _mix(1)],
+];
 
 /* ---- plain-language helpers: speak to marketers, not ML engineers ------- */
 const FEATURE_LABEL = {
@@ -126,18 +134,15 @@ function cardEl(c) {
       <div class="conv__readout">Confidence: <b class="${confCls}">${conf}</b></div>
     </div>
     <div class="result">
-      <span class="result__label">How did this perform?</span>
-      <input type="range" min="0" max="100" value="50" aria-label="Result for ${c.topic}">
-      <span class="result__pct">50%</span>
-      <button class="btn">Save result</button>
-      <div class="result__hint">0% = it flopped · 100% = a top performer — record what actually happened and the system learns from it</div>
+      <span class="result__label">Was this a good call?</span>
+      <div class="likert" role="group" aria-label="Your verdict on this recommendation">
+        ${LIKERT.map(([label, cls, r]) => `<button type="button" class="lk lk--${cls}" data-r="${r}">${label}</button>`).join("")}
+      </div>
+      <div class="result__hint">Your verdict trains the system — it learns which signals lead to wins.</div>
     </div>`;
 
-  const range = el.querySelector("input");
-  const pct = el.querySelector(".result__pct");
-  const btn = el.querySelector(".btn");
-  range.addEventListener("input", () => (pct.textContent = range.value + "%"));
-  btn.addEventListener("click", () => recordOutcome(c.id, pctToReward(range.value), el, btn, range));
+  el.querySelectorAll(".lk").forEach((b) =>
+    b.addEventListener("click", () => recordLikert(c.id, Number(b.dataset.r), el, b)));
   const planBtn = el.querySelector(".planbtn");
   const planHost = el.querySelector(".plan");
   planBtn.addEventListener("click", () => loadPlan(c, planBtn, planHost));
@@ -185,23 +190,25 @@ async function loadPlan(c, btn, host) {
   }
 }
 
-async function recordOutcome(recId, reward, el, btn, range) {
-  btn.disabled = true;
+async function recordLikert(recId, reward, el, btn) {
+  const group = btn.parentElement;
+  const unlock = () => group.querySelectorAll(".lk").forEach((b) => (b.disabled = false));
+  group.querySelectorAll(".lk").forEach((b) => (b.disabled = true));
+  btn.classList.add("is-picked");
   try {
     const r = await api("/api/outcome", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rec_id: recId, reward }),
     });
-    if (!r.ok) { toast(r.error || "Could not record that result."); btn.disabled = false; return; }
+    if (!r.ok) { toast(r.error || "Could not record that."); btn.classList.remove("is-picked"); unlock(); return; }
     el.classList.add("is-logged");
-    btn.textContent = "Saved ✓";
-    if (range) range.disabled = true;
-    toast(`Saved — the system just learned from your result (<b>${r.model_updates}</b> total)`);
+    toast(`Saved — the system just learned from your verdict (<b>${r.model_updates}</b> total)`);
     await Promise.all([loadWeights(), loadStatus(), refreshBriefInPlace(), loadDashboard()]);
   } catch (e) {
-    toast("Something went wrong saving that result.");
-    btn.disabled = false;
+    toast("Something went wrong saving that.");
+    btn.classList.remove("is-picked");
+    unlock();
   }
 }
 

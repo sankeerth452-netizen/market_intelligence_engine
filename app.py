@@ -19,7 +19,7 @@ Endpoints
 import os
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -124,4 +124,11 @@ app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 
 @app.get("/")
 def index():
-    return FileResponse(os.path.join(WEB_DIR, "index.html"))
+    # Serve index.html with a cache-busting ?v=<mtime> on the JS/CSS so a deploy
+    # is picked up immediately instead of clients running stale assets.
+    with open(os.path.join(WEB_DIR, "index.html"), encoding="utf-8") as f:
+        html = f.read()
+    ver = int(max(os.path.getmtime(os.path.join(WEB_DIR, n)) for n in ("app.js", "styles.css")))
+    html = (html.replace("/static/app.js", f"/static/app.js?v={ver}")
+                .replace("/static/styles.css", f"/static/styles.css?v={ver}"))
+    return HTMLResponse(html)

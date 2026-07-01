@@ -352,6 +352,22 @@ body {
 .result__label { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: var(--mute); text-transform: uppercase; }
 .result__hint { flex-basis: 100%; font-size: 11px; color: var(--mute-2); margin-top: 2px; line-height: 1.4; }
 .result__hint em { font-style: italic; color: var(--mute); }
+
+/* 5-point agree/disagree verdict (replaces the old 0-100 performance slider) */
+.likert { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 220px; }
+.lk {
+  font-family: var(--body); font-size: 11.5px; font-weight: 500;
+  color: var(--mute); background: var(--paper);
+  border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 6px 12px; cursor: pointer;
+  transition: color .12s, border-color .12s, background .12s;
+}
+.lk:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+.lk:disabled { cursor: default; opacity: .5; }
+.lk.is-picked { color: #fff; border-color: transparent; opacity: 1; }
+.lk--sd.is-picked, .lk--d.is-picked { background: var(--amber); }
+.lk--n.is-picked { background: var(--mute); }
+.lk--a.is-picked, .lk--sa.is-picked { background: var(--teal); }
 .result input[type=range] { flex: 1; min-width: 140px; accent-color: var(--teal); }
 .result input[type=range]:disabled { accent-color: var(--mute-2); opacity: .7; }
 .result__pct {
