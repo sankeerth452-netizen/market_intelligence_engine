@@ -20,6 +20,7 @@ import numpy as np
 import config
 import client_config
 import assistant as assistant_mod
+import strategist as strategist_mod
 from world import build_world
 from bandit import LinUCB
 from engine_core import iter_candidates, run_loop_training, run_head_to_head
@@ -50,6 +51,7 @@ class EngineService:
         self.bandit = self._load_bandit()   # ships pre-trained on first boot
         self._sim_cache = None
         self._real_cache = None             # (timestamp, candidates, index)
+        self._plan_cache = {}               # topic -> AI action plan (stable per session)
         if DATA_MODE == "real":             # warm the live-data cache off the request path
             threading.Thread(target=self._warm_real_cache, daemon=True).start()
 
@@ -304,6 +306,18 @@ class EngineService:
                 "robustness": (self.robustness() or {}).get("robustness"),
             }
         return {"answer": assistant_mod.answer(question, ctx)}
+
+    # ------------------------------------------------ AI strategist (cached) ----
+    def playbook(self, item: dict):
+        """A grounded, client-ready action plan for one recommendation. Cached by
+        topic so the (possibly LLM-backed) plan is computed once per session."""
+        topic = (item.get("topic") or "").strip()
+        if topic and topic in self._plan_cache:
+            return self._plan_cache[topic]
+        plan = strategist_mod.action_plan(item)
+        if topic:
+            self._plan_cache[topic] = plan
+        return plan
 
     # ------------------------------------------- head-to-head proof (cached) ----
     def simulate(self):

@@ -72,3 +72,15 @@ def test_summary_has_narrative_fields():
 def test_assistant_answers_from_data():
     a = client.post("/api/assistant", json={"question": "does it actually work?"}).json()
     assert a.get("answer")
+
+
+def test_playbook_returns_a_structured_plan(monkeypatch):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)   # exercise the offline tier
+    body = {"topic": "Test Widgets", "action": "Create new page", "effort": "low",
+            "headlines": ["Widgets are trending - example.com"],
+            "signals": {"trend_surprise": 0.8, "news_relevance": 0.7, "semantic_gap": 0.6}}
+    p = client.post("/api/playbook", json=body).json()
+    for k in ("title", "angle", "why_now", "points", "source"):
+        assert k in p
+    assert isinstance(p["points"], list) and p["points"]
+    assert p["source"] == "template"

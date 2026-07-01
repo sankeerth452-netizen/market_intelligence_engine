@@ -383,6 +383,47 @@ body {
 .card.is-learning .conv__roi { animation: roipulse .8s ease; }
 @keyframes roipulse { 0%, 40% { color: var(--teal-bright); } 100% { color: var(--teal); } }
 
+/* ---- AI Strategist action plan ----------------------------------------- */
+.planbtn {
+  font-family: var(--body); font-size: 12px; font-weight: 500;
+  color: var(--teal); background: var(--teal-wash);
+  border: 1px solid rgba(15,118,110,.28); border-radius: var(--r-pill);
+  padding: 4px 11px; cursor: pointer; transition: background .15s, color .15s;
+}
+.planbtn:hover { background: var(--teal); color: #fff; }
+.planbtn:disabled { opacity: .7; cursor: default; }
+.plan {
+  margin-top: 12px; padding: 14px 16px;
+  background: linear-gradient(120deg, rgba(15,118,110,.06), rgba(20,184,166,.03));
+  border: 1px solid rgba(15,118,110,.20); border-radius: 12px;
+  animation: rise .4s cubic-bezier(.2,.7,.2,1) both;
+}
+.plan[hidden] { display: none; }
+.plan__head {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--mute);
+  display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
+}
+.plan__tag {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .06em;
+  color: var(--teal); background: var(--surface);
+  border: 1px solid rgba(15,118,110,.3); border-radius: var(--r-pill); padding: 2px 7px;
+}
+.plan__tag--tpl { color: var(--mute); border-color: var(--line); }
+.plan__title {
+  font-family: var(--display); font-weight: 600; font-size: 16px;
+  letter-spacing: -.01em; margin-bottom: 10px; line-height: 1.25;
+}
+.plan__row { display: grid; grid-template-columns: 64px 1fr; gap: 10px; margin-bottom: 7px; }
+.plan__row > span {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--mute); padding-top: 2px;
+}
+.plan__row p { margin: 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.45; }
+.plan__row ul { margin: 0; padding-left: 16px; }
+.plan__row li { font-size: 13px; color: var(--ink-soft); line-height: 1.45; margin-bottom: 3px; }
+.plan__loading { font-size: 13px; color: var(--mute); font-style: italic; }
+
 /* ---- Analysis panels --------------------------------------------------- */
 .panels {
   display: grid;

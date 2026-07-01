@@ -113,7 +113,9 @@ function cardEl(c) {
       <div class="card__meta">
         <span class="tag tag--effort-${c.effort}">${EFFORT_LABEL[c.effort] || c.effort} effort</span>
         ${test}
+        <button class="planbtn" type="button">✦ Get the AI action plan</button>
       </div>
+      <div class="plan" hidden></div>
     </div>
     <div class="card__conv">
       <div class="conv__row">
@@ -136,7 +138,51 @@ function cardEl(c) {
   const btn = el.querySelector(".btn");
   range.addEventListener("input", () => (pct.textContent = range.value + "%"));
   btn.addEventListener("click", () => recordOutcome(c.id, pctToReward(range.value), el, btn, range));
+  const planBtn = el.querySelector(".planbtn");
+  const planHost = el.querySelector(".plan");
+  planBtn.addEventListener("click", () => loadPlan(c, planBtn, planHost));
   return el;
+}
+
+/* ---- AI Strategist: a grounded, client-ready action plan per pick ------- */
+function planHTML(p) {
+  const pts = (p.points || []).map((x) => `<li>${x}</li>`).join("");
+  const badge = p.source === "ai"
+    ? `<span class="plan__tag">✦ AI-written</span>`
+    : `<span class="plan__tag plan__tag--tpl">grounded plan</span>`;
+  return `<div class="plan__head">Suggested action plan ${badge}</div>
+    <div class="plan__title">${p.title || ""}</div>
+    <div class="plan__row"><span>Angle</span><p>${p.angle || ""}</p></div>
+    <div class="plan__row"><span>Why now</span><p>${p.why_now || ""}</p></div>
+    <div class="plan__row"><span>Cover</span><ul>${pts}</ul></div>`;
+}
+
+async function loadPlan(c, btn, host) {
+  if (host.dataset.loaded) {                       // toggle once generated
+    host.hidden = !host.hidden;
+    btn.textContent = host.hidden ? "✦ Get the AI action plan" : "✦ Hide action plan";
+    return;
+  }
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = "✦ Writing your plan…";
+  host.hidden = false;
+  host.innerHTML = '<div class="plan__loading">Thinking through the play…</div>';
+  try {
+    const p = await api("/api/playbook", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic: c.topic, action: c.action, effort: c.effort,
+                             headlines: c.headlines || [], signals: c.signals || {} }),
+    });
+    host.innerHTML = planHTML(p);
+    host.dataset.loaded = "1";
+    btn.textContent = "✦ Hide action plan";
+  } catch (e) {
+    host.innerHTML = '<div class="plan__loading">Could not generate a plan right now.</div>';
+    btn.textContent = orig;
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 async function recordOutcome(recId, reward, el, btn, range) {

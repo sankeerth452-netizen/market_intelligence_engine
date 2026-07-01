@@ -92,6 +92,21 @@ def post_assistant(q: Question):
     return ENGINE.assistant(q.question)
 
 
+class PlaybookReq(BaseModel):
+    topic: str = Field(default="", max_length=200)
+    action: str = Field(default="", max_length=60)
+    effort: str = Field(default="", max_length=12)
+    headlines: list[str] = Field(default_factory=list)
+    signals: dict = Field(default_factory=dict)
+
+
+@app.post("/api/playbook")
+def post_playbook(req: PlaybookReq):
+    """AI Strategist — a grounded, client-ready action plan for one recommendation
+    (Claude-written if an ANTHROPIC_API_KEY is set, else a real templated plan)."""
+    return ENGINE.playbook(req.model_dump())
+
+
 @app.get("/api/health")
 def health():
     """Liveness probe for the hosting platform's health check."""
