@@ -25,7 +25,7 @@ import competitors as competitors_mod
 import ahrefs
 from world import build_world
 from bandit import LinUCB
-from engine_core import iter_candidates, run_loop_training, run_head_to_head
+from engine_core import iter_candidates, run_head_to_head
 import recommender as rec
 import store
 
@@ -76,39 +76,19 @@ class EngineService:
         if data:
             try:
                 loaded = LinUCB.from_dict(data)
-                # Guard: ignore a stale model from a different feature schema
-                # (would mis-align with today's context vectors), OR an UNTRAINED
-                # one (0 updates — e.g. left behind by a reset). Either way,
-                # re-pretrain so the app always boots with informed weights.
-                if loaded.d == config.N_FEATURES and loaded.n_updates > 0:
+                # Keep any saved model whose feature schema still matches — even
+                # one with 0 updates. A model that has only learned from REAL
+                # recorded verdicts is exactly what we want (no synthetic seed).
+                if loaded.d == config.N_FEATURES:
                     return loaded
             except Exception:
                 pass
-        # First boot (or a stale/incompatible model): pre-train on the synthetic
-        # history and log it, so the dashboard opens with informed opinions.
-        bandit = self._train_initial()
+        # First boot (or an incompatible saved model): a genuine COLD model. It
+        # ranks by the live signals + effort from day one, and learns ONLY from
+        # the real verdicts recorded on the plan — nothing synthetic.
+        bandit = LinUCB(config.N_FEATURES, alpha=config.SETTINGS["linucb_alpha"])
         store.save_model(self.engine, MODEL_KEY, json.dumps(bandit.to_dict()))
         return bandit
-
-    def _train_initial(self) -> LinUCB:
-        """Warm-start the model by replaying the closed-loop learning once,
-        recording each recommendation + outcome so the loop counters are real."""
-        s = config.SETTINGS
-        rng = np.random.default_rng(s["seed"] + 1)
-        bandit = LinUCB(config.N_FEATURES, alpha=s["linucb_alpha"])
-
-        def persist(week, p, reward):
-            rid = store.save_recommendation(
-                self.engine, week, p["topic"].name, p["topic"].category,
-                p["topic"].kind, p["roi"], p["pred"]["mean"],
-                p["pred"]["uncertainty"], p["topic"].effort,
-                rec.rationale(p["signals"], p["pred"], p["topic"].effort,
-                              p["exploring"]),
-                context_json=json.dumps(p["x"]))
-            store.record_outcome(self.engine, rid, reward)
-
-        return run_loop_training(self.topics, self.index, s["weeks"],
-                                 s["weekly_budget"], rng, bandit, on_pick=persist)
 
     def _save_bandit(self) -> None:
         store.save_model(self.engine, MODEL_KEY, json.dumps(self.bandit.to_dict()))
@@ -136,6 +116,12 @@ class EngineService:
                                   p["exploring"]),
                     context_json=json.dumps(p["x"]))
                 out.append(self._serialize(rid, i, p, week))
+            scored = self._all_scored()
+            cuts = self._priority_cuts([o["roi"] for o in scored])
+            top = scored[0]["roi"] if scored else 1.0
+            for c in out:
+                c["priority"] = self._priority_label(c["roi"], cuts)
+                c["strength"] = round(min(1.0, c["roi"] / top), 3) if top > 0 else 0.0
             return out
 
     def _real_candidates(self):
@@ -240,6 +226,22 @@ class EngineService:
             return None
 
     # ------------------------------------ signals / summary / assistant ----
+    @staticmethod
+    def _priority_cuts(rois):
+        """Relative High/Medium ROI cutoffs from the current candidate spread, so
+        priority stays meaningful whatever the ROI scale (a cold model explores
+        with higher uncertainty, so its ROIs sit higher — relative bands fix it)."""
+        vals = sorted([float(r) for r in rois if r is not None], reverse=True)
+        if not vals:
+            return (0.62, 0.40)
+        top = vals[0]
+        return (0.72 * top, 0.5 * top)
+
+    @staticmethod
+    def _priority_label(roi, cuts):
+        hi, mid = cuts
+        return "High" if roi >= hi else "Medium" if roi >= mid else "Low"
+
     def _all_scored(self):
         """All current candidates, scored by the bandit, sorted by ROI. Real mode
         uses the live adapters (cached); synthetic uses the seeded world."""
@@ -261,6 +263,11 @@ class EngineService:
                 "headlines": c.get("headlines", []),
             })
         out.sort(key=lambda s: s["roi"], reverse=True)
+        cuts = self._priority_cuts([o["roi"] for o in out])
+        top = out[0]["roi"] if out else 1.0
+        for o in out:
+            o["priority"] = self._priority_label(o["roi"], cuts)
+            o["strength"] = round(min(1.0, o["roi"] / top), 3) if top > 0 else 0.0
         return out
 
     def _weights_list(self):
@@ -312,7 +319,7 @@ class EngineService:
         actions = [{"topic": i["topic"],
                     "action": "Create new page" if i["signals"]["semantic_gap"] >= 0.45
                     else "Optimise existing page",
-                    "roi": i["roi"]} for i in items[:3]]
+                    "roi": i["roi"], "priority": i.get("priority")} for i in items[:3]]
         top_w = (config.FEATURE_LABELS.get(weights[0]["name"], weights[0]["name"])
                  if weights else "—")
         learned = (f"After learning from {n} results, the system has found that {top_w} "

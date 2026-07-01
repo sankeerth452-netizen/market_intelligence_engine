@@ -42,6 +42,12 @@ const EFFORT_LABEL = { low: "Low", med: "Medium", high: "High" };
 
 const priorityOf = (roi) =>
   roi >= 0.62 ? ["High", "is-high"] : roi >= 0.4 ? ["Medium", "is-med"] : ["Low", "is-low"];
+// Prefer the server's relative priority (robust as the model learns); fall back
+// to an absolute ROI band if it's absent.
+const PRIO_CLASS = { High: "is-high", Medium: "is-med", Low: "is-low" };
+const prioOf = (item) =>
+  item && item.priority ? [item.priority, PRIO_CLASS[item.priority] || "is-med"]
+                        : priorityOf(item && item.roi);
 const confidenceOf = (unc) =>
   unc < 0.18 ? ["High", "is-high"] : unc < 0.35 ? ["Medium", "is-med"] : ["Still learning", "is-low"];
 const actionVerb = (a) =>
@@ -104,7 +110,7 @@ function cardEl(c) {
   el.dataset.id = c.id;
   el.style.animationDelay = (c.rank - 1) * 0.06 + "s";
 
-  const [prio, prioCls] = priorityOf(c.roi);
+  const [prio, prioCls] = prioOf(c);
   const [conf, confCls] = confidenceOf(c.uncertainty);
   const [verb, suffix] = actionVerb(c.action);
   const test = c.exploring
@@ -130,7 +136,7 @@ function cardEl(c) {
         <span class="conv__label">Priority</span>
         <span class="conv__roi prio ${prioCls}">${prio}</span>
       </div>
-      ${convictionSVG(c.value, c.uncertainty)}
+      ${convictionSVG(c.strength != null ? c.strength : c.value, c.uncertainty)}
       <div class="conv__readout">Confidence: <b class="${confCls}">${conf}</b></div>
     </div>
     <div class="result">
@@ -225,7 +231,7 @@ async function refreshBriefInPlace() {
     data.forEach((c) => {
       const el = shown.find((e) => Number(e.dataset.id) === c.id);
       if (!el) return;
-      setConviction(el, c.value, c.uncertainty, c.roi);
+      setConviction(el, c.strength != null ? c.strength : c.value, c.uncertainty, c.roi);
       el.classList.add("is-learning");
       setTimeout(() => el.classList.remove("is-learning"), 800);
     });
@@ -262,7 +268,7 @@ async function loadDashboard() {
 
   const kpis = [
     { label: "Do this first", big: top ? top.topic : "—",
-      sub: top ? `${priorityOf(top.roi)[0]} priority · ${(top.action || "").toLowerCase()}` : "", accent: "teal" },
+      sub: top ? `${prioOf(top)[0]} priority · ${(top.action || "").toLowerCase()}` : "", accent: "teal" },
     { label: "Categories watched", big: String(cats),
       sub: "monitored live, every week", accent: "ink" },
     { label: "Live data", big: live,
@@ -285,7 +291,7 @@ async function loadDashboard() {
      <div class="herometric"><b>${live}</b><span>live data</span></div>`;
 
   $("dashPlan").innerHTML = brief.length ? brief.map((c) => {
-    const [p, pc] = priorityOf(c.roi);
+    const [p, pc] = prioOf(c);
     return `<button class="dpitem" data-goto="plan">
       <div class="dpitem__rank">${pad2(c.rank)}</div>
       <div class="dpitem__main">
@@ -307,7 +313,7 @@ function loadSummary() {
     if (!s || !s.actions) return;
     const chips = (arr) => (arr || []).map((x) => `<span class="schip">${x}</span>`).join("");
     const acts = s.actions.map((a) => {
-      const [p] = priorityOf(a.roi);
+      const [p] = prioOf(a);
       return `<li><b>${a.action}</b> — ${a.topic} <span class="schip__roi">${p} priority</span></li>`;
     }).join("");
     $("summaryCard").innerHTML = `
@@ -340,7 +346,7 @@ function loadSignals() {
       <span class="sig__val">${Math.round(v * 100)}</span></div>`;
     host.innerHTML = items.map((it) => {
       const s = it.signals;
-      const [p, pc] = priorityOf(it.roi);
+      const [p, pc] = prioOf(it);
       const heads = (it.headlines || []).slice(0, 2).map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
       const vol = it.volume != null
         ? `<div class="sigrow__vol">🔍 ${it.volume.toLocaleString()} searches/mo</div>` : "";
