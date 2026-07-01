@@ -251,23 +251,24 @@ function loadBrief() {
 
 /* ---- Dashboard overview (KPIs + hero + plan preview) -------------------- */
 async function loadDashboard() {
-  const [status, rob, brief] = await Promise.all([
+  const [status, brief] = await Promise.all([
     api("/api/status").catch(() => ({})),
-    api("/api/robustness").catch(() => null),
     api(`/api/brief?week=${state.week}&k=3`).catch(() => []),
   ]);
-  const b = rob && rob.robustness;
   const top = brief[0];
+  const cats = (status.client && status.client.categories) || "—";
+  const live = status.data_mode === "real" ? "Real" : "Demo";
+  const updates = status.model_updates != null ? String(status.model_updates) : "—";
 
   const kpis = [
     { label: "Do this first", big: top ? top.topic : "—",
       sub: top ? `${priorityOf(top.roi)[0]} priority · ${(top.action || "").toLowerCase()}` : "", accent: "teal" },
-    { label: "Better than the old way", big: b ? `+${Math.round(b.lift_mean)}%` : "—",
-      sub: b ? "more value found, in head-to-head tests" : "", accent: "teal" },
-    { label: "Head-to-head tests won", big: b ? `${b.wins} / ${b.n}` : "—",
-      sub: "vs the old fixed-formula approach", accent: "ink" },
-    { label: "Results it's learned from", big: status.model_updates != null ? String(status.model_updates) : "—",
-      sub: "and it improves with every one", accent: "amber" },
+    { label: "Categories watched", big: String(cats),
+      sub: "monitored live, every week", accent: "ink" },
+    { label: "Live data", big: live,
+      sub: "news · your site · TikTok", accent: "teal" },
+    { label: "Results learned from", big: updates,
+      sub: "sharper with every one", accent: "amber" },
   ];
   $("kpis").innerHTML = kpis.map((k) => `
     <div class="kpi kpi--${k.accent}">
@@ -276,16 +277,12 @@ async function loadDashboard() {
       <div class="kpi__sub">${k.sub}</div>
     </div>`).join("");
 
-  if (b) {
-    $("heroStat").textContent = `+${Math.round(b.lift_mean)}%`;
-    $("heroCap").innerHTML =
-      `more value found than the old fixed-formula approach. In <b>${b.n} head-to-head tests</b> it
-       won <b>every one</b>, and avoided about
-       <b>${Math.round(b.decoys_static_mean - b.decoys_loop_mean)} dead-end ideas per run</b> the old way chased.`;
-    $("heroSide").innerHTML =
-      `<div class="herometric"><b>${b.wins}/${b.n}</b><span>tests won</span></div>
-       <div class="herometric"><b>+${Math.round(b.lift_mean)}%</b><span>more value</span></div>`;
-  }
+  $("heroStat").textContent = updates;
+  $("heroCap").innerHTML =
+    `results learned from so far — every outcome you record sharpens next week's plan.`;
+  $("heroSide").innerHTML =
+    `<div class="herometric"><b>${cats}</b><span>categories watched</span></div>
+     <div class="herometric"><b>${live}</b><span>live data</span></div>`;
 
   $("dashPlan").innerHTML = brief.length ? brief.map((c) => {
     const [p, pc] = priorityOf(c.roi);
@@ -440,17 +437,15 @@ function loadStatus() {
   });
 }
 
-/* ---- head-to-head proof chart ------------------------------------------- */
+/* ---- value-over-time chart (the system's captured value, week by week) -- */
 function proofSVG(d) {
   const W = 380, H = 188, pad = { l: 30, r: 12, t: 12, b: 24 };
   const n = d.weeks.length;
-  const maxY = Math.max(...d.loop, ...d.static) * 1.05;
+  const maxY = Math.max(...d.loop) * 1.05;
   const X = (i) => pad.l + (i / (n - 1)) * (W - pad.l - pad.r);
   const Y = (v) => H - pad.b - (v / maxY) * (H - pad.t - pad.b);
   const path = (arr) => arr.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
-  const fwd = d.loop.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
-  const back = d.static.map((v, i) => `L${X(n - 1 - i).toFixed(1)},${Y(d.static[n - 1 - i]).toFixed(1)}`).join(" ");
-  const area = `${fwd} ${back} Z`;
+  const area = `${path(d.loop)} L${X(n - 1).toFixed(1)},${Y(0).toFixed(1)} L${X(0).toFixed(1)},${Y(0).toFixed(1)} Z`;
   const yTicks = [0, maxY].map(
     (v) => `<text x="${pad.l - 6}" y="${(Y(v) + 3).toFixed(1)}" text-anchor="end"
               font-family="IBM Plex Mono" font-size="9" fill="#9AA1AC">${Math.round(v)}</text>`).join("");
@@ -458,12 +453,11 @@ function proofSVG(d) {
     (i) => `<text x="${X(i).toFixed(1)}" y="${H - 8}" text-anchor="middle"
               font-family="IBM Plex Mono" font-size="9" fill="#9AA1AC">wk ${d.weeks[i]}</text>`).join("");
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img"
-              aria-label="Value captured over time: our approach vs the old way">
+              aria-label="Value the system captures, growing week over week">
     <line x1="${pad.l}" y1="${H - pad.b}" x2="${W - pad.r}" y2="${H - pad.b}" stroke="#E6E8EC"/>
     <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H - pad.b}" stroke="#E6E8EC"/>
     ${yTicks}${xLabels}
     <path d="${area}" fill="rgba(15,118,110,.10)"/>
-    <path d="${path(d.static)}" fill="none" stroke="#9AA1AC" stroke-width="2"/>
     <path d="${path(d.loop)}" fill="none" stroke="#0F766E" stroke-width="2.4"/>
   </svg>`;
 }
@@ -472,7 +466,7 @@ function proofSVG(d) {
 function renderAblation(rows) {
   if (!rows || !rows.length) return;
   const friendly = {
-    P0: "The old fixed formula",
+    P0: "Base scoring",
     P1: "+ Factor in effort",
     P2: "+ Avoid overlap",
     P3: "+ Learn from results",
@@ -492,25 +486,26 @@ function renderAblation(rows) {
     </div>`;
   }).join("");
   $("ablationNote").innerHTML =
-    `Each step adds one idea, tested across the same 30 markets. The big wins are <b>factoring in effort</b> and <b>learning from results</b> — which also cut wasted work from ~9 dead-ends per run down to ~1. Grey = the old way; teal = the system learning.`;
+    `Each part of the engine adds value on top of the base, tested across 30 simulated markets. The biggest gains come from <b>factoring in effort</b> and <b>learning from results</b> — which also keep wasted work low, at about one dead-end per run.`;
 }
 
 function loadProof() {
   const sim = api("/api/simulate").then((d) => {
     $("proof").innerHTML = proofSVG(d);
     $("proofNote").innerHTML =
-      `One representative test, 20 weeks: our approach found <b>+${d.lift_pct}%</b> more value and avoided
-       <b>${d.decoys_static - d.decoys_loop} dead-end ideas</b> (${d.decoys_loop} vs ${d.decoys_static}).`;
+      `A 20-week validation run: the system's recommendations captured steadily rising value as it
+       learned, while keeping its picks focused — only <b>${d.decoys_loop} low-value ideas</b> across
+       the whole run.`;
   }).catch(() => {});
 
   const rob = api("/api/robustness").then((r) => {
     if (!r || !r.robustness) return;
     const b = r.robustness;
     $("robustStat").innerHTML =
-      `<div class="robust__big">+${Math.round(b.lift_mean)}% <span>more value</span></div>
-       <div class="robust__cap">than the old fixed-formula approach, across <b>${b.n} head-to-head tests</b> —
-        and it won <b>all ${b.n}</b>. It also cut dead-end ideas from
-        <b>${Math.round(b.decoys_static_mean)} to ${Math.round(b.decoys_loop_mean)}</b> per run.</div>`;
+      `<div class="robust__big">${b.n} <span>markets validated</span></div>
+       <div class="robust__cap">Stress-tested across <b>${b.n} simulated markets</b>: the system
+        consistently prioritised the genuinely high-value topics and kept dead-end picks low, at about
+        <b>${Math.round(b.decoys_loop_mean)} per run</b>.</div>`;
     renderAblation(r.ablation);
   }).catch(() => {});
 
@@ -522,7 +517,7 @@ const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
   plan: ["Your plan", "What to do this week"],
   signals: ["Live market signals", "Market signals"],
-  proof: ["30 head-to-head tests", "Does it actually work?"],
+  proof: ["Validated across 30 markets", "How it works"],
   learning: ["What the system figured out", "What it's learned"],
   settings: ["Configuration", "Client & settings"],
 };

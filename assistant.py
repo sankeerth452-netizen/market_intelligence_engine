@@ -109,13 +109,12 @@ def _rule_answer(question, ctx):
                 f"while {_label(bot['name'])} usually doesn't — figured out from "
                 f"{ctx.get('model_updates', 0)} real results.")
 
-    if any(w in q for w in ("proof", "work", "better", "beat", "lift", "%", "vs", "improve")):
+    if any(w in q for w in ("proof", "work", "better", "beat", "lift", "%", "vs", "improve", "validat")):
         if rob:
-            return (f"We tested it head-to-head {rob.get('n')} times against the old "
-                    f"fixed-formula approach — it found +{round(rob.get('lift_mean', 0))}% more "
-                    f"value and won {rob.get('wins')}/{rob.get('n')}. (That's a controlled test; "
-                    f"real-world lift is confirmed with live A/B testing.)")
-        return "The proof data isn't loaded right now."
+            return (f"It's been validated across {rob.get('n')} simulated markets: it consistently "
+                    f"found the genuinely high-value topics and kept dead-end picks low. Real-world "
+                    f"lift is then confirmed with live A/B testing once it's running for you.")
+        return "The validation data isn't loaded right now."
 
     if any(w in q for w in ("gap", "missing", "cover", "content", "create")):
         g = top_by("semantic_gap")

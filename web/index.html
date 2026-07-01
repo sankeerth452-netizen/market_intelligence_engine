@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Market Intelligence Engine — an AI analyst that learns</title>
-  <meta name="description" content="An AI market analyst that recommends what content to build, learns from real outcomes, and provably beats a fixed-score recommender — +40% more value across 30 simulated markets.">
+  <meta name="description" content="An AI market analyst that turns live signals into ranked content recommendations, writes the action plan, and learns from real outcomes to get sharper every week.">
   <meta name="theme-color" content="#15171E">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <!-- Rich preview when the link is shared (iMessage, Slack, etc.) -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Market Intelligence Engine — an AI analyst that learns">
-  <meta property="og:description" content="Recommends what to build, learns from real outcomes, and provably beats a fixed-score recommender — +40% value across 30 simulated markets.">
+  <meta property="og:description" content="Turns live market signals into ranked content recommendations, writes the action plan, and learns from real outcomes.">
   <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@
         <button class="nav__item is-active" data-view="dashboard"><span class="nav__ico">▤</span>Dashboard</button>
         <button class="nav__item" data-view="plan"><span class="nav__ico">◎</span>This Week's Plan</button>
         <button class="nav__item" data-view="signals"><span class="nav__ico">≋</span>Market Signals</button>
-        <button class="nav__item" data-view="proof"><span class="nav__ico">▰</span>Does it work?</button>
+        <button class="nav__item" data-view="proof"><span class="nav__ico">▰</span>How it works</button>
         <button class="nav__item" data-view="learning"><span class="nav__ico">✦</span>What It's Learned</button>
         <button class="nav__item" data-view="settings"><span class="nav__ico">⚙</span>Settings</button>
       </nav>
@@ -61,8 +61,8 @@
 
         <div class="hero" id="hero">
           <div class="hero__main">
-            <div class="eyebrow">How we compare to the old approach</div>
-            <div class="hero__stat" id="heroStat">+40%</div>
+            <div class="eyebrow">Always-on market intelligence</div>
+            <div class="hero__stat" id="heroStat">—</div>
             <p class="hero__cap" id="heroCap">more real value captured — and it keeps improving.</p>
           </div>
           <div class="hero__side" id="heroSide"></div>
@@ -108,22 +108,21 @@
 
       <!-- ----------------------------- PROOF --------------------------- -->
       <section class="view" id="view-proof">
-        <p class="lede">Is this actually better than the old way? We ran it <b>head-to-head 30 times</b>
-          against the old fixed-formula approach on simulated markets — the fair way to prove it before
-          spending a client's budget. It won <b>every single time</b>. (Real-world lift is then confirmed
-          with live A/B tests once it's running for a client.)</p>
+        <p class="lede">How the engine turns live market signals into ranked recommendations — and how it
+          gets <b>sharper every week</b> by learning from the results you record. It's been validated across
+          <b>30 simulated markets</b> before ever spending your budget; real-world lift is then confirmed with
+          live A/B tests once it's running for you.</p>
 
         <div class="panels">
           <div class="panel">
             <div class="panel__head">
-              <div class="eyebrow">30 head-to-head tests</div>
-              <h2 class="panel__title">We tested it. It won.</h2>
+              <div class="eyebrow">Validated across 30 markets</div>
+              <h2 class="panel__title">Built to find real value</h2>
             </div>
             <div id="robustStat" class="robust"></div>
             <div id="proof" class="proof"></div>
             <div class="legend">
-              <span><i class="dot dot--loop"></i> Our approach</span>
-              <span><i class="dot dot--static"></i> The old way</span>
+              <span><i class="dot dot--loop"></i> Value captured, week over week</span>
             </div>
             <p class="panel__note" id="proofNote"></p>
           </div>
@@ -141,9 +140,8 @@
 
       <!-- ----------------------------- LEARNING ------------------------ -->
       <section class="view" id="view-learning">
-        <p class="lede">The old approach used a <b>fixed formula</b> that never changed. Ours
-          <b>learns</b> what actually drives results from real outcomes — record a result on the plan
-          and watch this update live.</p>
+        <p class="lede">The system <b>learns</b> what actually drives results from real outcomes —
+          record a result on the plan and watch this update live.</p>
 
         <div class="panels">
           <div class="panel">

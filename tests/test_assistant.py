@@ -15,9 +15,9 @@ _CTX = {
 }
 
 
-def test_proof_question_cites_the_lift():
+def test_proof_question_describes_validation():
     a = assistant._rule_answer("does it actually work?", _CTX)
-    assert "40" in a and "30/30" in a
+    assert "30" in a and "validat" in a.lower()   # non-comparative, client-facing
 
 
 def test_learning_question_cites_weights():
