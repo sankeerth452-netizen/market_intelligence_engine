@@ -52,6 +52,25 @@ model_state = Table(
     Column("payload", Text), Column("updated_at", Float),
 )
 
+# Competitor page inventory: one row per (site, url), with when we first saw it.
+# Diffing week-over-week surfaces the pages a competitor has newly published.
+competitor_pages = Table(
+    "competitor_pages", metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("site", Text), Column("url", Text),
+    Column("first_seen", Float), Column("last_seen", Float),
+    UniqueConstraint("site", "url", name="uq_competitor_site_url"),
+)
+
+# One row per crawl attempt per site — the status feed (accessible? blocked?).
+crawl_runs = Table(
+    "crawl_runs", metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("site", Text), Column("ran_at", Float),
+    Column("found", Integer), Column("added", Integer),
+    Column("ok", Integer), Column("note", Text),
+)
+
 
 def _normalize_url(url: str) -> str:
     """Accept a bare file path or any DB URL; return a SQLAlchemy URL."""
@@ -153,8 +172,82 @@ def load_model(engine, key: str):
 
 
 def reset_all(engine) -> None:
-    """Wipe recommendations, outcomes and the saved model (the demo reset)."""
+    """Wipe recommendations, outcomes and the saved model (the demo reset).
+    Competitor crawl history is deliberately kept — it's slow to rebuild and
+    unrelated to the learning demo."""
     with engine.begin() as conn:
         conn.execute(outcomes.delete())
         conn.execute(recommendations.delete())
         conn.execute(model_state.delete())
+
+
+# ---- competitor page inventory + new-page detection ----
+def sync_site_pages(engine, site: str, urls) -> dict:
+    """Record the current page URLs for a site. New URLs get first_seen=now;
+    already-known URLs just have last_seen bumped. Returns {found, added}."""
+    now = time.time()
+    urls = list(dict.fromkeys(urls))          # de-dup, keep order
+    with engine.begin() as conn:
+        known = {r[0] for r in conn.execute(
+            select(competitor_pages.c.url).where(competitor_pages.c.site == site))}
+        fresh = [u for u in urls if u not in known]
+        if fresh:
+            conn.execute(insert(competitor_pages), [
+                {"site": site, "url": u, "first_seen": now, "last_seen": now}
+                for u in fresh])
+        # bump last_seen for the pages still present (in chunks; IN-lists stay small)
+        present = [u for u in urls if u in known]
+        for i in range(0, len(present), 400):
+            chunk = present[i:i + 400]
+            conn.execute(update(competitor_pages)
+                         .where(competitor_pages.c.site == site,
+                                competitor_pages.c.url.in_(chunk))
+                         .values(last_seen=now))
+    return {"found": len(urls), "added": len(fresh)}
+
+
+def record_crawl_run(engine, site, found, added, ok, note="") -> None:
+    with engine.begin() as conn:
+        conn.execute(insert(crawl_runs).values(
+            site=site, ran_at=time.time(), found=int(found), added=int(added),
+            ok=1 if ok else 0, note=note))
+
+
+def new_pages(engine, site: str, since_ts: float, limit: int = 40):
+    """Pages for a site whose first_seen is at/after since_ts — the 'new' ones."""
+    with engine.begin() as conn:
+        rows = conn.execute(
+            select(competitor_pages.c.url, competitor_pages.c.first_seen)
+            .where(competitor_pages.c.site == site,
+                   competitor_pages.c.first_seen >= since_ts)
+            .order_by(competitor_pages.c.first_seen.desc())
+            .limit(limit)).all()
+    return [{"url": r[0], "first_seen": r[1]} for r in rows]
+
+
+def first_crawl_at(engine, site: str):
+    """When we first successfully crawled this site (the baseline). Pages present
+    at the baseline are NOT 'new'; only ones seen afterwards are."""
+    with engine.begin() as conn:
+        return conn.execute(select(func.min(crawl_runs.c.ran_at))
+                            .where(crawl_runs.c.site == site,
+                                   crawl_runs.c.ok == 1)).scalar()
+
+
+def site_page_count(engine, site: str) -> int:
+    with engine.begin() as conn:
+        return int(conn.execute(select(func.count()).select_from(competitor_pages)
+                                .where(competitor_pages.c.site == site)).scalar() or 0)
+
+
+def last_crawl_run(engine, site: str):
+    with engine.begin() as conn:
+        row = conn.execute(
+            select(crawl_runs.c.ran_at, crawl_runs.c.found, crawl_runs.c.added,
+                   crawl_runs.c.ok, crawl_runs.c.note)
+            .where(crawl_runs.c.site == site)
+            .order_by(crawl_runs.c.ran_at.desc()).limit(1)).first()
+    if not row:
+        return None
+    return {"ran_at": row[0], "found": row[1], "added": row[2],
+            "ok": bool(row[3]), "note": row[4]}

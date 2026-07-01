@@ -622,6 +622,36 @@ body {
 .sig__val { font-family: var(--mono); font-size: 12px; width: 30px; text-align: right; color: var(--ink); }
 .sig__news { font-size: 12px; color: var(--mute); margin-top: 8px; line-height: 1.4; }
 
+/* ---- Competitors view -------------------------------------------------- */
+.refreshbtn {
+  font-family: var(--body); font-size: 13px; font-weight: 500;
+  color: #fff; background: var(--ink); border: none; border-radius: 9px;
+  padding: 9px 16px; cursor: pointer; white-space: nowrap; transition: background .15s;
+}
+.refreshbtn:hover { background: var(--teal); }
+.refreshbtn:disabled { opacity: .6; cursor: default; }
+.complist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.comp {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card);
+  padding: 16px 18px; box-shadow: var(--shadow);
+}
+.comp--blocked { opacity: .82; }
+.comp__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 5px; }
+.comp__name { font-family: var(--display); font-weight: 600; font-size: 16px; }
+.comp__badge {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em; color: var(--mute);
+  background: var(--line-soft); border-radius: var(--r-pill); padding: 3px 9px; white-space: nowrap;
+}
+.comp__badge--new { color: #fff; background: var(--teal); }
+.comp__badge--blk { color: var(--amber); background: var(--amber-wash); border: 1px solid rgba(183,121,31,.3); }
+.comp__meta { font-family: var(--mono); font-size: 11px; color: var(--mute); margin-bottom: 10px; }
+.comp__pages { margin: 0; padding-left: 18px; }
+.comp__pages li { font-size: 13px; line-height: 1.5; margin-bottom: 3px; }
+.comp__pages a { color: var(--teal); text-decoration: none; }
+.comp__pages a:hover { text-decoration: underline; }
+.comp__note { font-size: 12.5px; color: var(--mute); line-height: 1.45; margin: 0; }
+@media (max-width: 900px) { .complist { grid-template-columns: 1fr; } }
+
 /* ---- virtual assistant ------------------------------------------------- */
 .asst-fab {
   position: fixed; right: 22px; bottom: 22px; z-index: 60;

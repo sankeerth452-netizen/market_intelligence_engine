@@ -74,6 +74,14 @@ def test_assistant_answers_from_data():
     assert a.get("answer")
 
 
+def test_competitors_returns_per_site_shape():
+    d = client.get("/api/competitors").json()
+    assert "competitors" in d and isinstance(d["competitors"], list)
+    if d["competitors"]:
+        for k in ("name", "total", "new_count", "new_pages", "ok"):
+            assert k in d["competitors"][0]
+
+
 def test_playbook_returns_a_structured_plan(monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)   # exercise the offline tier
     body = {"topic": "Test Widgets", "action": "Create new page", "effort": "low",

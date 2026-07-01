@@ -30,6 +30,7 @@
         <button class="nav__item is-active" data-view="dashboard"><span class="nav__ico">▤</span>Dashboard</button>
         <button class="nav__item" data-view="plan"><span class="nav__ico">◎</span>This Week's Plan</button>
         <button class="nav__item" data-view="signals"><span class="nav__ico">≋</span>Market Signals</button>
+        <button class="nav__item" data-view="competitors"><span class="nav__ico">⚑</span>Competitors</button>
         <button class="nav__item" data-view="proof"><span class="nav__ico">▰</span>How it works</button>
         <button class="nav__item" data-view="learning"><span class="nav__ico">✦</span>What It's Learned</button>
         <button class="nav__item" data-view="settings"><span class="nav__ico">⚙</span>Settings</button>
@@ -104,6 +105,17 @@
           recommendation — real search demand, news coverage, and what's missing from your site.
           No placeholders: it only shows what it actually found.</p>
         <div id="signals" class="siglist"></div>
+      </section>
+
+      <!-- ----------------------------- COMPETITORS --------------------- -->
+      <section class="view" id="view-competitors">
+        <div class="planbar">
+          <p class="lede">What your competitors are <b>publishing</b>. We watch their catalogues weekly and
+            flag the <b>new pages</b> they add — so you can respond fast. Sites behind enterprise
+            bot-protection are shown honestly (their pages will come via Ahrefs).</p>
+          <button id="compRefresh" class="refreshbtn">Refresh now</button>
+        </div>
+        <div id="competitors" class="complist"></div>
       </section>
 
       <!-- ----------------------------- PROOF --------------------------- -->

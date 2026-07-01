@@ -107,6 +107,19 @@ def post_playbook(req: PlaybookReq):
     return ENGINE.playbook(req.model_dump())
 
 
+@app.get("/api/competitors")
+def get_competitors():
+    """Competitor page inventory + newly-published pages (week-over-week diff)."""
+    return ENGINE.competitors()
+
+
+@app.post("/api/competitors/refresh")
+def post_competitors_refresh():
+    """Trigger a competitor crawl in the background (the weekly cron does this
+    automatically; this is the on-demand button)."""
+    return ENGINE.refresh_competitors()
+
+
 @app.get("/api/health")
 def health():
     """Liveness probe for the hosting platform's health check."""

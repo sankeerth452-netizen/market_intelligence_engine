@@ -512,11 +512,58 @@ function loadProof() {
   return Promise.all([sim, rob]);
 }
 
+/* ---- Competitors: new pages rivals are publishing ---------------------- */
+function timeAgo(ts) {
+  if (!ts) return "not yet";
+  const s = Date.now() / 1000 - ts;
+  if (s < 3600) return Math.max(1, Math.round(s / 60)) + "m ago";
+  if (s < 86400) return Math.round(s / 3600) + "h ago";
+  return Math.round(s / 86400) + "d ago";
+}
+
+function compCard(c) {
+  if (c.ok === false) {
+    return `<div class="comp comp--blocked">
+      <div class="comp__top">
+        <div class="comp__name">${c.name}</div>
+        <span class="comp__badge comp__badge--blk">bot-protected</span>
+      </div>
+      <p class="comp__note">This retailer blocks automated crawlers (enterprise bot-protection).
+        Their new pages will come through the <b>Ahrefs</b> integration.</p>
+    </div>`;
+  }
+  const pages = c.new_pages && c.new_pages.length
+    ? `<ul class="comp__pages">${c.new_pages.map((p) =>
+        `<li><a href="${p.url}" target="_blank" rel="noopener">${p.title || p.url}</a></li>`).join("")}</ul>`
+    : `<p class="comp__note">Baseline captured — new pages this competitor publishes will appear
+        here after the next weekly crawl.</p>`;
+  return `<div class="comp">
+    <div class="comp__top">
+      <div class="comp__name">${c.name}</div>
+      <span class="comp__badge ${c.new_count ? "comp__badge--new" : ""}">${
+        c.new_count ? c.new_count + " new" : "tracked"}</span>
+    </div>
+    <div class="comp__meta">${(c.total || 0).toLocaleString()} pages tracked · crawled ${timeAgo(c.last_crawled)}</div>
+    ${pages}
+  </div>`;
+}
+
+function loadCompetitors() {
+  const host = $("competitors");
+  if (!host.children.length) host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  return api("/api/competitors").then((d) => {
+    const rows = (d && d.competitors) || [];
+    host.innerHTML = rows.length ? rows.map(compCard).join("")
+      : `<p class="lede">No competitors configured.</p>`;
+  }).catch(() => { host.innerHTML = `<p class="lede">Could not load competitor data.</p>`; });
+}
+
 /* ---- view routing ------------------------------------------------------- */
 const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
   plan: ["Your plan", "What to do this week"],
   signals: ["Live market signals", "Market signals"],
+  competitors: ["New pages rivals are publishing", "Competitors"],
   proof: ["Validated across 30 markets", "How it works"],
   learning: ["What the system figured out", "What it's learned"],
   settings: ["Configuration", "Client & settings"],
@@ -532,6 +579,7 @@ function showView(name) {
   $("viewTitle").textContent = t;
   if (name === "dashboard") loadDashboard();
   if (name === "signals") loadSignals();
+  if (name === "competitors") loadCompetitors();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -556,6 +604,13 @@ $("resetBtn").addEventListener("click", async () => {
   await api("/api/reset", { method: "POST" });
   toast("Reset — the system starts learning from scratch");
   await Promise.all([loadBrief(), loadWeights(), loadStatus(), loadDashboard()]);
+});
+$("compRefresh").addEventListener("click", async () => {
+  const b = $("compRefresh");
+  b.disabled = true; b.textContent = "Crawling…";
+  try { await api("/api/competitors/refresh", { method: "POST" }); } catch (e) {}
+  toast("Crawling competitors in the background — this refreshes in a moment.");
+  setTimeout(() => { loadCompetitors(); b.disabled = false; b.textContent = "Refresh now"; }, 6000);
 });
 
 /* ---- virtual assistant -------------------------------------------------- */
@@ -612,5 +667,6 @@ loadStatus();
 loadProof();
 loadDashboard();
 loadSummary();
+loadCompetitors();
 wireGoto();
 showView("dashboard");

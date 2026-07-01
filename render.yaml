@@ -29,6 +29,27 @@ services:
         sync: false             # optional: enables the AI assistant + AI Strategist
       - key: APIFY_API_KEY
         sync: false             # optional: enables real TikTok velocity (Apify)
+      # ---- Competitor monitoring (weekly crawl below keeps this fresh) ----
+      - key: COMPETITOR_URLS
+        value: https://www.thegoodguys.com.au,https://www.officeworks.com.au,https://www.harveynorman.com.au
+      - key: COMPETITOR_CRAWL_ON_BOOT
+        value: "1"              # seed a baseline on first boot
+
+  # Weekly competitor crawl — updates the shared DB the web service reads.
+  # NOTE: Render Cron Jobs require a paid instance; until then the web app's
+  # "Refresh" button (POST /api/competitors/refresh) triggers the same crawl.
+  - type: cron
+    name: mie-competitor-crawl
+    runtime: docker
+    schedule: "0 3 * * 1"       # Mondays 03:00 UTC
+    dockerCommand: python crawl_job.py
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mie-db
+          property: connectionString
+      - key: COMPETITOR_URLS
+        value: https://www.thegoodguys.com.au,https://www.officeworks.com.au,https://www.harveynorman.com.au
 
 databases:
   - name: mie-db

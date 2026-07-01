@@ -21,6 +21,7 @@ import config
 import client_config
 import assistant as assistant_mod
 import strategist as strategist_mod
+import competitors as competitors_mod
 from world import build_world
 from bandit import LinUCB
 from engine_core import iter_candidates, run_loop_training, run_head_to_head
@@ -52,8 +53,12 @@ class EngineService:
         self._sim_cache = None
         self._real_cache = None             # (timestamp, candidates, index)
         self._plan_cache = {}               # topic -> AI action plan (stable per session)
+        self._comp_cache = None             # (timestamp, competitor report)
+        self._comp_refreshing = False
         if DATA_MODE == "real":             # warm the live-data cache off the request path
             threading.Thread(target=self._warm_real_cache, daemon=True).start()
+        if os.environ.get("COMPETITOR_CRAWL_ON_BOOT", "").strip() == "1":
+            threading.Thread(target=self._baseline_competitors, daemon=True).start()
 
     def _warm_real_cache(self):
         """Pre-fetch live signals after boot so the first request isn't slow.
@@ -318,6 +323,43 @@ class EngineService:
         if topic:
             self._plan_cache[topic] = plan
         return plan
+
+    # ------------------------------------------ competitor monitoring ----------
+    def competitors(self):
+        """Per-competitor page inventory + newly-published pages (cached)."""
+        now = time.time()
+        if self._comp_cache and now - self._comp_cache[0] < 300:
+            return self._comp_cache[1]
+        rep = competitors_mod.report(self.engine)
+        rep["refreshing"] = self._comp_refreshing
+        self._comp_cache = (now, rep)
+        return rep
+
+    def refresh_competitors(self):
+        """Kick off a competitor crawl in the background (crawling is slow); the
+        report picks up the results when it finishes."""
+        if self._comp_refreshing:
+            return {"ok": True, "status": "already running"}
+        self._comp_refreshing = True
+        threading.Thread(target=self._refresh_competitors_bg, daemon=True).start()
+        return {"ok": True, "status": "started"}
+
+    def _refresh_competitors_bg(self):
+        try:
+            competitors_mod.refresh(self.engine)
+        finally:
+            self._comp_refreshing = False
+            self._comp_cache = None
+
+    def _baseline_competitors(self):
+        """First-boot only: seed a baseline so the view isn't empty. The weekly
+        cron + manual refresh handle ongoing updates."""
+        try:
+            rep = competitors_mod.report(self.engine)
+            if all(c["last_crawled"] is None for c in rep["competitors"]):
+                self._refresh_competitors_bg()
+        except Exception:
+            pass
 
     # ------------------------------------------- head-to-head proof (cached) ----
     def simulate(self):

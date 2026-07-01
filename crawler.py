@@ -229,6 +229,60 @@ def sitemap_corpus(url: str, max_urls: int = 2500, max_sitemaps: int = 6):
     return docs
 
 
+def sitemap_page_urls(url: str, max_urls: int = 4000, max_sitemaps: int = 10):
+    """Return the actual page URLs from a site's SITEMAP (not slug text).
+
+    Used to inventory a competitor's catalogue and diff it week-over-week to spot
+    newly-published pages. Reads only the published sitemap (robots-friendly) and
+    fails soft to [] — including when a site is bot-protected (WAF/Incapsula) and
+    serves an HTML challenge instead of XML, which ET simply can't parse.
+    """
+    start = url if "://" in url else "https://" + url
+    parts = urllib.parse.urlparse(start)
+    host = parts.netloc
+    raw = _fetch(f"{parts.scheme}://{host}/sitemap.xml")
+    if not raw:
+        return []
+    try:
+        root = ET.fromstring(raw)
+    except Exception:
+        return []                                   # e.g. an HTML bot-challenge page
+    locs = [e.text.strip() for e in root.iter() if e.tag.endswith("}loc") and e.text]
+
+    page_urls = []
+    if root.tag.endswith("sitemapindex"):           # index -> sample child sitemaps
+        step = max(1, len(locs) // max_sitemaps)
+        chosen = locs[::step][:max_sitemaps]
+        per_map = max(200, (max_urls * 2) // max(1, len(chosen)))
+        for sm in chosen:
+            sraw = _fetch(sm)
+            if not sraw:
+                continue
+            try:
+                sroot = ET.fromstring(sraw)
+                page_urls += [e.text.strip() for e in sroot.iter()
+                              if e.tag.endswith("}loc") and e.text][:per_map]
+            except Exception:
+                pass
+            if len(page_urls) >= max_urls:
+                break
+    else:
+        page_urls = locs
+
+    out, seen = [], set()
+    for u in page_urls:
+        pu = urllib.parse.urlparse(u)
+        if (pu.netloc and pu.netloc != host) or _ASSET_RE.search(pu.path):
+            continue                                # keep only this host's real pages
+        if u in seen:
+            continue
+        seen.add(u)
+        out.append(u)
+        if len(out) >= max_urls:
+            break
+    return out
+
+
 if __name__ == "__main__":   # smoke test: a permissive public page (robots allows)
     got = crawl("https://example.com", max_pages=2, delay=0)
     print(f"crawled {len(got)} page(s) from example.com")
