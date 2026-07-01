@@ -106,6 +106,7 @@ body {
   font-family: var(--display); font-weight: 600; font-size: 26px;
   min-width: 44px; text-align: center; color: var(--ink); font-variant-numeric: tabular-nums;
 }
+.week__val--date { font-size: 18px; white-space: nowrap; }   /* real date range, not "08" */
 .step {
   width: 34px; height: 34px; border-radius: 9px;
   border: 1px solid var(--line); background: var(--surface); color: var(--mute);
@@ -153,7 +154,10 @@ body {
 /* ---- top bar + view routing ------------------------------------------- */
 .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
 .topbar__title { font-family: var(--display); font-weight: 600; font-size: 30px; letter-spacing: -.015em; margin: 6px 0 0; }
-.topbar__right { padding-top: 4px; }
+.topbar__right { padding-top: 4px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.greeting { text-align: right; line-height: 1.3; }
+.greeting__hi { display: block; font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--ink); }
+.greeting__dt { display: block; font-family: var(--mono); font-size: 11px; color: var(--mute); }
 .clientchip {
   font-family: var(--mono); font-size: 12px; color: var(--teal);
   background: var(--teal-wash); border: 1px solid rgba(15,118,110,.22);

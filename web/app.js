@@ -57,6 +57,49 @@ const whyLine = (c) => {
   return ev.length ? ev.join(" · ") : "Flagged by this week's market signals.";
 };
 
+/* ---- greeting + live date/time (client-friendly header) ---------------- */
+const greetWord = (h) => (h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
+function updateGreeting() {
+  const now = new Date();
+  const date = now.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const time = now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const g = $("greeting");
+  if (g) g.innerHTML = `<span class="greeting__hi">${greetWord(now.getHours())}</span>` +
+    `<span class="greeting__dt">${date} · ${time}</span>`;
+}
+function weekRange() {
+  const now = new Date();
+  const day = (now.getDay() + 6) % 7;                 // Monday = 0
+  const mon = new Date(now); mon.setDate(now.getDate() - day);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const f = (d) => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  return `${f(mon)} – ${f(sun)}`;
+}
+const shortToday = () => new Date().toLocaleDateString(undefined, { day: "numeric", month: "short" });
+
+/* Real mode has no synthetic "week N"; show the actual current week + hide the
+   demo stepper. Synthetic/demo keeps the stepper. */
+function configureWeek() {
+  const eb = document.querySelector(".week .eyebrow");
+  const down = $("weekDown"), up = $("weekUp");
+  if (state.real) {
+    if (eb) eb.textContent = "This week";
+    if (down) down.style.display = "none";
+    if (up) up.style.display = "none";
+  } else {
+    if (eb) eb.textContent = "Planning week";
+    if (down) down.style.display = "";
+    if (up) up.style.display = "";
+  }
+  setWeekLabel();
+}
+function setWeekLabel() {
+  const el = $("weekVal");
+  if (!el) return;
+  if (state.real) { el.textContent = weekRange(); el.classList.add("week__val--date"); }
+  else { el.textContent = pad2(state.week); el.classList.remove("week__val--date"); }
+}
+
 async function api(path, opts) {
   const res = await fetch(path, opts);
   if (!res.ok) throw new Error(await res.text());
@@ -242,7 +285,7 @@ async function refreshBriefInPlace() {
 function loadBrief() {
   const host = $("cards");
   host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
-  $("weekVal").textContent = pad2(state.week);
+  setWeekLabel();
   return api(`/api/brief?week=${state.week}&k=3`).then((data) => {
     host.innerHTML = "";
     if (!data.length) {
@@ -257,22 +300,27 @@ function loadBrief() {
 
 /* ---- Dashboard overview (KPIs + hero + plan preview) -------------------- */
 async function loadDashboard() {
-  const [status, brief] = await Promise.all([
+  const [status, brief, sig] = await Promise.all([
     api("/api/status").catch(() => ({})),
     api(`/api/brief?week=${state.week}&k=3`).catch(() => []),
+    api("/api/signals").catch(() => ({ items: [] })),
   ]);
   const top = brief[0];
   const cats = (status.client && status.client.categories) || "—";
-  const live = status.data_mode === "real" ? "Real" : "Demo";
   const updates = status.model_updates != null ? String(status.model_updates) : "—";
+  const topVol = (sig.items || []).filter((i) => i.volume != null).sort((a, b) => b.volume - a.volume)[0];
+
+  const demandKpi = topVol
+    ? { label: "Biggest search demand", big: topVol.topic,
+        sub: topVol.volume.toLocaleString() + " searches/mo", accent: "teal" }
+    : { label: "This week", big: weekRange(), sub: "your market snapshot", accent: "teal" };
 
   const kpis = [
     { label: "Do this first", big: top ? top.topic : "—",
       sub: top ? `${prioOf(top)[0]} priority · ${(top.action || "").toLowerCase()}` : "", accent: "teal" },
     { label: "Categories watched", big: String(cats),
-      sub: "monitored live, every week", accent: "ink" },
-    { label: "Live data", big: live,
-      sub: "news · your site · TikTok", accent: "teal" },
+      sub: "monitored every week", accent: "ink" },
+    demandKpi,
     { label: "Results learned from", big: updates,
       sub: "sharper with every one", accent: "amber" },
   ];
@@ -288,7 +336,7 @@ async function loadDashboard() {
     `results learned from so far — every outcome you record sharpens next week's plan.`;
   $("heroSide").innerHTML =
     `<div class="herometric"><b>${cats}</b><span>categories watched</span></div>
-     <div class="herometric"><b>${live}</b><span>live data</span></div>`;
+     <div class="herometric"><b>${shortToday()}</b><span>updated</span></div>`;
 
   $("dashPlan").innerHTML = brief.length ? brief.map((c) => {
     const [p, pc] = prioOf(c);
@@ -318,8 +366,8 @@ function loadSummary() {
     }).join("");
     $("summaryCard").innerHTML = `
       <div class="summary__head">
-        <span class="eyebrow">✦ This week's read on the market · from live data</span>
-        <span class="summary__mode">${s.data_mode === "real" ? "LIVE DATA" : "demo data"}</span>
+        <span class="eyebrow">✦ This week's read on the market</span>
+        <span class="summary__mode">${shortToday()}</span>
       </div>
       <p class="summary__learned">${s.learned}</p>
       <div class="summary__grid">
@@ -424,6 +472,8 @@ function loadWeights() {
 /* ---- status: gauges + rail + client chip + settings -------------------- */
 function loadStatus() {
   return api("/api/status").then((s) => {
+    state.real = s.data_mode === "real";
+    configureWeek();
     $("gRecs").textContent = s.recommendations;
     $("gOuts").textContent = s.outcomes;
     $("gUpd").textContent = s.model_updates;
@@ -441,7 +491,6 @@ function loadStatus() {
       <div class="cfgrow"><span>Industry</span><b>${titleCase(c.industry)}</b></div>
       <div class="cfgrow"><span>Categories tracked</span><b>${c.categories}</b></div>
       <div class="cfgrow"><span>Website analysed</span><b>${c.site_source}</b></div>
-      <div class="cfgrow"><span>Data</span><b>${s.data_mode === "real" ? "live" : "demo"}</b></div>
       <p class="cfg__note">This is a reusable platform — point it at a new client by setting
         <code>CLIENT_NAME</code>, <code>CLIENT_INDUSTRY</code>, <code>CLIENT_CATEGORIES</code> and
         <code>SITE_URL</code>. No code changes.</p>` : "";
@@ -601,7 +650,7 @@ function loadAiVisibility() {
 const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
   plan: ["Your plan", "What to do this week"],
-  signals: ["Live market signals", "Market signals"],
+  signals: ["The signals behind every recommendation", "Market signals"],
   competitors: ["New pages rivals are publishing", "Competitors"],
   aivis: ["Your presence in AI answers", "AI Visibility"],
   proof: ["Validated across 30 markets", "How it works"],
@@ -710,5 +759,7 @@ loadDashboard();
 loadSummary();
 loadCompetitors();
 loadAiVisibility();
+updateGreeting();
+setInterval(updateGreeting, 30000);   // keep the clock current
 wireGoto();
 showView("dashboard");
