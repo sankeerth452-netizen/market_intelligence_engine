@@ -17,6 +17,7 @@ reads cost 0):
   * Cheap fields only (url, keyword, volume — no 10-unit 'traffic' export),
     small row caps, and hour-long caches upstream.
 """
+import datetime
 import json
 import os
 import time
@@ -116,6 +117,24 @@ def top_pages(domain, limit=100, country=None):
         "date": time.strftime("%Y-%m-%d"), "select": "url,sum_traffic",
         "order_by": "sum_traffic:desc", "limit": int(limit)})
     return [p["url"] for p in (d or {}).get("pages", []) if p.get("url")]
+
+
+HISTORY_MONTHS = int(os.environ.get("AHREFS_HISTORY_MONTHS", "18"))
+
+
+def volume_history(keyword, country=None, months=None):
+    """Monthly search-volume history for a keyword: [{date:'YYYY-MM', volume}].
+    Date-capped to the last `months` so each call is only the ~50-unit minimum
+    (the full history back to 2015 would be ~2.3k units). [] if off/over budget."""
+    if not enabled() or not keyword or not within_budget():
+        return []
+    months = months or HISTORY_MONTHS
+    frm = (datetime.date.today().replace(day=1) - datetime.timedelta(days=31 * months)).isoformat()
+    d = _get("keywords-explorer/volume-history", {
+        "country": (country or COUNTRY), "keyword": keyword,
+        "date_from": frm, "select": "date,volume"})
+    return [{"date": (m.get("date") or "")[:7], "volume": int(m.get("volume") or 0)}
+            for m in (d or {}).get("metrics", []) if m.get("date")]
 
 
 def share_of_voice(brand, competitors, country=None, data_sources=None):

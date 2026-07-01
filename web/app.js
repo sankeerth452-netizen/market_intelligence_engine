@@ -381,13 +381,27 @@ function loadSummary() {
 }
 
 /* ---- Market signals view ------------------------------------------------ */
+function sparkline(series, w = 118, h = 26) {
+  if (!series || series.length < 2) return "";
+  const max = Math.max(...series), min = Math.min(...series), rng = max - min || 1;
+  const pts = series.map((v, i) =>
+    `${(i / (series.length - 1) * w).toFixed(1)},${(h - 2 - (v - min) / rng * (h - 4)).toFixed(1)}`).join(" ");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">` +
+    `<polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>`;
+}
+
 function loadSignals() {
   const host = $("signals");
   if (host.dataset.loaded) return Promise.resolve();
   host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
-  return api("/api/signals").then((d) => {
+  return Promise.all([
+    api("/api/signals"),
+    api("/api/demand").catch(() => ({ categories: [] })),
+  ]).then(([d, dem]) => {
     const items = d.items || [];
     if (!items.length) { host.innerHTML = '<p class="lede">No signals loaded yet.</p>'; return; }
+    const demand = {};
+    (dem.categories || []).forEach((c) => { demand[String(c.category).toLowerCase()] = c; });
     const bar = (v, label) => `<div class="sig">
       <span class="sig__lbl">${label}</span>
       <div class="sig__track"><div class="sig__fill" style="width:${Math.round(v * 100)}%"></div></div>
@@ -398,6 +412,17 @@ function loadSignals() {
       const heads = (it.headlines || []).slice(0, 2).map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
       const vol = it.volume != null
         ? `<div class="sigrow__vol">🔍 ${it.volume.toLocaleString()} searches/mo</div>` : "";
+      const f = demand[String(it.category || it.topic).toLowerCase()];
+      let demandLine = "";
+      if (f) {
+        const cls = f.trend_pct > 4 ? "up" : f.trend_pct < -4 ? "down" : "";
+        const arrow = cls === "up" ? "↑" : cls === "down" ? "↓" : "→";
+        const peak = f.seasonal ? ` · peaks <b>${f.peak_month}</b> (+${f.peak_lift}%)` : "";
+        demandLine = `<div class="sig__demand">
+          <span class="spark--wrap ${cls}">${sparkline(f.series)}</span>
+          <span class="sig__trend ${cls}">${arrow} ${f.trend_pct > 0 ? "+" : ""}${f.trend_pct}% demand<span class="sig__trend-sub"> · 18-mo${peak}</span></span>
+        </div>`;
+      }
       return `<div class="sigrow">
         <div class="sigrow__top">
           <div>
@@ -411,6 +436,7 @@ function loadSignals() {
           ${bar(s.news_relevance, "In the news")}
           ${bar(s.semantic_gap, "Gap on your site")}
         </div>
+        ${demandLine}
         ${heads}
       </div>`;
     }).join("");

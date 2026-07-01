@@ -79,6 +79,11 @@ def test_ai_visibility_shape():
     assert "enabled" in d and "brands" in d      # enabled:false without an Ahrefs key
 
 
+def test_demand_shape():
+    d = client.get("/api/demand").json()
+    assert "enabled" in d and "categories" in d  # enabled:false without an Ahrefs key
+
+
 def test_competitors_returns_per_site_shape():
     d = client.get("/api/competitors").json()
     assert "competitors" in d and isinstance(d["competitors"], list)

@@ -23,6 +23,7 @@ import assistant as assistant_mod
 import strategist as strategist_mod
 import competitors as competitors_mod
 import ahrefs
+import forecast
 from world import build_world
 from bandit import LinUCB
 from engine_core import iter_candidates, run_head_to_head
@@ -58,6 +59,7 @@ class EngineService:
         self._comp_refreshing = False
         self._vol_cache = None              # (timestamp, {category_lower: volume})
         self._aiv_cache = None              # (timestamp, AI-visibility report)
+        self._demand_cache = None           # (timestamp, demand forecast report)
         if DATA_MODE == "real":             # warm the live-data cache off the request path
             threading.Thread(target=self._warm_real_cache, daemon=True).start()
         if os.environ.get("COMPETITOR_CRAWL_ON_BOOT", "").strip() == "1":
@@ -295,6 +297,27 @@ class EngineService:
                 "brands": rows, "updated": now}
         if rows:                                   # only cache a real result
             self._aiv_cache = (now, data)
+        return data
+
+    def demand_forecast(self):
+        """Per-category demand trend, seasonality and next-month forecast from real
+        Ahrefs monthly volume history. Cached a week (history moves slowly); ~500
+        units per refresh (date-capped). {enabled:false} unless AHREFS_API_KEY set."""
+        if not ahrefs.enabled():
+            return {"enabled": False, "categories": []}
+        now = time.time()
+        ttl = float(os.environ.get("DEMAND_CACHE_TTL", "604800"))   # 7 days
+        if self._demand_cache and now - self._demand_cache[0] < ttl:
+            return self._demand_cache[1]
+        out = []
+        for c in client_config.active_client().categories:
+            a = forecast.analyze(ahrefs.volume_history(c.lower()))
+            if a:
+                out.append({"category": c, **a})
+        out.sort(key=lambda x: x["current"], reverse=True)
+        data = {"enabled": True, "categories": out}
+        if out:
+            self._demand_cache = (now, data)
         return data
 
     def _category_volumes(self):

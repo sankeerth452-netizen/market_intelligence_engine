@@ -626,6 +626,17 @@ body {
 .sig__fill { height: 100%; background: var(--teal); border-radius: 4px; }
 .sig__val { font-family: var(--mono); font-size: 12px; width: 30px; text-align: right; color: var(--ink); }
 .sig__news { font-size: 12px; color: var(--mute); margin-top: 8px; line-height: 1.4; }
+/* demand history sparkline + seasonality (real Ahrefs volume history) */
+.sig__demand { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.spark--wrap { display: inline-flex; width: 118px; height: 26px; color: var(--mute-2); flex-shrink: 0; }
+.spark--wrap.up { color: var(--teal); }
+.spark--wrap.down { color: var(--amber); }
+.spark { width: 100%; height: 100%; }
+.sig__trend { font-family: var(--mono); font-size: 12px; color: var(--mute); }
+.sig__trend.up { color: var(--teal); }
+.sig__trend.down { color: var(--amber); }
+.sig__trend b { color: var(--ink); }
+.sig__trend-sub { color: var(--mute); }
 
 /* ---- Competitors view -------------------------------------------------- */
 .refreshbtn {

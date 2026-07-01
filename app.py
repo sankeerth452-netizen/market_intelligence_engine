@@ -120,6 +120,13 @@ def post_competitors_refresh():
     return ENGINE.refresh_competitors()
 
 
+@app.get("/api/demand")
+def get_demand():
+    """Per-category demand trend + seasonality + next-month forecast (Ahrefs volume
+    history). Empty/enabled:false unless AHREFS_API_KEY is set; cached a week."""
+    return ENGINE.demand_forecast()
+
+
 @app.get("/api/ai-visibility")
 def get_ai_visibility():
     """AI 'share of voice' — the client vs competitors in AI answers (Brand Radar).
