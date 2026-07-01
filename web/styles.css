@@ -654,6 +654,19 @@ body {
 .comp__note { font-size: 12.5px; color: var(--mute); line-height: 1.45; margin: 0; }
 @media (max-width: 900px) { .complist { grid-template-columns: 1fr; } }
 
+/* ---- AI Visibility view ------------------------------------------------ */
+.aivlist { display: flex; flex-direction: column; gap: 12px; max-width: 720px; }
+.aiv__src { font-family: var(--mono); font-size: 11px; color: var(--mute); margin-bottom: 4px; }
+.aiv { display: grid; grid-template-columns: 150px 1fr 46px; align-items: center; gap: 14px; }
+.aiv__name { font-family: var(--body); font-size: 14px; font-weight: 500; color: var(--ink); }
+.aiv__you { font-family: var(--mono); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--teal); border-radius: var(--r-pill); padding: 2px 7px; margin-left: 4px; }
+.aiv__track { height: 22px; background: var(--line-soft); border-radius: 6px; overflow: hidden; }
+.aiv__fill { height: 100%; background: var(--mute-2); border-radius: 6px; transition: width .6s cubic-bezier(.2,.7,.2,1); }
+.aiv--me .aiv__fill { background: var(--teal); }
+.aiv--me .aiv__name { font-weight: 600; }
+.aiv__val { font-family: var(--mono); font-weight: 600; font-size: 14px; text-align: right; color: var(--ink); }
+@media (max-width: 640px) { .aiv { grid-template-columns: 104px 1fr 40px; gap: 10px; } }
+
 /* ---- virtual assistant ------------------------------------------------- */
 .asst-fab {
   position: fixed; right: 22px; bottom: 22px; z-index: 60;

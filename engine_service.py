@@ -57,6 +57,7 @@ class EngineService:
         self._comp_cache = None             # (timestamp, competitor report)
         self._comp_refreshing = False
         self._vol_cache = None              # (timestamp, {category_lower: volume})
+        self._aiv_cache = None              # (timestamp, AI-visibility report)
         if DATA_MODE == "real":             # warm the live-data cache off the request path
             threading.Thread(target=self._warm_real_cache, daemon=True).start()
         if os.environ.get("COMPETITOR_CRAWL_ON_BOOT", "").strip() == "1":
@@ -276,6 +277,25 @@ class EngineService:
                  for n, w in zip(config.FEATURE_NAMES, theta) if n != "bias"]
         items.sort(key=lambda d: d["weight"], reverse=True)
         return items
+
+    def ai_visibility(self):
+        """AI 'share of voice' for the client vs its competitors, from Ahrefs
+        Brand Radar. Cached a full week by default because the call is expensive
+        (~3-4k units). {enabled: false} unless AHREFS_API_KEY is set."""
+        if not ahrefs.enabled():
+            return {"enabled": False, "brands": []}
+        now = time.time()
+        ttl = float(os.environ.get("AIV_CACHE_TTL", "604800"))   # 7 days
+        if self._aiv_cache and now - self._aiv_cache[0] < ttl:
+            return self._aiv_cache[1]
+        client = client_config.active_client()
+        competitors = [c["name"] for c in competitors_mod.sites()]
+        rows = ahrefs.share_of_voice(client.name, competitors)
+        data = {"enabled": True, "client": client.name, "sources": ahrefs.AI_SOURCES,
+                "brands": rows, "updated": now}
+        if rows:                                   # only cache a real result
+            self._aiv_cache = (now, data)
+        return data
 
     def _category_volumes(self):
         """Real monthly search volume per category via Ahrefs (cached 24h; one

@@ -120,6 +120,13 @@ def post_competitors_refresh():
     return ENGINE.refresh_competitors()
 
 
+@app.get("/api/ai-visibility")
+def get_ai_visibility():
+    """AI 'share of voice' — the client vs competitors in AI answers (Brand Radar).
+    Empty/enabled:false unless AHREFS_API_KEY is set; cached a week (expensive)."""
+    return ENGINE.ai_visibility()
+
+
 @app.get("/api/health")
 def health():
     """Liveness probe for the hosting platform's health check."""

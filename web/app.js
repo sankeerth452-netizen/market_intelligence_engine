@@ -570,12 +570,40 @@ function loadCompetitors() {
   }).catch(() => { host.innerHTML = `<p class="lede">Could not load competitor data.</p>`; });
 }
 
+/* ---- AI Visibility: share of voice in AI answers ----------------------- */
+function loadAiVisibility() {
+  const host = $("aivBars");
+  if (!host.children.length) host.innerHTML = '<div class="skeleton"></div>';
+  return api("/api/ai-visibility").then((d) => {
+    if (!d.enabled) {
+      host.innerHTML = `<p class="lede">AI visibility turns on with the Ahrefs key —
+        set <b>AHREFS_API_KEY</b> to see your share of voice in ChatGPT & co.</p>`;
+      return;
+    }
+    const brands = d.brands || [];
+    if (!brands.length) { host.innerHTML = `<p class="lede">No AI visibility data available yet.</p>`; return; }
+    const max = Math.max(...brands.map((b) => b.sov), 0.0001);
+    const src = (d.sources || ["chatgpt"]).join(", ").toUpperCase();
+    host.innerHTML =
+      `<div class="aiv__src">Source: <b>${src}</b> · Australia · how often each brand appears in AI answers</div>` +
+      brands.map((b) => {
+        const mine = b.brand === d.client;
+        return `<div class="aiv ${mine ? "aiv--me" : ""}">
+          <div class="aiv__name">${b.brand}${mine ? ' <span class="aiv__you">you</span>' : ""}</div>
+          <div class="aiv__track"><div class="aiv__fill" style="width:${Math.round(b.sov / max * 100)}%"></div></div>
+          <div class="aiv__val">${Math.round(b.sov * 100)}%</div>
+        </div>`;
+      }).join("");
+  }).catch(() => { host.innerHTML = `<p class="lede">Could not load AI visibility.</p>`; });
+}
+
 /* ---- view routing ------------------------------------------------------- */
 const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
   plan: ["Your plan", "What to do this week"],
   signals: ["Live market signals", "Market signals"],
   competitors: ["New pages rivals are publishing", "Competitors"],
+  aivis: ["Your presence in AI answers", "AI Visibility"],
   proof: ["Validated across 30 markets", "How it works"],
   learning: ["What the system figured out", "What it's learned"],
   settings: ["Configuration", "Client & settings"],
@@ -592,6 +620,7 @@ function showView(name) {
   if (name === "dashboard") loadDashboard();
   if (name === "signals") loadSignals();
   if (name === "competitors") loadCompetitors();
+  if (name === "aivis") loadAiVisibility();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -680,5 +709,6 @@ loadProof();
 loadDashboard();
 loadSummary();
 loadCompetitors();
+loadAiVisibility();
 wireGoto();
 showView("dashboard");

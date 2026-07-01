@@ -26,6 +26,9 @@ import urllib.request
 _BASE = "https://api.ahrefs.com/v3"
 COUNTRY = os.environ.get("AHREFS_COUNTRY", "au")
 BUDGET = int(os.environ.get("AHREFS_MONTHLY_UNIT_BUDGET", "40000"))
+# AI-visibility sources. Each is an EXPENSIVE Brand Radar call (~3-4k units),
+# so default to just ChatGPT; add more only if the budget allows.
+AI_SOURCES = [s.strip() for s in os.environ.get("AHREFS_AI_SOURCES", "chatgpt").split(",") if s.strip()]
 _usage_cache = [0.0, None]                 # (checked_at, units_used_on_key)
 
 
@@ -46,6 +49,21 @@ def _get(path, params):
         url, headers={"Authorization": f"Bearer {key}", "Accept": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read())
+    except Exception:
+        return None
+
+
+def _post(path, body):
+    key = _key()
+    if not key:
+        return None
+    req = urllib.request.Request(
+        f"{_BASE}/{path}", data=json.dumps(body).encode("utf-8"),
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json", "Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=45) as r:
             return json.loads(r.read())
     except Exception:
         return None
@@ -98,3 +116,26 @@ def top_pages(domain, limit=100, country=None):
         "date": time.strftime("%Y-%m-%d"), "select": "url,sum_traffic",
         "order_by": "sum_traffic:desc", "limit": int(limit)})
     return [p["url"] for p in (d or {}).get("pages", []) if p.get("url")]
+
+
+def share_of_voice(brand, competitors, country=None, data_sources=None):
+    """AI 'share of voice' — how often each brand shows up in AI answers (ChatGPT
+    etc.). Returns [{'brand':.., 'sov':0..1}] sorted desc, or [] if disabled /
+    over budget / on error.
+
+    EXPENSIVE (~3-4k units per call with Ahrefs prompts) — callers MUST cache it
+    for days and keep data_sources short."""
+    if not enabled() or not brand or not within_budget():
+        return []
+    body = {
+        "data_source": data_sources or AI_SOURCES,
+        "country": [(country or COUNTRY)],
+        "prompts": "ahrefs",
+        "brands": [{"names": [brand]}],
+        "competitors": [{"names": [c]} for c in (competitors or [])],
+    }
+    d = _post("brand-radar/sov-overview", body)
+    rows = [{"brand": m.get("brand"), "sov": round(float(m.get("share_of_voice") or 0), 4)}
+            for m in (d or {}).get("metrics", []) if m.get("brand")]
+    rows.sort(key=lambda r: r["sov"], reverse=True)
+    return rows
