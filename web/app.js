@@ -719,8 +719,10 @@ function asstToggle(show) {
   $("asst").hidden = !asst.open;
   $("asstFab").style.display = asst.open ? "none" : "";
   if (asst.open && !$("asstLog").children.length) {
-    asstAdd("bot", "Hi — ask me anything about your market. Try: “what should we do first?”, " +
-      "“what's trending?”, “where are the gaps on our site?”, or “does this actually work?”");
+    asstAdd("bot", "Hi — ask me anything about your market. I can dig into your categories, " +
+      "search volumes, competitors and AI visibility. Try: “what should we do first?”, " +
+      "“what's our AI share of voice?”, “what are competitors publishing?”, or " +
+      "“what's the search volume for headphones?”");
     if (window.innerWidth > 600) $("asstInput").focus();
   }
 }

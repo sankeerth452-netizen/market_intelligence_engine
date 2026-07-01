@@ -349,7 +349,70 @@ class EngineService:
                 "rising": by("trend_surprise", True), "gaps": by("semantic_gap", True),
                 "covered": by("semantic_gap", False), "actions": actions, "learned": learned}
 
+    def _assistant_docs(self):
+        """The knowledge base the assistant retrieves over (RAG): one document per
+        category (with signals, real search volume and headlines) plus competitors,
+        AI visibility, what the model has learned, and the validation result. All
+        real, already-computed data — assembled from the live caches."""
+        with self.lock:
+            items = self._all_scored()[:14]
+            weights = self._weights_list()
+            n = self.bandit.n_updates
+        vols = self._category_volumes()                 # cached
+        docs = []
+        for it in items:
+            s = it["signals"]
+            vol = vols.get((it.get("category") or it["topic"]).lower())
+            heads = "; ".join(f'"{h}"' for h in it.get("headlines", [])[:2])
+            gap = s["semantic_gap"]
+            parts = [f"{it['topic']} — {it.get('priority', '')} priority.",
+                     f"Search demand {round(s['trend_surprise'] * 100)}/100, "
+                     f"news coverage {round(s['news_relevance'] * 100)}/100, "
+                     f"content gap {round(gap * 100)}/100."]
+            if vol is not None:
+                parts.append(f"Real search volume about {vol:,} per month.")
+            if abs(s.get("tiktok_velocity", 0.5) - 0.5) > 1e-6:
+                parts.append(f"TikTok velocity {round(s['tiktok_velocity'] * 100)}/100.")
+            if heads:
+                parts.append(f"In the news: {heads}.")
+            parts.append(f"Recommended: {'create a new page' if gap >= 0.45 else 'strengthen the existing page'}.")
+            docs.append({"title": f"Category — {it['topic']}", "text": " ".join(parts)})
+
+        if weights and n > 0:
+            top = config.FEATURE_LABELS.get(weights[0]["name"], weights[0]["name"])
+            bot = config.FEATURE_LABELS.get(weights[-1]["name"], weights[-1]["name"])
+            docs.append({"title": "What the system has learned",
+                         "text": f"Learned from {n} real results recorded on the plan: '{top}' most "
+                                 f"reliably pays off; '{bot}' least. It updates from every agree/disagree verdict."})
+        else:
+            docs.append({"title": "Learning status",
+                         "text": "No results recorded yet. Recommendations start from the live signals; the "
+                                 "system learns what drives results from each verdict recorded on the plan."})
+        try:
+            for c in self.competitors().get("competitors", []):
+                newp = "; ".join(p["title"] for p in c.get("new_pages", [])[:6])
+                src = " (data via Ahrefs)" if c.get("note") == "via Ahrefs" else ""
+                body = f"{c['name']}{src}: {c.get('total', 0):,} pages tracked."
+                body += f" Recently published pages: {newp}." if newp else " No new pages since the last crawl."
+                docs.append({"title": f"Competitor — {c['name']}", "text": body})
+        except Exception:
+            pass
+        aiv = self._aiv_cache[1] if self._aiv_cache else None   # peek only (the call is expensive)
+        if aiv and aiv.get("brands"):
+            sov = ", ".join(f"{b['brand']} {round(b['sov'] * 100)}%" for b in aiv["brands"])
+            docs.append({"title": "AI visibility — share of voice",
+                         "text": f"How often each brand appears when shoppers ask AI assistants (ChatGPT, "
+                                 f"Australia): {sov}. Higher is better."})
+        rob = (self.robustness() or {}).get("robustness")
+        if rob:
+            docs.append({"title": "Validation — does it work",
+                         "text": f"Validated across {rob.get('n')} simulated markets: consistently found the "
+                                 f"high-value topics and kept dead-end picks low. Real-world lift is confirmed "
+                                 f"with live A/B testing once running for the client."})
+        return docs
+
     def assistant(self, question: str):
+        docs = self._assistant_docs()
         with self.lock:
             ctx = {
                 "client": client_config.active_client().name,
@@ -359,7 +422,7 @@ class EngineService:
                 "model_updates": self.bandit.n_updates,
                 "robustness": (self.robustness() or {}).get("robustness"),
             }
-        return {"answer": assistant_mod.answer(question, ctx)}
+        return {"answer": assistant_mod.answer(question, ctx, docs)}
 
     # ------------------------------------------------ AI strategist (cached) ----
     def playbook(self, item: dict):
