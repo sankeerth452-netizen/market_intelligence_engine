@@ -16,6 +16,7 @@ import client_config
 import crawler
 import demo_client
 import adapters
+import apify
 from semantic import SemanticIndex
 from world import Topic
 
@@ -59,15 +60,26 @@ def real_candidates(client=None):
         d = adapters.demand_signals(cat)        # one fetch: news relevance + trend
         news = NEUTRAL if d["news_relevance"] is None else d["news_relevance"]
         tr = d["trend"]
+        tik = apify.tiktok_velocity(cat) if apify.enabled() else None  # real, or None
+        # cross-source agreement: do the INDEPENDENT live sources corroborate?
+        # (high when the real signals we actually have all point the same way)
+        real_vals = []
+        if tr:
+            real_vals.append(tr["trend_surprise"])
+        if d["news_relevance"] is not None:
+            real_vals.append(news)
+        if tik is not None:
+            real_vals.append(tik)
+        cross = round(1.0 - (max(real_vals) - min(real_vals)), 3) if len(real_vals) >= 2 else NEUTRAL
         signals = {
             "trend_surprise": tr["trend_surprise"] if tr else NEUTRAL,
             "trend_changepoint": tr["trend_changepoint"] if tr else NEUTRAL,
             "reddit_growth": NEUTRAL,
             "reddit_neg_sentiment": NEUTRAL,
-            "tiktok_velocity": NEUTRAL,
+            "tiktok_velocity": NEUTRAL if tik is None else tik,
             "news_relevance": news,
             "semantic_gap": gap,
-            "cross_source_agreement": NEUTRAL,   # needs >=2 independent live sources
+            "cross_source_agreement": cross,
         }
         x = [1.0] + [signals[f] for f in config.FEATURE_NAMES[1:]]
         topic = Topic(id=i, name=cat, category=cat, kind="real",

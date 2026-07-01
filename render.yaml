@@ -26,7 +26,9 @@ services:
       - key: SITE_URL
         value: https://www.jbhifi.com.au
       - key: ANTHROPIC_API_KEY
-        sync: false             # optional: set to enable the free-form assistant
+        sync: false             # optional: enables the AI assistant + AI Strategist
+      - key: APIFY_API_KEY
+        sync: false             # optional: enables real TikTok velocity (Apify)
 
 databases:
   - name: mie-db

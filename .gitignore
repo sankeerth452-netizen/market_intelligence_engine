@@ -10,6 +10,12 @@ __pycache__/
 venv/
 env/
 
+# ---- Secrets / local env (API keys must NEVER be committed) ----
+.env
+.env.*
+*.key
+secrets.*
+
 # ---- IDE ----
 .idea/
 .vscode/
