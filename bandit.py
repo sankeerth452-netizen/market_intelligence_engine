@@ -57,6 +57,22 @@ class LinUCB:
         self.A_inv -= np.outer(Ax, Ax) / (1.0 + float(x @ Ax))
         self.n_updates += 1
 
+    def seed_prior(self, weights, strength: float = 1.0) -> "LinUCB":
+        """Start from a PRIOR belief theta ~= weights, held with confidence
+        `strength` (equivalent to `strength` pseudo-observations of ridge prior).
+
+        This is NOT synthetic training data and does NOT count as a real update
+        (n_updates stays 0): it's just a sensible starting point (marketing
+        best-practice) so the model works out-of-the-box and refines from real
+        recorded results, rather than starting blank. A += sI, b = s*weights =>
+        theta = A^{-1} b = weights, with uncertainty scaled down by sqrt(s)."""
+        w = np.asarray(weights, dtype=float)
+        s = max(1e-6, float(strength))
+        self.A = np.identity(self.d) * s
+        self.A_inv = np.identity(self.d) / s
+        self.b = w * s
+        return self
+
     def learned_weights(self) -> dict:
         """Expose the current learned coefficients for interpretability."""
         return {"theta": self._theta().tolist(), "n_updates": self.n_updates}

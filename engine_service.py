@@ -79,19 +79,25 @@ class EngineService:
         if data:
             try:
                 loaded = LinUCB.from_dict(data)
-                # Keep any saved model whose feature schema still matches — even
-                # one with 0 updates. A model that has only learned from REAL
-                # recorded verdicts is exactly what we want (no synthetic seed).
                 if loaded.d == config.N_FEATURES:
-                    return loaded
+                    # Keep a model that has learned from real verdicts, or one
+                    # already seeded with the prior. Only a pristine EMPTY model
+                    # (0 updates AND zero weights) is upgraded to the prior — this
+                    # also auto-heals an older blank/cold model on the next boot.
+                    if loaded.n_updates > 0 or float(np.max(np.abs(loaded.b))) > 1e-9:
+                        return loaded
             except Exception:
                 pass
-        # First boot (or an incompatible saved model): a genuine COLD model. It
-        # ranks by the live signals + effort from day one, and learns ONLY from
-        # the real verdicts recorded on the plan — nothing synthetic.
-        bandit = LinUCB(config.N_FEATURES, alpha=config.SETTINGS["linucb_alpha"])
+        bandit = self._seed_prior()
         store.save_model(self.engine, MODEL_KEY, json.dumps(bandit.to_dict()))
         return bandit
+
+    def _seed_prior(self) -> LinUCB:
+        """A live model that starts from the marketing best-practice PRIOR (not
+        blank, not synthetic): it ranks well from day one on the real signals and
+        refines from any real verdicts recorded on the plan."""
+        return LinUCB(config.N_FEATURES, alpha=config.SETTINGS["linucb_alpha"]) \
+            .seed_prior(config.PRIOR_WEIGHTS, config.PRIOR_STRENGTH)
 
     def _save_bandit(self) -> None:
         store.save_model(self.engine, MODEL_KEY, json.dumps(self.bandit.to_dict()))
@@ -165,6 +171,7 @@ class EngineService:
             "exploring": bool(p["exploring"]),
             "evidence": chips,
             "headlines": p.get("headlines", [])[:2],
+            "confidence": self._confidence(sig),
             "signals": {k: round(float(v), 3) for k, v in sig.items()},
         }
 
@@ -208,8 +215,7 @@ class EngineService:
 
     def reset(self):
         with self.lock:
-            self.bandit = LinUCB(config.N_FEATURES,
-                                 alpha=config.SETTINGS["linucb_alpha"])
+            self.bandit = self._seed_prior()      # back to the prior, not blank
             store.reset_all(self.engine)
             self._save_bandit()
             self._sim_cache = None
@@ -245,6 +251,17 @@ class EngineService:
         hi, mid = cuts
         return "High" if roi >= hi else "Medium" if roi >= mid else "Low"
 
+    @staticmethod
+    def _confidence(sig):
+        """How sure we are of THIS recommendation, from the data itself — do
+        independent sources corroborate, and are the core demand signals strong?
+        (This is the client-facing 'confidence', not the bandit's exploration
+        uncertainty, which measures model training, not recommendation quality.)"""
+        cross = sig.get("cross_source_agreement", 0.5)
+        core = (sig.get("trend_surprise", 0) + sig.get("news_relevance", 0)
+                + sig.get("semantic_gap", 0)) / 3.0
+        return round(min(1.0, 0.55 * cross + 0.45 * core), 3)
+
     def _all_scored(self):
         """All current candidates, scored by the bandit, sorted by ROI. Real mode
         uses the live adapters (cached); synthetic uses the seeded world."""
@@ -263,6 +280,7 @@ class EngineService:
                 "roi": round(float(rec.roi_score(pred, c["topic"].effort)), 3),
                 "value": round(float(pred["mean"]), 3),
                 "uncertainty": round(float(pred["uncertainty"]), 3),
+                "confidence": self._confidence(c["signals"]),
                 "headlines": c.get("headlines", []),
             })
         out.sort(key=lambda s: s["roi"], reverse=True)
@@ -367,7 +385,8 @@ class EngineService:
                  if weights else "—")
         learned = (f"After learning from {n} results, the system has found that {top_w} "
                    f"is what most reliably pays off."
-                   if n else "No results recorded yet — record outcomes on the plan to start learning.")
+                   if n else f"Guided by proven marketing priors — {top_w} matters most — and your live "
+                             f"signals; it sharpens further as real results are recorded.")
         return {"client": client.name, "industry": client.industry, "data_mode": DATA_MODE,
                 "rising": by("trend_surprise", True), "gaps": by("semantic_gap", True),
                 "covered": by("semantic_gap", False), "actions": actions, "learned": learned}

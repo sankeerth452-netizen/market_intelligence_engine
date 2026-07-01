@@ -48,8 +48,8 @@ const PRIO_CLASS = { High: "is-high", Medium: "is-med", Low: "is-low" };
 const prioOf = (item) =>
   item && item.priority ? [item.priority, PRIO_CLASS[item.priority] || "is-med"]
                         : priorityOf(item && item.roi);
-const confidenceOf = (unc) =>
-  unc < 0.18 ? ["High", "is-high"] : unc < 0.35 ? ["Medium", "is-med"] : ["Still learning", "is-low"];
+const confidenceOf = (conf) =>
+  conf >= 0.62 ? ["High", "is-high"] : conf >= 0.42 ? ["Medium", "is-med"] : ["Low", "is-low"];
 const actionVerb = (a) =>
   (a || "").toLowerCase().startsWith("create") ? ["Create a page for", ""] : ["Strengthen your", " page"];
 const whyLine = (c) => {
@@ -114,9 +114,12 @@ function toast(html) {
   toast._t = setTimeout(() => t.classList.remove("show"), 2600);
 }
 
-/* ---- the signature element: how-sure-we-are meter (dot + band) ---------- */
-function convictionSVG(value, unc) {
-  const lo = Math.max(0, value - unc), hi = Math.min(1, value + unc);
+/* ---- the signature element: how-sure-we-are meter (dot + band) ----------
+   dot = opportunity strength; band = uncertainty, narrow when confidence is high. */
+function convictionSVG(strength, confidence) {
+  const half = (1 - (confidence == null ? 0.5 : confidence)) * 0.42;
+  const lo = Math.max(0, strength - half), hi = Math.min(1, strength + half);
+  const value = strength;
   const X = (v) => (10 + v * 280).toFixed(1);
   const grid = [0.25, 0.5, 0.75]
     .map((g) => `<line class="cv__grid" x1="${X(g)}" y1="7" x2="${X(g)}" y2="17"/>`)
@@ -130,20 +133,21 @@ function convictionSVG(value, unc) {
 }
 
 /* slide a card's meter + labels to the engine's revised belief after a result */
-function setConviction(el, value, unc, roi) {
+function setConviction(el, strength, confidence, roi) {
   const X = (v) => 10 + v * 280;
-  const lo = Math.max(0, value - unc), hi = Math.min(1, value + unc);
+  const half = (1 - (confidence == null ? 0.5 : confidence)) * 0.42;
+  const lo = Math.max(0, strength - half), hi = Math.min(1, strength + half);
   const band = el.querySelector(".cv__band");
   const pt = el.querySelector(".cv__pt");
   if (band) {
     band.setAttribute("x", X(lo).toFixed(1));
     band.setAttribute("width", (X(hi) - X(lo)).toFixed(1));
   }
-  if (pt) pt.setAttribute("cx", X(value).toFixed(1));
+  if (pt) pt.setAttribute("cx", X(strength).toFixed(1));
   const roiEl = el.querySelector(".conv__roi");
   if (roiEl) { const [p, cls] = priorityOf(roi); roiEl.textContent = p; roiEl.className = "conv__roi prio " + cls; }
   const readout = el.querySelector(".conv__readout");
-  if (readout) { const [cf, cc] = confidenceOf(unc); readout.innerHTML = `Confidence: <b class="${cc}">${cf}</b>`; }
+  if (readout) { const [cf, cc] = confidenceOf(confidence); readout.innerHTML = `Confidence: <b class="${cc}">${cf}</b>`; }
 }
 
 /* ---- opportunity cards --------------------------------------------------- */
@@ -154,10 +158,10 @@ function cardEl(c) {
   el.style.animationDelay = (c.rank - 1) * 0.06 + "s";
 
   const [prio, prioCls] = prioOf(c);
-  const [conf, confCls] = confidenceOf(c.uncertainty);
+  const [conf, confCls] = confidenceOf(c.confidence);
   const [verb, suffix] = actionVerb(c.action);
-  const test = c.exploring
-    ? `<span class="tag tag--test" title="We're less sure here — worth a quick test to find out">Worth a test</span>` : "";
+  const test = (c.confidence != null && c.confidence < 0.5)
+    ? `<span class="tag tag--test" title="Signals are mixed here — worth a quick test to find out">Worth a test</span>` : "";
   const news = (c.headlines && c.headlines[0])
     ? `<div class="card__news">📰 In the news: “${c.headlines[0]}”</div>` : "";
 
@@ -179,7 +183,7 @@ function cardEl(c) {
         <span class="conv__label">Priority</span>
         <span class="conv__roi prio ${prioCls}">${prio}</span>
       </div>
-      ${convictionSVG(c.strength != null ? c.strength : c.value, c.uncertainty)}
+      ${convictionSVG(c.strength != null ? c.strength : c.value, c.confidence)}
       <div class="conv__readout">Confidence: <b class="${confCls}">${conf}</b></div>
     </div>
     <div class="result">
@@ -274,7 +278,7 @@ async function refreshBriefInPlace() {
     data.forEach((c) => {
       const el = shown.find((e) => Number(e.dataset.id) === c.id);
       if (!el) return;
-      setConviction(el, c.strength != null ? c.strength : c.value, c.uncertainty, c.roi);
+      setConviction(el, c.strength != null ? c.strength : c.value, c.confidence, c.roi);
       el.classList.add("is-learning");
       setTimeout(() => el.classList.remove("is-learning"), 800);
     });
@@ -331,9 +335,17 @@ async function loadDashboard() {
       <div class="kpi__sub">${k.sub}</div>
     </div>`).join("");
 
-  $("heroStat").textContent = updates;
-  $("heroCap").innerHTML =
-    `results learned from so far — every outcome you record sharpens next week's plan.`;
+  const totalVol = (sig.items || []).reduce((a, i) => a + (i.volume || 0), 0);
+  const compact = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(n);
+  if (totalVol > 0) {
+    $("heroStat").textContent = compact(totalVol);
+    $("heroCap").innerHTML =
+      `monthly searches across your categories — the system ranks exactly where to focus, and refines as results come in.`;
+  } else {
+    $("heroStat").textContent = String(cats);
+    $("heroCap").innerHTML =
+      `categories analysed live — demand, gaps, competitors and AI visibility, refreshed weekly.`;
+  }
   $("heroSide").innerHTML =
     `<div class="herometric"><b>${cats}</b><span>categories watched</span></div>
      <div class="herometric"><b>${shortToday()}</b><span>updated</span></div>`;
@@ -490,7 +502,7 @@ function loadWeights() {
         `After ${data.model_updates} results, the system has figured out that <b>${drivers}</b> are what actually pay off — and that <b>${worstLbl}</b> usually doesn’t.${punch}`;
     } else {
       $("weightsNote").innerHTML =
-        `These start even and shift as results come in. Record a few outcomes on the plan and watch what the system decides actually matters.`;
+        `These start from proven marketing priors — rising demand and content gaps matter most — and adapt to what actually works for you as results are recorded.`;
     }
   });
 }

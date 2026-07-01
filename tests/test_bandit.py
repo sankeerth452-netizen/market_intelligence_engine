@@ -39,6 +39,24 @@ def test_learns_reward_direction():
     assert m.predict(x)["mean"] > 0.3
 
 
+def test_seed_prior_sets_theta_without_a_real_update():
+    """A prior is a starting belief, not synthetic training data: theta == the
+    prior, uncertainty is scaled down by sqrt(strength), and n_updates stays 0."""
+    prior = [0.05, 0.3, 0.1, 0.0, -0.05, 0.08, 0.12, 0.28, 0.12]
+    m = LinUCB(9, alpha=0.65).seed_prior(prior, strength=6.0)
+    theta = m.learned_weights()["theta"]
+    assert m.n_updates == 0
+    for t, p in zip(theta, prior):
+        assert t == pytest.approx(p, abs=1e-9)
+    # a stronger prior => more day-one confidence (lower uncertainty)
+    weak = LinUCB(9, alpha=0.65).seed_prior(prior, strength=1.0)
+    x = np.ones(9)
+    assert m.predict(x)["uncertainty"] < weak.predict(x)["uncertainty"]
+    # and a real verdict still moves it
+    m.update(x, 1.0)
+    assert m.n_updates == 1
+
+
 def test_persistence_roundtrip_preserves_predictions():
     rng = np.random.default_rng(1)
     m = LinUCB(5, alpha=0.6)

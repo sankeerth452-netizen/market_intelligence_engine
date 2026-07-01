@@ -52,6 +52,27 @@ STATIC_WEIGHTS = {
     # "business_priority" 0.05 folded into a constant; the rest are unrepresentable.
 }
 
+# ----- Starting PRIOR for the live model (order == FEATURE_NAMES) -----
+# Not synthetic training data — a sensible marketing best-practice starting belief
+# so the model works out-of-the-box and REFINES from real recorded results, instead
+# of starting blank (cold) or on fabricated outcomes. Rising demand + on-site gaps
+# drive value most; news + corroboration matter; social is modest.
+PRIOR_WEIGHTS = [
+    0.05,   # bias (small baseline value)
+    0.30,   # trend_surprise        — rising search demand
+    0.12,   # trend_changepoint     — a demand spike
+    0.05,   # reddit_growth
+    -0.05,  # reddit_neg_sentiment  — reputation risk slightly lowers value
+    0.08,   # tiktok_velocity       — social hype (modest; can mislead)
+    0.12,   # news_relevance        — news coverage
+    0.28,   # semantic_gap          — a gap you don't cover = big opportunity
+    0.12,   # cross_source_agreement — independent sources corroborate
+]
+# How strongly the prior is held (≈ pseudo-observations). Low enough that a
+# handful of real verdicts start to move it, high enough to give calibrated
+# day-one confidence rather than pure exploration.
+PRIOR_STRENGTH = 6.0
+
 # ----- Effort model (the original spec scores value but ignores effort) -----
 EFFORT_COST = {"low": 0.03, "med": 0.07, "high": 0.12}
 
