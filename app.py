@@ -150,8 +150,9 @@ def google_auth():
 @app.get("/api/google/callback")
 def google_callback(code: str = "", state: str = "", error: str = ""):
     """OAuth redirect target — exchanges the code, then returns to the dashboard."""
-    if code:
-        ENGINE.google_connect(code)
+    if error:
+        return RedirectResponse(url=f"/?google=error&reason={error}")
+    if code and ENGINE.google_connect(code).get("ok"):
         return RedirectResponse(url="/?google=connected")
     return RedirectResponse(url="/?google=error")
 

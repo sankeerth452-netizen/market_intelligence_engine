@@ -64,12 +64,28 @@ def _decrypt(token_enc: str):
         return None
 
 
+# Last connect() failure reason, surfaced via status() so a failed OAuth
+# round-trip is diagnosable instead of silently swallowed. Single worker
+# (see Dockerfile), so this module-level value is visible to later requests.
+_LAST_ERROR = {"connect": None}
+
+
 def _post_form(url, params):
     body = urllib.parse.urlencode(params).encode()
     req = urllib.request.Request(url, data=body,
                                  headers={"Content-Type": "application/x-www-form-urlencoded"})
-    with urllib.request.urlopen(req, timeout=25) as r:
-        return json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=25) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        # Google returns the real reason (invalid_client, redirect_uri_mismatch,
+        # invalid_grant, ...) in the JSON body. Keep the HTTPError type so the
+        # refresh-token revoke handling in access_token() still works.
+        try:
+            e.detail = e.read().decode()[:500]
+        except Exception:
+            e.detail = ""
+        raise
 
 
 # --------------------------------------------------------------- flow ----
@@ -92,6 +108,7 @@ def auth_url(state: str) -> str:
 def connect(engine, client_key: str, code: str) -> bool:
     """Exchange an auth code for tokens and store them (encrypted)."""
     if not enabled():
+        _LAST_ERROR["connect"] = "not_configured"
         return False
     try:
         tok = _post_form(_TOKEN, {
@@ -99,10 +116,16 @@ def connect(engine, client_key: str, code: str) -> bool:
             "client_secret": _cfg("GOOGLE_CLIENT_SECRET"),
             "redirect_uri": _cfg("GOOGLE_REDIRECT_URI"),
             "grant_type": "authorization_code"})
-    except Exception:
+    except urllib.error.HTTPError as e:
+        _LAST_ERROR["connect"] = f"http_{e.code}: {getattr(e, 'detail', '') or e.reason}"
+        return False
+    except Exception as e:
+        _LAST_ERROR["connect"] = f"exchange_failed: {type(e).__name__}: {e}"
         return False
     if "access_token" not in tok:
+        _LAST_ERROR["connect"] = f"no_access_token: {json.dumps(tok)[:300]}"
         return False
+    _LAST_ERROR["connect"] = None
     blob = {
         "access_token": tok["access_token"],
         "refresh_token": tok.get("refresh_token", ""),
@@ -188,6 +211,7 @@ def status(engine, client_key: str) -> dict:
     return {
         "oauth_configured": enabled(),
         "account_connected": bool(blob),
+        "last_error": None if blob else _LAST_ERROR["connect"],
         "gsc": {
             "connected": bool(blob and "webmasters" in scope and blob.get("gsc_property")),
             "granted": bool(blob and "webmasters" in scope),
