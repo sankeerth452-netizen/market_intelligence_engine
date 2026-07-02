@@ -84,6 +84,17 @@ def test_demand_shape():
     assert "enabled" in d and "categories" in d  # enabled:false without an Ahrefs key
 
 
+def test_google_status_shape():
+    d = client.get("/api/google/status").json()
+    assert "oauth_configured" in d and "gsc" in d and "ga4" in d   # safe without config
+
+
+def test_performance_shape():
+    d = client.get("/api/performance").json()
+    for k in ("total", "evaluated", "pending", "positive", "real_updates"):
+        assert k in d
+
+
 def test_competitors_returns_per_site_shape():
     d = client.get("/api/competitors").json()
     assert "competitors" in d and isinstance(d["competitors"], list)

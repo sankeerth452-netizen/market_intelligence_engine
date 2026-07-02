@@ -175,6 +175,7 @@ function cardEl(c) {
         <span class="tag tag--effort-${c.effort}">${EFFORT_LABEL[c.effort] || c.effort} effort</span>
         ${test}
         <button class="planbtn" type="button">✦ Get the AI action plan</button>
+        <button class="markdone" type="button" title="Mark this recommendation as shipped so we can track its real results">✓ We built this</button>
       </div>
       <div class="plan" hidden></div>
     </div>
@@ -199,6 +200,8 @@ function cardEl(c) {
   const planBtn = el.querySelector(".planbtn");
   const planHost = el.querySelector(".plan");
   planBtn.addEventListener("click", () => loadPlan(c, planBtn, planHost));
+  const doneBtn = el.querySelector(".markdone");
+  if (doneBtn) doneBtn.addEventListener("click", () => markDone(c, doneBtn));
   return el;
 }
 
@@ -681,6 +684,108 @@ function loadAiVisibility() {
   }).catch(() => { host.innerHTML = `<p class="lede">Could not load AI visibility.</p>`; });
 }
 
+/* ---- Google integrations (connect GSC/GA4 → real outcome learning) ------ */
+async function connectGoogle() {
+  try {
+    const d = await api("/api/google/auth");
+    if (d.auth_url) { window.location.href = d.auth_url; return; }
+  } catch (e) {}
+  toast("Google sign-in isn't available right now.");
+}
+async function disconnectGoogle() {
+  try { await api("/api/google/disconnect", { method: "POST" }); } catch (e) {}
+  loadIntegrations();
+}
+async function selectProperty(service, el) {
+  if (!el.value) return;
+  try {
+    await api("/api/google/select", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ service, property_id: el.value }) });
+    toast("Property selected — collecting your performance data…");
+    loadIntegrations(); loadPerformance();
+  } catch (e) {}
+}
+function intgRow(name, service, st) {
+  const status = st.connected ? `<span class="intg__ok">Connected ✅</span>`
+    : st.granted ? `<span class="intg__warn">Choose a property ↓</span>`
+      : `<span class="intg__off">Not connected</span>`;
+  const picker = st.granted
+    ? `<select class="intg__sel" data-service="${service}" onchange="selectProperty('${service}', this)">
+         <option value="">Loading properties…</option></select>` : "";
+  return `<div class="intg"><div class="intg__top"><span class="intg__name">${name}</span>${status}</div>${picker}</div>`;
+}
+function loadIntegrations() {
+  const host = $("integrations");
+  if (!host) return Promise.resolve();
+  return api("/api/google/status").then((s) => {
+    if (!s.oauth_configured) {
+      host.innerHTML = `<p class="intg__note">Google connection isn't enabled on this deployment yet. Once an
+        admin adds Google credentials, clients can connect <b>Search Console</b> and <b>Analytics 4</b> here so
+        the engine learns from real SEO outcomes. Everything else works without it.</p>`;
+      return;
+    }
+    if (!s.account_connected) {
+      host.innerHTML = `<p class="intg__note">Connect your Google account (read-only) so the engine can measure
+        the real-world impact of the pages you build — clicks, rankings and traffic — and learn from what
+        actually works.</p><button class="btn" onclick="connectGoogle()">Connect Google</button>`;
+      return;
+    }
+    host.innerHTML = intgRow("Google Search Console", "gsc", s.gsc)
+      + intgRow("Google Analytics 4", "ga4", s.ga4)
+      + `<button class="linkbtn" onclick="disconnectGoogle()">Disconnect Google</button>`;
+    ["gsc", "ga4"].forEach((svc) => {
+      if (!s[svc].granted) return;
+      api("/api/google/properties?service=" + svc).then((d) => {
+        const sel = host.querySelector(`.intg__sel[data-service="${svc}"]`);
+        if (!sel) return;
+        const cur = s[svc].property;
+        sel.innerHTML = `<option value="">— select your property —</option>` +
+          (d.properties || []).map((p) =>
+            `<option value="${p.id}" ${p.id === cur ? "selected" : ""}>${p.name}</option>`).join("");
+      }).catch(() => {});
+    });
+  }).catch(() => {});
+}
+
+/* ---- Recommendation performance (real measured outcomes) --------------- */
+function loadPerformance() {
+  const host = $("performance");
+  if (!host) return Promise.resolve();
+  return api("/api/performance").then((p) => {
+    if (!p.connected) {
+      host.innerHTML = `<p class="perf__empty">Connect <b>Google Search Console</b> and <b>GA4</b> in Settings
+        to measure the real-world impact of implemented recommendations — click growth, ranking gains and
+        traffic uplift — and let those results refine the engine over time.</p>`;
+      return;
+    }
+    const pct = (v) => v == null ? "—" : (v > 0 ? "+" : "") + v + "%";
+    const stat = (val, label) => `<div class="perf__stat"><b>${val}</b><span>${label}</span></div>`;
+    host.innerHTML = `<div class="perf__grid">
+        ${stat(p.total, "Implemented")}
+        ${stat(p.evaluated, "Evaluated")}
+        ${stat(p.positive, "Positive outcomes")}
+        ${stat(p.pending, "Still evaluating")}
+        ${stat(pct(p.avg_click_growth), "Avg click growth")}
+        ${stat(p.avg_position_gain == null ? "—" : "+" + p.avg_position_gain, "Avg ranking gain (positions)")}
+      </div>
+      <p class="panel__note">${p.real_updates} real outcome(s) have refined the model so far. Recommendations
+        are measured 30–90 days after you mark them implemented — real results, never fabricated.</p>`;
+  }).catch(() => { host.innerHTML = `<p class="perf__empty">Could not load performance data.</p>`; });
+}
+
+async function markDone(c, btn) {
+  const url = window.prompt("Which page did you create or update for this recommendation?\n(Enter the URL so we can track its results.)", "");
+  if (url === null) return;
+  try {
+    await api("/api/recommendations/implemented", { method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rec_id: c.id, target_url: (url || "").trim() }) });
+    btn.textContent = "✓ Tracking results";
+    btn.disabled = true;
+    toast("Marked as done — we'll measure its impact over the next 30–90 days.");
+  } catch (e) { toast("Couldn't save that just now."); }
+}
+
 /* ---- view routing ------------------------------------------------------- */
 const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
@@ -705,6 +810,8 @@ function showView(name) {
   if (name === "signals") loadSignals();
   if (name === "competitors") loadCompetitors();
   if (name === "aivis") loadAiVisibility();
+  if (name === "settings") loadIntegrations();
+  if (name === "learning") loadPerformance();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -796,7 +903,20 @@ loadDashboard();
 loadSummary();
 loadCompetitors();
 loadAiVisibility();
+loadPerformance();
+loadIntegrations();
 updateGreeting();
 setInterval(updateGreeting, 30000);   // keep the clock current
 wireGoto();
-showView("dashboard");
+// returning from the Google OAuth consent flow?
+if (location.search.indexOf("google=connected") >= 0) {
+  toast("Google connected — pick your properties in Settings.");
+  showView("settings");
+  history.replaceState({}, "", "/");
+} else if (location.search.indexOf("google=error") >= 0) {
+  toast("Google connection didn't complete. Please try again.");
+  history.replaceState({}, "", "/");
+  showView("dashboard");
+} else {
+  showView("dashboard");
+}

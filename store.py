@@ -71,6 +71,49 @@ crawl_runs = Table(
     Column("ok", Integer), Column("note", Text),
 )
 
+# ---- Google integration (OAuth tokens, fetched SEO metrics, outcome tracking) ----
+# All keyed by client_key so the schema is multi-client-ready (this deployment
+# serves one client, but tokens/metrics/outcomes are namespaced per client).
+
+# Encrypted OAuth tokens, one row per (client, service = 'gsc' | 'ga4').
+google_tokens = Table(
+    "google_tokens", metadata,
+    Column("client_key", Text), Column("service", Text),
+    Column("token_enc", Text),                 # Fernet-encrypted {access,refresh,expiry,scope}
+    Column("property_id", Text),               # the chosen GSC site / GA4 property
+    Column("connected_at", Float), Column("updated_at", Float),
+    UniqueConstraint("client_key", "service", name="uq_google_client_service"),
+)
+
+# Daily per-page SEO metrics fetched from GSC / GA4 (the raw performance history
+# the outcome evaluator diffs). metrics_json holds the standardised numbers.
+seo_metrics = Table(
+    "seo_metrics", metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("client_key", Text), Column("source", Text),   # 'gsc' | 'ga4'
+    Column("page", Text), Column("date", Text),           # 'YYYY-MM-DD'
+    Column("metrics_json", Text), Column("fetched_at", Float),
+    UniqueConstraint("client_key", "source", "page", "date", name="uq_seo_metric"),
+)
+
+# Recommendation tracking beyond the base row: which page it targets and when the
+# client marked it implemented (the anchor for before/after evaluation).
+rec_meta = Table(
+    "rec_meta", metadata,
+    Column("rec_id", Integer, primary_key=True),
+    Column("target_url", Text), Column("implemented_at", Float),
+)
+
+# Measured, real-world outcome of an implemented recommendation (from Google data).
+# Separate from `outcomes` (manual agree/disagree) but both feed the same learner.
+seo_outcomes = Table(
+    "seo_outcomes", metadata,
+    Column("rec_id", Integer, primary_key=True),
+    Column("status", Text),                    # 'pending' | 'evaluated'
+    Column("reward", Float), Column("evaluated_at", Float),
+    Column("detail_json", Text),               # the standardised outcome (metric changes)
+)
+
 
 def _normalize_url(url: str) -> str:
     """Accept a bare file path or any DB URL; return a SQLAlchemy URL."""
@@ -173,12 +216,14 @@ def load_model(engine, key: str):
 
 def reset_all(engine) -> None:
     """Wipe recommendations, outcomes and the saved model (the demo reset).
-    Competitor crawl history is deliberately kept — it's slow to rebuild and
-    unrelated to the learning demo."""
+    Competitor crawl history and Google connections/metrics are deliberately kept
+    — slow/valuable to rebuild and not part of the learning-demo reset."""
     with engine.begin() as conn:
         conn.execute(outcomes.delete())
         conn.execute(recommendations.delete())
         conn.execute(model_state.delete())
+        conn.execute(rec_meta.delete())          # tracking is tied to the wiped recs
+        conn.execute(seo_outcomes.delete())
 
 
 # ---- competitor page inventory + new-page detection ----
@@ -251,3 +296,127 @@ def last_crawl_run(engine, site: str):
         return None
     return {"ran_at": row[0], "found": row[1], "added": row[2],
             "ok": bool(row[3]), "note": row[4]}
+
+
+# ---- Google integration persistence ----
+def save_google_token(engine, client_key, service, token_enc, property_id=None):
+    now = time.time()
+    with engine.begin() as conn:
+        exists = conn.execute(select(google_tokens.c.client_key).where(
+            google_tokens.c.client_key == client_key,
+            google_tokens.c.service == service)).first()
+        if exists:
+            vals = {"token_enc": token_enc, "updated_at": now}
+            if property_id is not None:
+                vals["property_id"] = property_id
+            conn.execute(update(google_tokens).where(
+                google_tokens.c.client_key == client_key,
+                google_tokens.c.service == service).values(**vals))
+        else:
+            conn.execute(insert(google_tokens).values(
+                client_key=client_key, service=service, token_enc=token_enc,
+                property_id=property_id, connected_at=now, updated_at=now))
+
+
+def set_google_property(engine, client_key, service, property_id):
+    with engine.begin() as conn:
+        conn.execute(update(google_tokens).where(
+            google_tokens.c.client_key == client_key, google_tokens.c.service == service
+        ).values(property_id=property_id, updated_at=time.time()))
+
+
+def load_google_token(engine, client_key, service):
+    with engine.begin() as conn:
+        row = conn.execute(select(
+            google_tokens.c.token_enc, google_tokens.c.property_id,
+            google_tokens.c.connected_at).where(
+            google_tokens.c.client_key == client_key,
+            google_tokens.c.service == service)).first()
+    if not row:
+        return None
+    return {"token_enc": row[0], "property_id": row[1], "connected_at": row[2]}
+
+
+def delete_google_token(engine, client_key, service):
+    with engine.begin() as conn:
+        conn.execute(google_tokens.delete().where(
+            google_tokens.c.client_key == client_key, google_tokens.c.service == service))
+
+
+def save_seo_metrics(engine, client_key, source, rows):
+    """rows = [{'page','date','metrics':{...}}]. Upsert per (client, source, page, date)."""
+    now = time.time()
+    with engine.begin() as conn:
+        for r in rows:
+            exists = conn.execute(select(seo_metrics.c.id).where(
+                seo_metrics.c.client_key == client_key, seo_metrics.c.source == source,
+                seo_metrics.c.page == r["page"], seo_metrics.c.date == r["date"])).first()
+            payload = json.dumps(r.get("metrics", {}))
+            if exists:
+                conn.execute(update(seo_metrics).where(seo_metrics.c.id == exists[0])
+                             .values(metrics_json=payload, fetched_at=now))
+            else:
+                conn.execute(insert(seo_metrics).values(
+                    client_key=client_key, source=source, page=r["page"],
+                    date=r["date"], metrics_json=payload, fetched_at=now))
+
+
+def seo_page_metrics(engine, client_key, source, page, start_date, end_date):
+    """Daily metric rows for a page in [start_date, end_date] (YYYY-MM-DD strings)."""
+    with engine.begin() as conn:
+        rows = conn.execute(select(seo_metrics.c.date, seo_metrics.c.metrics_json).where(
+            seo_metrics.c.client_key == client_key, seo_metrics.c.source == source,
+            seo_metrics.c.page == page, seo_metrics.c.date >= start_date,
+            seo_metrics.c.date <= end_date).order_by(seo_metrics.c.date)).all()
+    return [{"date": r[0], "metrics": json.loads(r[1] or "{}")} for r in rows]
+
+
+def set_rec_meta(engine, rec_id, target_url=None, implemented_at=None):
+    with engine.begin() as conn:
+        exists = conn.execute(select(rec_meta.c.rec_id).where(rec_meta.c.rec_id == rec_id)).first()
+        vals = {}
+        if target_url is not None:
+            vals["target_url"] = target_url
+        if implemented_at is not None:
+            vals["implemented_at"] = implemented_at
+        if exists:
+            if vals:
+                conn.execute(update(rec_meta).where(rec_meta.c.rec_id == rec_id).values(**vals))
+        else:
+            conn.execute(insert(rec_meta).values(rec_id=rec_id, **vals))
+
+
+def implemented_recs(engine):
+    """Recommendations marked implemented, joined with their base row + stored context
+    vector — everything the outcome evaluator + learner need."""
+    with engine.begin() as conn:
+        rows = conn.execute(select(
+            rec_meta.c.rec_id, rec_meta.c.target_url, rec_meta.c.implemented_at,
+            recommendations.c.topic, recommendations.c.context, recommendations.c.roi,
+            recommendations.c.uncertainty).select_from(
+            rec_meta.join(recommendations, rec_meta.c.rec_id == recommendations.c.id)
+        ).where(rec_meta.c.implemented_at.isnot(None))).all()
+    return [{"rec_id": r[0], "target_url": r[1], "implemented_at": r[2], "topic": r[3],
+             "context": json.loads(r[4]) if r[4] else None, "roi": r[5],
+             "uncertainty": r[6]} for r in rows]
+
+
+def save_seo_outcome(engine, rec_id, status, reward=None, detail=None):
+    now = time.time()
+    with engine.begin() as conn:
+        exists = conn.execute(select(seo_outcomes.c.rec_id)
+                              .where(seo_outcomes.c.rec_id == rec_id)).first()
+        vals = dict(status=status, reward=reward, evaluated_at=now,
+                    detail_json=json.dumps(detail or {}))
+        if exists:
+            conn.execute(update(seo_outcomes).where(seo_outcomes.c.rec_id == rec_id).values(**vals))
+        else:
+            conn.execute(insert(seo_outcomes).values(rec_id=rec_id, **vals))
+
+
+def seo_outcomes_all(engine):
+    with engine.begin() as conn:
+        rows = conn.execute(select(seo_outcomes.c.rec_id, seo_outcomes.c.status,
+                                   seo_outcomes.c.reward, seo_outcomes.c.detail_json)).all()
+    return [{"rec_id": r[0], "status": r[1], "reward": r[2],
+             "detail": json.loads(r[3] or "{}")} for r in rows]

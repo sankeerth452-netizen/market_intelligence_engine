@@ -24,6 +24,11 @@ import strategist as strategist_mod
 import competitors as competitors_mod
 import ahrefs
 import forecast
+import google_oauth
+import search_console
+import ga4
+import outcome_evaluator
+import reward_engine
 from world import build_world
 from bandit import LinUCB
 from engine_core import iter_candidates, run_head_to_head
@@ -60,10 +65,13 @@ class EngineService:
         self._vol_cache = None              # (timestamp, {category_lower: volume})
         self._aiv_cache = None              # (timestamp, AI-visibility report)
         self._demand_cache = None           # (timestamp, demand forecast report)
+        self._seo_collect_ts = 0.0          # last SEO-metrics collection time
         if DATA_MODE == "real":             # warm the live-data cache off the request path
             threading.Thread(target=self._warm_real_cache, daemon=True).start()
         if os.environ.get("COMPETITOR_CRAWL_ON_BOOT", "").strip() == "1":
             threading.Thread(target=self._baseline_competitors, daemon=True).start()
+        if google_oauth.enabled():          # collect SEO data + evaluate outcomes periodically
+            threading.Thread(target=self._google_worker, daemon=True).start()
 
     def _warm_real_cache(self):
         """Pre-fetch live signals after boot so the first request isn't slow.
@@ -514,6 +522,143 @@ class EngineService:
                 self._refresh_competitors_bg()
         except Exception:
             pass
+
+    # ---------------------------- Google integration (real outcome loop) --------
+    def _client_key(self):
+        c = client_config.active_client()
+        return c.site_source or c.name or "default"
+
+    def google_status(self):
+        return google_oauth.status(self.engine, self._client_key())
+
+    def google_auth_url(self):
+        import base64
+        state = base64.urlsafe_b64encode(os.urandom(12)).decode()
+        return {"configured": google_oauth.enabled(),
+                "auth_url": google_oauth.auth_url(state) if google_oauth.enabled() else None}
+
+    def google_connect(self, code):
+        ok = google_oauth.connect(self.engine, self._client_key(), code)
+        if ok:
+            threading.Thread(target=self._collect_seo_data, args=(True,), daemon=True).start()
+        return {"ok": ok}
+
+    def google_properties(self, service):
+        tok = google_oauth.access_token(self.engine, self._client_key())
+        if not tok:
+            return {"properties": []}
+        if service == "gsc":
+            return {"properties": [{"id": s["url"], "name": s["url"]}
+                                   for s in search_console.list_sites(tok)]}
+        return {"properties": [{"id": p["property"], "name": p["name"]}
+                               for p in ga4.list_properties(tok)]}
+
+    def google_select(self, service, property_id):
+        ok = google_oauth.set_property(self.engine, self._client_key(), service, property_id)
+        if ok:
+            threading.Thread(target=self._collect_seo_data, args=(True,), daemon=True).start()
+        return {"ok": ok}
+
+    def google_disconnect(self):
+        google_oauth.disconnect(self.engine, self._client_key())
+        return {"ok": True}
+
+    def _collect_seo_data(self, force=False):
+        """Data Collector: fetch ~120 days of per-page GSC + GA4 metrics for the
+        connected property and store them (throttled to ~once/day; cached history
+        means the outcome evaluator never re-hits the APIs)."""
+        now = time.time()
+        if not force and now - self._seo_collect_ts < 86400:
+            return
+        ck = self._client_key()
+        tok = google_oauth.access_token(self.engine, ck)
+        if not tok:
+            return
+        import datetime
+        end = datetime.date.today()
+        s, e = (end - datetime.timedelta(days=120)).isoformat(), end.isoformat()
+        st = google_oauth.status(self.engine, ck)
+        try:
+            if st["gsc"]["property"]:
+                rows = search_console.daily_by_page(tok, st["gsc"]["property"], s, e)
+                store.save_seo_metrics(self.engine, ck, "gsc",
+                                       [{"page": r["page"], "date": r["date"], "metrics": r} for r in rows])
+            if st["ga4"]["property"]:
+                rows = ga4.daily_by_page(tok, st["ga4"]["property"], s, e)
+                store.save_seo_metrics(self.engine, ck, "ga4",
+                                       [{"page": r["page"], "date": r["date"], "metrics": r} for r in rows])
+            self._seo_collect_ts = now
+        except Exception:
+            pass
+
+    def mark_implemented(self, rec_id, target_url=None):
+        """Recommendation Tracker: record when the client shipped a recommendation
+        and which page it targets — the anchor for before/after evaluation."""
+        store.set_rec_meta(self.engine, int(rec_id), target_url=target_url,
+                           implemented_at=time.time())
+        store.save_seo_outcome(self.engine, int(rec_id), "pending")
+        return {"ok": True}
+
+    def evaluate_outcomes(self):
+        """Outcome Evaluator + Learning hook: for each implemented recommendation,
+        measure real before/after impact; when it's readable, turn it into a reward
+        and teach the model from that recommendation's OWN stored context vector.
+        Real outcomes thus gradually supersede the expert priors. Never fabricated."""
+        ck = self._client_key()
+        learned = {o["rec_id"]: o for o in store.seo_outcomes_all(self.engine)}
+        results = []
+        for rec in store.implemented_recs(self.engine):
+            outcome = outcome_evaluator.evaluate(self.engine, ck, rec)
+            if outcome.get("status") != "evaluated":
+                store.save_seo_outcome(self.engine, rec["rec_id"], "pending", detail=outcome)
+                results.append({"rec_id": rec["rec_id"], "status": "pending"})
+                continue
+            r = reward_engine.reward(outcome)
+            if r is None:
+                store.save_seo_outcome(self.engine, rec["rec_id"], "pending", detail=outcome)
+                continue
+            already = learned.get(rec["rec_id"], {}).get("status") == "evaluated"
+            store.save_seo_outcome(self.engine, rec["rec_id"], "evaluated", reward=r, detail=outcome)
+            if not already and rec.get("context"):          # teach once, from real data
+                with self.lock:
+                    self.bandit.update(np.asarray(rec["context"], dtype=float), float(r))
+                    self._save_bandit()
+                    self._sim_cache = None
+            results.append({"rec_id": rec["rec_id"], "status": "evaluated", "reward": r})
+        return {"evaluated": results}
+
+    def performance(self):
+        """Recommendation-Performance dashboard stats (real measured outcomes)."""
+        implemented = store.implemented_recs(self.engine)
+        outs = store.seo_outcomes_all(self.engine)
+        evaluated = [o for o in outs if o["status"] == "evaluated" and o.get("reward") is not None]
+        positive = [o for o in evaluated if reward_engine.is_success(o["detail"])]
+
+        def avg(vals):
+            vals = [v for v in vals if v is not None]
+            return round(sum(vals) / len(vals), 1) if vals else None
+
+        return {
+            "connected": self.google_status()["account_connected"],
+            "total": len(implemented),
+            "evaluated": len(evaluated),
+            "pending": max(0, len(implemented) - len(evaluated)),
+            "positive": len(positive),
+            "avg_click_growth": avg([o["detail"].get("clicks_change_pct") for o in evaluated]),
+            "avg_position_gain": avg([o["detail"].get("position_change") for o in evaluated]),
+            "real_updates": len(evaluated),
+        }
+
+    def _google_worker(self):
+        """Periodically collect SEO data + evaluate outcomes while connected."""
+        while True:
+            try:
+                if self.google_status()["account_connected"]:
+                    self._collect_seo_data()
+                    self.evaluate_outcomes()
+            except Exception:
+                pass
+            time.sleep(6 * 3600)
 
     # ------------------------------------------- head-to-head proof (cached) ----
     def simulate(self):

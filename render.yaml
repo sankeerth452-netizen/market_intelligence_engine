@@ -37,6 +37,15 @@ services:
         value: au
       - key: AHREFS_AI_SOURCES
         value: chatgpt          # AI-visibility source(s); each adds ~3-4k units/refresh
+      # ---- Google integrations (real outcome-based learning; all optional) ----
+      - key: GOOGLE_CLIENT_ID
+        sync: false             # from your Google Cloud OAuth client
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://market-intelligence-engine-x998.onrender.com/api/google/callback
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false             # a Fernet key: python -c "from cryptography.fernet import Fernet;print(Fernet.generate_key().decode())"
       # ---- Competitor monitoring (weekly crawl below keeps this fresh) ----
       - key: COMPETITOR_URLS
         value: https://www.thegoodguys.com.au,https://www.officeworks.com.au,https://www.harveynorman.com.au

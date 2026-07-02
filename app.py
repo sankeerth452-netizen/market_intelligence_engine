@@ -19,7 +19,7 @@ Endpoints
 import os
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -132,6 +132,77 @@ def get_ai_visibility():
     """AI 'share of voice' — the client vs competitors in AI answers (Brand Radar).
     Empty/enabled:false unless AHREFS_API_KEY is set; cached a week (expensive)."""
     return ENGINE.ai_visibility()
+
+
+# ---- Google integrations: real outcome-based learning loop ----
+@app.get("/api/google/status")
+def google_status():
+    """GSC/GA4 connection + selected properties (all false/None if not configured)."""
+    return ENGINE.google_status()
+
+
+@app.get("/api/google/auth")
+def google_auth():
+    """The Google consent URL to start the OAuth flow (null if not configured)."""
+    return ENGINE.google_auth_url()
+
+
+@app.get("/api/google/callback")
+def google_callback(code: str = "", state: str = "", error: str = ""):
+    """OAuth redirect target — exchanges the code, then returns to the dashboard."""
+    if code:
+        ENGINE.google_connect(code)
+        return RedirectResponse(url="/?google=connected")
+    return RedirectResponse(url="/?google=error")
+
+
+@app.get("/api/google/properties")
+def google_properties(service: str = "gsc"):
+    """The user's available GSC sites / GA4 properties, to pick the right one."""
+    return ENGINE.google_properties("ga4" if service == "ga4" else "gsc")
+
+
+class PropertySelection(BaseModel):
+    service: str = Field(max_length=8)
+    property_id: str = Field(max_length=300)
+
+
+@app.post("/api/google/select")
+def google_select(p: PropertySelection):
+    return ENGINE.google_select("ga4" if p.service == "ga4" else "gsc", p.property_id)
+
+
+@app.post("/api/google/disconnect")
+def google_disconnect():
+    return ENGINE.google_disconnect()
+
+
+class Implemented(BaseModel):
+    rec_id: int
+    target_url: str = Field(default="", max_length=500)
+
+
+@app.post("/api/recommendations/implemented")
+def recommendation_implemented(r: Implemented):
+    """Mark a recommendation as shipped (records the date + target page), so its
+    real-world impact can be measured later."""
+    return ENGINE.mark_implemented(r.rec_id, r.target_url or None)
+
+
+@app.get("/api/performance")
+def performance():
+    """Recommendation-performance stats (real measured outcomes)."""
+    return ENGINE.performance()
+
+
+@app.post("/api/google/refresh")
+def google_refresh():
+    """Manually kick off a data-collect + outcome-evaluation pass (background)."""
+    import threading
+    threading.Thread(
+        target=lambda: (ENGINE._collect_seo_data(True), ENGINE.evaluate_outcomes()),
+        daemon=True).start()
+    return {"ok": True, "status": "started"}
 
 
 @app.get("/api/health")

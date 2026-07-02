@@ -682,6 +682,29 @@ body {
 .aiv__val { font-family: var(--mono); font-weight: 600; font-size: 14px; text-align: right; color: var(--ink); }
 @media (max-width: 640px) { .aiv { grid-template-columns: 104px 1fr 40px; gap: 10px; } }
 
+/* ---- Integrations (Connect Google) + Recommendation performance -------- */
+.integrations { display: flex; flex-direction: column; gap: 12px; }
+.intg { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.intg__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.intg__name { font-family: var(--display); font-weight: 600; font-size: 15px; }
+.intg__ok { font-family: var(--mono); font-size: 11px; color: var(--teal); }
+.intg__warn { font-family: var(--mono); font-size: 11px; color: var(--amber); }
+.intg__off { font-family: var(--mono); font-size: 11px; color: var(--mute); }
+.intg__sel { margin-top: 10px; width: 100%; font-family: var(--body); font-size: 13px; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); }
+.intg__note { font-size: 13.5px; color: var(--mute); line-height: 1.5; margin: 0 0 12px; }
+.markdone { font-family: var(--body); font-size: 12px; font-weight: 500; color: var(--mute);
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 4px 11px; cursor: pointer; transition: color .12s, border-color .12s; }
+.markdone:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+.markdone:disabled { color: var(--teal); border-color: rgba(15,118,110,.3); cursor: default; }
+.perf__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 12px; }
+.perf__stat { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
+.perf__stat b { display: block; font-family: var(--display); font-weight: 600; font-size: 26px; color: var(--ink); }
+.perf__stat span { font-family: var(--mono); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; color: var(--mute); }
+.perf__empty { font-size: 13.5px; color: var(--mute); line-height: 1.5; margin: 0; }
+@media (max-width: 560px) { .perf__grid { grid-template-columns: 1fr 1fr; } }
+
 /* ---- virtual assistant ------------------------------------------------- */
 .asst-fab {
   position: fixed; right: 22px; bottom: 22px; z-index: 60;
