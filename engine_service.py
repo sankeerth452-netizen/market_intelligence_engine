@@ -546,12 +546,14 @@ class EngineService:
     def google_properties(self, service):
         tok = google_oauth.access_token(self.engine, self._client_key())
         if not tok:
-            return {"properties": []}
+            return {"properties": [], "error": "not_connected"}
         if service == "gsc":
-            return {"properties": [{"id": s["url"], "name": s["url"]}
-                                   for s in search_console.list_sites(tok)]}
-        return {"properties": [{"id": p["property"], "name": p["name"]}
-                               for p in ga4.list_properties(tok)]}
+            sites = search_console.list_sites(tok)
+            return {"properties": [{"id": s["url"], "name": s["url"]} for s in sites],
+                    "error": search_console.last_error()}
+        props = ga4.list_properties(tok)
+        return {"properties": [{"id": p["property"], "name": p["name"]} for p in props],
+                "error": ga4.last_error()}
 
     def google_select(self, service, property_id):
         ok = google_oauth.set_property(self.engine, self._client_key(), service, property_id)

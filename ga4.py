@@ -7,6 +7,7 @@ page and day: sessions, users, engagement, and â€” when the property has them â€
 conversions and revenue. Fail-soft: errors return empty results.
 """
 import json
+import urllib.error
 import urllib.request
 
 _ADMIN = "https://analyticsadmin.googleapis.com/v1beta"
@@ -14,12 +15,30 @@ _DATA = "https://analyticsdata.googleapis.com/v1beta"
 _METRICS = ["sessions", "totalUsers", "engagementRate", "conversions", "totalRevenue"]
 
 
+# Last GET failure reason (e.g. Admin API not enabled, insufficient
+# permission), so an empty property list can be told apart from a silent
+# error. Single worker (see Dockerfile).
+_LAST_ERROR = {"get": None}
+
+
+def last_error():
+    return _LAST_ERROR["get"]
+
+
 def _get(url, token):
     req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
+            _LAST_ERROR["get"] = None
             return json.loads(r.read())
-    except Exception:
+    except urllib.error.HTTPError as e:
+        try:
+            _LAST_ERROR["get"] = f"http_{e.code}: {e.read().decode()[:300]}"
+        except Exception:
+            _LAST_ERROR["get"] = f"http_{e.code}: {e.reason}"
+        return None
+    except Exception as e:
+        _LAST_ERROR["get"] = f"{type(e).__name__}: {e}"
         return None
 
 
