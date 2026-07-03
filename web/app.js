@@ -381,7 +381,7 @@ function loadSummary() {
     }).join("");
     $("summaryCard").innerHTML = `
       <div class="summary__head">
-        <span class="eyebrow">✦ This week's read on the market</span>
+        <span class="eyebrow">This week's read on the market</span>
         <span class="summary__mode">${shortToday()}</span>
       </div>
       <p class="summary__learned">${s.learned}</p>
@@ -522,8 +522,7 @@ function loadStatus() {
 
     const c = s.client || {};
     if (c.name) {
-      $("clientChip").textContent = c.name + (c.industry ? " · " + titleCase(c.industry) : "");
-      $("railClient").textContent = c.name;
+      $("clientChip").innerHTML = `<span class="clientchip__dot"></span><span class="clientchip__pre">Prepared for</span><b>${c.name}</b>`;
     }
     $("cfg").innerHTML = c.name ? `
       <div class="cfgrow"><span>Client</span><b>${c.name}</b></div>
