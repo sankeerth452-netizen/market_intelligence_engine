@@ -517,13 +517,8 @@ function loadStatus() {
     $("gOuts").textContent = s.outcomes;
     $("gUpd").textContent = s.model_updates;
     $("gAvg").textContent = s.avg_reward == null ? "—" : s.avg_reward.toFixed(2);
-    $("railUpd").textContent = s.model_updates == null ? "—" : s.model_updates;
-    $("railAvg").textContent = s.avg_reward == null ? "—" : s.avg_reward.toFixed(2);
 
     const c = s.client || {};
-    if (c.name) {
-      $("clientChip").innerHTML = `<span class="clientchip__dot"></span><span class="clientchip__pre">Prepared for</span><b>${c.name}</b>`;
-    }
     $("cfg").innerHTML = c.name ? `
       <div class="cfgrow"><span>Client</span><b>${c.name}</b></div>
       <div class="cfgrow"><span>Industry</span><b>${titleCase(c.industry)}</b></div>
@@ -657,29 +652,77 @@ function loadCompetitors() {
 }
 
 /* ---- AI Visibility: share of voice in AI answers ----------------------- */
+function sovGauge(p) {
+  const r = 54, c = 2 * Math.PI * r, on = Math.max(0, Math.min(1, p)) * c;
+  return `<svg viewBox="0 0 140 140" class="sovg" role="img" aria-label="${Math.round(p * 100)} percent share of voice">
+      <circle cx="70" cy="70" r="${r}" class="sovg__bg"/>
+      <circle cx="70" cy="70" r="${r}" class="sovg__arc" stroke-dasharray="${on.toFixed(1)} ${(c - on).toFixed(1)}" transform="rotate(-90 70 70)"/>
+      <text x="70" y="65" class="sovg__pct">${Math.round(p * 100)}%</text>
+      <text x="70" y="87" class="sovg__lbl">share of voice</text>
+    </svg>`;
+}
+
 function loadAiVisibility() {
   const host = $("aivBars");
-  if (!host.children.length) host.innerHTML = '<div class="skeleton"></div>';
+  if (!host.children.length) host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
   return api("/api/ai-visibility").then((d) => {
     if (!d.enabled) {
       host.innerHTML = `<p class="lede">AI visibility turns on with the Ahrefs key —
-        set <b>AHREFS_API_KEY</b> to see your share of voice in ChatGPT & co.</p>`;
+        set <b>AHREFS_API_KEY</b> to see your share of voice in ChatGPT and other AI answers.</p>`;
       return;
     }
-    const brands = d.brands || [];
+    const brands = (d.brands || []).slice().sort((a, b) => b.sov - a.sov);
     if (!brands.length) { host.innerHTML = `<p class="lede">No AI visibility data available yet.</p>`; return; }
+    const client = d.client, pct = (x) => Math.round(x * 100);
     const max = Math.max(...brands.map((b) => b.sov), 0.0001);
-    const src = (d.sources || ["chatgpt"]).join(", ").toUpperCase();
-    host.innerHTML =
-      `<div class="aiv__src">Source: <b>${src}</b> · Australia · how often each brand appears in AI answers</div>` +
-      brands.map((b) => {
-        const mine = b.brand === d.client;
-        return `<div class="aiv ${mine ? "aiv--me" : ""}">
-          <div class="aiv__name">${b.brand}${mine ? ' <span class="aiv__you">you</span>' : ""}</div>
-          <div class="aiv__track"><div class="aiv__fill" style="width:${Math.round(b.sov / max * 100)}%"></div></div>
-          <div class="aiv__val">${Math.round(b.sov * 100)}%</div>
+    const me = brands.find((b) => b.brand === client) || brands[0];
+    const myRank = brands.indexOf(me) + 1;
+    const rivals = brands.filter((b) => b.brand !== client);
+    const top = rivals[0];
+    const src = (d.sources || ["chatgpt"]).map((s) => s.toUpperCase()).join(", ");
+    const leadPts = top ? pct(me.sov) - pct(top.sov) : null;
+    const leadX = (top && top.sov > 0) ? (me.sov / top.sov).toFixed(1) : null;
+    const headroom = pct(1 - me.sov);
+
+    const heroLine = (myRank === 1 && top)
+      ? `<b>${client}</b> leads AI visibility — cited in <b>${pct(me.sov)}%</b> of AI shopping answers, about <b>${leadX}&times;</b> the nearest competitor.`
+      : `<b>${client}</b> ranks #${myRank} of ${brands.length} — cited in <b>${pct(me.sov)}%</b> of AI shopping answers.`;
+    const hero = `<div class="aivhero">${sovGauge(me.sov)}<div>
+        <span class="aivhero__rankbadge">${myRank === 1 ? "Category leader" : "Rank #" + myRank + " of " + brands.length}</span>
+        <div class="aivhero__title">${heroLine}</div>
+        <p class="aivhero__sub">Share of voice is how often a brand gets named when AI assistants answer shopping
+          questions in your categories — the new shelf space, sitting above the ten blue links.</p>
+        <div class="aivhero__chips"><span class="aivchip">Source: ${src}</span><span class="aivchip">Australia</span><span class="aivchip">Refreshed weekly</span></div>
+      </div></div>`;
+
+    const rows = brands.map((b, i) => {
+      const mine = b.brand === client, threat = !mine && b === top;
+      const gap = mine ? "" : `<span class="lb__gap">−${pct(me.sov) - pct(b.sov)} pts vs you</span>`;
+      return `<div class="lb ${mine ? "lb--me" : ""} ${threat ? "lb--threat" : ""}">
+          <div class="lb__rank">${pad2(i + 1)}</div>
+          <div class="lb__main">
+            <div class="lb__top"><span class="lb__name">${b.brand}</span>${mine ? '<span class="aiv__you">you</span>' : ""}${gap}</div>
+            <div class="lb__bar"><div class="lb__fill" style="width:${Math.round(b.sov / max * 100)}%"></div></div>
+          </div>
+          <div class="lb__val">${pct(b.sov)}%</div>
         </div>`;
-      }).join("");
+    }).join("");
+    const board = `<div class="lbpanel"><div class="eyebrow" style="margin-bottom:14px">Competitive leaderboard</div>${rows}</div>`;
+
+    const card = (cls, lbl, big, sub) =>
+      `<div class="aivcard ${cls}"><div class="aivcard__lbl">${lbl}</div><div class="aivcard__big">${big}</div><div class="aivcard__sub">${sub}</div></div>`;
+    const cards = `<div class="aivcards">
+        ${card("", "Your rank", "#" + myRank + " of " + brands.length, myRank === 1 ? "you own the top spot" : "room to climb")}
+        ${top ? card("", "Lead over #2", "+" + leadPts + " pts", leadX + "&times; " + top.brand) : ""}
+        ${card("aivcard--amber", "Answer headroom", headroom + "%", "of AI answers still don't name you")}
+        ${top ? card("aivcard--amber", "Closest challenger", top.brand, pct(top.sov) + "% share of voice") : ""}
+      </div>`;
+
+    const method = `<div class="aivmethod"><b>How this is measured.</b> Real Ahrefs Brand Radar data — how often each brand
+      is actually cited when ${src} answers shopping questions across your categories in Australia, refreshed weekly.
+      Share of voice is an appearance rate (one brand can appear in many answers), so figures do not sum to 100%.</div>`;
+
+    host.innerHTML = hero + cards + board + method;
   }).catch(() => { host.innerHTML = `<p class="lede">Could not load AI visibility.</p>`; });
 }
 
