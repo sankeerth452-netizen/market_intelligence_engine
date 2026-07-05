@@ -114,6 +114,18 @@ seo_outcomes = Table(
     Column("detail_json", Text),               # the standardised outcome (metric changes)
 )
 
+# Principle-based learning: one row per implemented rec, tagged with the marketing
+# idea TYPE it used; the reward is filled in when the outcome is measured. Aggregated
+# by type, this teaches which KINDS of move pay off (not just which URLs).
+principle_log = Table(
+    "principle_log", metadata,
+    Column("rec_id", Integer, primary_key=True),
+    Column("client_key", Text),
+    Column("idea_type", Text),
+    Column("reward", Float),                    # NULL until the outcome is measured
+    Column("ts", Float),
+)
+
 
 def _normalize_url(url: str) -> str:
     """Accept a bare file path or any DB URL; return a SQLAlchemy URL."""
@@ -224,6 +236,7 @@ def reset_all(engine) -> None:
         conn.execute(model_state.delete())
         conn.execute(rec_meta.delete())          # tracking is tied to the wiped recs
         conn.execute(seo_outcomes.delete())
+        conn.execute(principle_log.delete())
 
 
 # ---- competitor page inventory + new-page detection ----
@@ -399,6 +412,41 @@ def implemented_recs(engine):
     return [{"rec_id": r[0], "target_url": r[1], "implemented_at": r[2], "topic": r[3],
              "context": json.loads(r[4]) if r[4] else None, "roi": r[5],
              "uncertainty": r[6]} for r in rows]
+
+
+def principle_set_type(engine, rec_id, client_key, idea_type):
+    """Tag an implemented rec with the marketing idea type it used (reward comes later)."""
+    with engine.begin() as conn:
+        exists = conn.execute(select(principle_log.c.rec_id)
+                              .where(principle_log.c.rec_id == rec_id)).first()
+        if exists:
+            conn.execute(update(principle_log).where(principle_log.c.rec_id == rec_id)
+                         .values(client_key=client_key, idea_type=idea_type))
+        else:
+            conn.execute(insert(principle_log).values(
+                rec_id=rec_id, client_key=client_key, idea_type=idea_type, ts=time.time()))
+
+
+def principle_set_reward(engine, rec_id, reward):
+    """Fill in the measured reward for a tagged rec once its outcome is known."""
+    with engine.begin() as conn:
+        conn.execute(update(principle_log).where(principle_log.c.rec_id == rec_id)
+                     .values(reward=reward))
+
+
+def principle_stats(engine, client_key):
+    """{idea_type: {'sum': total_reward, 'n': count}} over measured outcomes."""
+    with engine.begin() as conn:
+        rows = conn.execute(select(principle_log.c.idea_type, principle_log.c.reward)
+                            .where(principle_log.c.client_key == client_key)).fetchall()
+    agg = {}
+    for idea_type, reward in rows:
+        if reward is None or not idea_type:
+            continue
+        a = agg.setdefault(idea_type, {"sum": 0.0, "n": 0})
+        a["sum"] += float(reward)
+        a["n"] += 1
+    return agg
 
 
 def save_seo_outcome(engine, rec_id, status, reward=None, detail=None):

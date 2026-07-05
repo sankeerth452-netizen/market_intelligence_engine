@@ -227,12 +227,18 @@ def discover_topics(opps):
     return topics
 
 
-def generate(limit_topics=12):
+def generate(limit_topics=12, mult=None):
     gaps = content_gap.content_gaps()
     opps = gaps.get("opportunities", [])
     if not opps:
         return {"available": False, "topics": [], "topic_count": 0, "idea_count": 0}
-    topics = discover_topics(opps)[:limit_topics]
+    topics = discover_topics(opps)
+    if mult:                                     # re-weight by learned principle effectiveness
+        for t in topics:
+            for i in t["ideas"]:
+                i["score"] = round(i["score"] * mult.get(i["type"], 1.0))
+            t["ideas"].sort(key=lambda x: -x["score"])
+    topics = topics[:limit_topics]
     lane_counter = Counter(i["lane"] for t in topics for i in t["ideas"])
     return {
         "available": True,

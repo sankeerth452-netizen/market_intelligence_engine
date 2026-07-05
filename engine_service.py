@@ -30,6 +30,7 @@ import google_oauth
 import search_console
 import ga4
 import outcome_evaluator
+import principles
 import reward_engine
 from world import build_world
 from bandit import LinUCB
@@ -349,10 +350,17 @@ class EngineService:
 
     def marketing_ideas(self):
         """Topics discovered from the content gaps, each with many ranked marketing
-        ideas across SEO / Content / Social / Commercial / AI Visibility."""
-        data = ideas_mod.generate()
+        ideas across SEO / Content / Social / Commercial / AI Visibility — re-weighted
+        by the principle effectiveness learned so far."""
+        mult = principles.multipliers(self.engine, self._client_key())
+        data = ideas_mod.generate(mult=mult)
         data["client"] = client_config.active_client().name
         return data
+
+    def principles(self):
+        """Learned marketing principles: which idea TYPES pay off (expert prior now,
+        refined by real GSC/GA4 outcomes over time)."""
+        return {"principles": principles.effectiveness(self.engine, self._client_key())}
 
     def demand_forecast(self):
         """Per-category demand trend, seasonality and next-month forecast from real
@@ -622,12 +630,15 @@ class EngineService:
         except Exception:
             pass
 
-    def mark_implemented(self, rec_id, target_url=None):
-        """Recommendation Tracker: record when the client shipped a recommendation
-        and which page it targets — the anchor for before/after evaluation."""
+    def mark_implemented(self, rec_id, target_url=None, idea_type=None):
+        """Recommendation Tracker: record when the client shipped a recommendation,
+        which page it targets, and which marketing idea TYPE it used — the anchors for
+        before/after evaluation and for principle-based learning."""
         store.set_rec_meta(self.engine, int(rec_id), target_url=target_url,
                            implemented_at=time.time())
         store.save_seo_outcome(self.engine, int(rec_id), "pending")
+        if idea_type:
+            store.principle_set_type(self.engine, int(rec_id), self._client_key(), idea_type)
         return {"ok": True}
 
     def evaluate_outcomes(self):
@@ -655,6 +666,7 @@ class EngineService:
                     self.bandit.update(np.asarray(rec["context"], dtype=float), float(r))
                     self._save_bandit()
                     self._sim_cache = None
+                store.principle_set_reward(self.engine, rec["rec_id"], float(r))  # learn the principle
             results.append({"rec_id": rec["rec_id"], "status": "evaluated", "reward": r})
         return {"evaluated": results}
 

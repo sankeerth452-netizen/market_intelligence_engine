@@ -830,6 +830,19 @@ html { scroll-behavior: smooth; }
   .idea__score { display: none; }
 }
 
+/* ---- Learned principles (What It's Learned) ---------------------------- */
+.principles { display: flex; flex-direction: column; gap: 14px; }
+.prin__top { display: flex; align-items: baseline; gap: 10px; }
+.prin__type { font-family: var(--display); font-weight: 600; font-size: 14px; color: var(--ink); }
+.prin__basis { font-family: var(--mono); font-size: 9.5px; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--mute); background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 2px 8px; }
+.prin__basis.is-learned { color: var(--teal); border-color: rgba(15,118,110,.3); background: var(--teal-wash); }
+.prin__score { margin-left: auto; font-family: var(--mono); font-weight: 600; font-size: 14px; color: var(--teal); font-variant-numeric: tabular-nums; }
+.prin__track { height: 8px; background: var(--line-soft); border-radius: var(--r-pill); overflow: hidden; margin: 6px 0 5px; }
+.prin__fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--teal-bright), var(--teal));
+  transition: width .7s cubic-bezier(.2,.7,.2,1); }
+.prin__why { font-size: 12px; color: var(--mute); line-height: 1.4; }
+
 /* ---- Integrations (Connect Google) + Recommendation performance -------- */
 .integrations { display: flex; flex-direction: column; gap: 12px; }
 .intg { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }

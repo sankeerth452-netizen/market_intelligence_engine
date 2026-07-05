@@ -148,6 +148,13 @@ def get_ideas():
     return ENGINE.marketing_ideas()
 
 
+@app.get("/api/principles")
+def get_principles():
+    """Learned marketing principles — which idea TYPES pay off (expert prior now,
+    refined by real GSC/GA4 outcomes over time)."""
+    return ENGINE.principles()
+
+
 # ---- Google integrations: real outcome-based learning loop ----
 @app.get("/api/google/status")
 def google_status():
@@ -195,13 +202,14 @@ def google_disconnect():
 class Implemented(BaseModel):
     rec_id: int
     target_url: str = Field(default="", max_length=500)
+    idea_type: str = Field(default="", max_length=60)
 
 
 @app.post("/api/recommendations/implemented")
 def recommendation_implemented(r: Implemented):
     """Mark a recommendation as shipped (records the date + target page), so its
     real-world impact can be measured later."""
-    return ENGINE.mark_implemented(r.rec_id, r.target_url or None)
+    return ENGINE.mark_implemented(r.rec_id, r.target_url or None, r.idea_type or None)
 
 
 @app.get("/api/performance")

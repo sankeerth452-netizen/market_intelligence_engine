@@ -844,6 +844,27 @@ function loadMarketingIdeas() {
   }).catch(() => { host.innerHTML = `<p class="lede">Could not load marketing ideas.</p>`; });
 }
 
+/* ---- Principle-based learning: which idea TYPES pay off ------------------ */
+function loadPrinciples() {
+  const host = $("principles");
+  if (!host) return;
+  return api("/api/principles").then((d) => {
+    const ps = d.principles || [];
+    if (!ps.length) { host.innerHTML = ""; return; }
+    const max = Math.max(...ps.map((p) => p.score), 0.01);
+    host.innerHTML = ps.map((p) => `
+        <div class="prin">
+          <div class="prin__top">
+            <span class="prin__type">${p.type}</span>
+            <span class="prin__basis ${p.n > 0 ? "is-learned" : ""}">${p.basis}</span>
+            <span class="prin__score">${p.score.toFixed(2)}</span>
+          </div>
+          <div class="prin__track"><div class="prin__fill" style="width:${Math.round(p.score / max * 100)}%"></div></div>
+          <div class="prin__why">${p.rationale}</div>
+        </div>`).join("");
+  }).catch(() => {});
+}
+
 /* ---- Google integrations (connect GSC/GA4 → real outcome learning) ------ */
 async function connectGoogle() {
   try {
@@ -937,9 +958,10 @@ async function markDone(c, btn) {
   const url = window.prompt("Which page did you create or update for this recommendation?\n(Enter the URL so we can track its results.)", "");
   if (url === null) return;
   try {
+    const ideaType = c.action === "Optimise existing page" ? "Category optimisation" : "New landing page";
     await api("/api/recommendations/implemented", { method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rec_id: c.id, target_url: (url || "").trim() }) });
+      body: JSON.stringify({ rec_id: c.id, target_url: (url || "").trim(), idea_type: ideaType }) });
     btn.textContent = "✓ Tracking results";
     btn.disabled = true;
     toast("Marked as done — we'll measure its impact over the next 30–90 days.");
@@ -975,7 +997,7 @@ function showView(name) {
   if (name === "ideas") loadMarketingIdeas();
   if (name === "aivis") loadAiVisibility();
   if (name === "settings") loadIntegrations();
-  if (name === "learning") loadPerformance();
+  if (name === "learning") { loadPerformance(); loadPrinciples(); }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
