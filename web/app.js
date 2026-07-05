@@ -50,7 +50,8 @@ const prioOf = (item) =>
                         : priorityOf(item && item.roi);
 const confidenceOf = (conf) =>
   conf >= 0.62 ? ["High", "is-high"] : conf >= 0.42 ? ["Medium", "is-med"] : ["Low", "is-low"];
-const actionVerb = (a) =>
+const actionVerb = (a, leads) =>
+  leads ? ["Defend your", " lead"] :
   (a || "").toLowerCase().startsWith("create") ? ["Create a page for", ""] : ["Strengthen your", " page"];
 const whyLine = (c) => {
   const ev = (c.evidence || []).map((e) => CHIP_LABEL[e] || e);
@@ -159,7 +160,7 @@ function cardEl(c) {
 
   const [prio, prioCls] = prioOf(c);
   const [conf, confCls] = confidenceOf(c.confidence);
-  const [verb, suffix] = actionVerb(c.action);
+  const [verb, suffix] = actionVerb(c.action, c.leads);
   const test = (c.confidence != null && c.confidence < 0.5)
     ? `<span class="tag tag--test" title="Signals are mixed here — worth a quick test to find out">Worth a test</span>` : "";
   const news = (c.headlines && c.headlines[0])

@@ -136,10 +136,22 @@ class EngineService:
                                   p["exploring"]),
                     context_json=json.dumps(p["x"]))
                 out.append(self._serialize(rid, i, p, week))
+            # Re-weight by JB's real competitive position: don't push 'strengthen X'
+            # where JB already leads; lift the categories rivals own and JB doesn't.
+            ctx = self._category_context()
+            for c in out:
+                info = ctx.get((c.get("category") or "").lower())
+                if info:
+                    c["roi"] = round(c["roi"] * info["mult"], 3)
+                    c["leads"] = info["leads"]
+                    if info["note"]:
+                        c["evidence"] = [info["note"]] + c["evidence"]
+            out.sort(key=lambda c: -c["roi"])
             scored = self._all_scored()
             cuts = self._priority_cuts([o["roi"] for o in scored])
-            top = scored[0]["roi"] if scored else 1.0
-            for c in out:
+            top = out[0]["roi"] if out else (scored[0]["roi"] if scored else 1.0)
+            for i, c in enumerate(out, 1):
+                c["rank"] = i
                 c["priority"] = self._priority_label(c["roi"], cuts)
                 c["strength"] = round(min(1.0, c["roi"] / top), 3) if top > 0 else 0.0
             return out
@@ -400,6 +412,28 @@ class EngineService:
         vols = ahrefs.search_volumes([c.lower() for c in cats])
         self._vol_cache = (now, vols)
         return vols
+
+    def _category_context(self):
+        """Per-category competitive position from the Ahrefs exports: does JB already
+        LEAD (covers it well — few gaps + real traffic) or is it WIDE OPEN (many gaps)?
+        Used to stop recommending 'strengthen X' where JB is already the leader, and to
+        lift categories where rivals rank and JB doesn't."""
+        strengths = content_gap.top_pages().get("jb_strengths", {})   # {cat:{traffic,pages}}
+        gaps = content_gap.content_gaps().get("by_category", {})       # {cat: gap_count}
+        if not strengths and not gaps:
+            return {}
+        max_traf = max((v.get("traffic", 0) for v in strengths.values()), default=0) or 1
+        max_gaps = max(gaps.values(), default=0) or 1
+        out = {}
+        for cat in set(list(strengths) + list(gaps)):
+            traf = strengths.get(cat, {}).get("traffic", 0)
+            gc = gaps.get(cat, 0)
+            opp = gc / max_gaps
+            leads = gc <= 4 and traf >= 0.15 * max_traf     # covered well + real presence
+            mult = round(0.6 + 0.8 * opp, 3)                # few gaps -> down-weight; many -> lift
+            note = "you already lead here" if leads else ("wide-open vs rivals" if opp > 0.55 else None)
+            out[cat.lower()] = {"mult": mult, "leads": leads, "note": note}
+        return out
 
     def signals(self, k: int = 14):
         with self.lock:
