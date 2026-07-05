@@ -30,6 +30,11 @@ secrets.*
 *.db
 bandit_state.json
 
+# ---- Ahrefs raw exports (large; the committed data/ahrefs/*.json is derived) ----
+# Drop weekly exports here and run import_ahrefs.py; only the small JSON is committed.
+data/ahrefs/raw/
+data/ahrefs/*.csv
+
 # ---- OS ----
 .DS_Store
 Thumbs.db

@@ -726,6 +726,64 @@ function loadAiVisibility() {
   }).catch(() => { host.innerHTML = `<p class="lede">Could not load AI visibility.</p>`; });
 }
 
+/* ---- Content Gaps: competitor content JB is missing (Ahrefs export) ----- */
+let _gapFilter = "all";
+function loadContentGaps() {
+  const host = $("gaps");
+  if (!host.children.length) host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  return api("/api/content-gaps").then((d) => {
+    if (!d.available) {
+      host.innerHTML = `<p class="lede">No content-gap data imported yet. Add the Ahrefs content-gap and
+        top-pages exports and run <code>import_ahrefs.py</code> to populate this view.</p>`;
+      return;
+    }
+    const opps = d.opportunities || [];
+    if (!opps.length) { host.innerHTML = `<p class="lede">No relevant gaps found.</p>`; return; }
+    const cats = d.by_category || {}, catList = Object.keys(cats);
+    const compact = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(n);
+    const topCat = catList[0];
+
+    const card = (lbl, big, sub) => `<div class="aivcard"><div class="aivcard__lbl">${lbl}</div><div class="aivcard__big">${big}</div><div class="aivcard__sub">${sub}</div></div>`;
+    const summary = `<div class="aivcards">
+        ${card("Opportunities", opps.length, "competitor ranks, you don't")}
+        ${card("Categories", catList.length, "with missing content")}
+        ${card("Addressable demand", compact(d.addressable_volume || 0) + "/mo", "searches across the gaps")}
+        ${card("Biggest gap", topCat, cats[topCat] + " opportunities")}
+      </div>`;
+
+    const chip = (id, label, n) => `<button class="gapchip ${_gapFilter === id ? "is-on" : ""}" data-f="${id}">${label} <b>${n}</b></button>`;
+    const chips = `<div class="gapchips">${chip("all", "All", opps.length)}${catList.map((c) => chip(c, c, cats[c])).join("")}</div>`;
+
+    const typeCls = (t) => /Comparison/.test(t) ? "cmp" : /Buying/.test(t) ? "guide" : /Guide|FAQ|Review/.test(t) ? "info" : "land";
+    const rows = opps.map((o) => {
+      const comp = o.competitors[0], others = o.competitors.length > 1 ? " +" + (o.competitors.length - 1) : "";
+      const intents = (o.intent || []).slice(0, 2).join(" · ");
+      return `<div class="gap" data-cat="${o.category}">
+          <span class="gaptype gaptype--${typeCls(o.type)}">${o.type}</span>
+          <div class="gap__main">
+            <div class="gap__kw">${o.keyword}</div>
+            <div class="gap__meta"><span class="gap__vol">${o.volume.toLocaleString()}/mo</span>
+              <span class="gap__sep">·</span>${intents}<span class="gap__sep">·</span>
+              <span class="gap__comp">${comp.name} ranks #${comp.position}${others} — you don't</span></div>
+          </div>
+          <span class="gap__cat">${o.category}</span>
+        </div>`;
+    }).join("");
+
+    const method = `<div class="aivmethod"><b>How this works.</b> Straight from your Ahrefs content-gap export
+      (JB Hi-Fi vs ${(d.competitors || []).join(", ")}). A gap = a competitor ranks in Google and JB doesn't.
+      Filtered to your categories and buyer intent (branded and navigational queries removed), then ranked by
+      search volume × intent × how well the rival already ranks. Refresh weekly by re-running the import.</div>`;
+
+    host.innerHTML = summary + chips + `<div class="gaplist">${rows}</div>` + method;
+    host.querySelectorAll(".gapchip").forEach((b) => b.addEventListener("click", () => {
+      _gapFilter = b.dataset.f;
+      host.querySelectorAll(".gapchip").forEach((x) => x.classList.toggle("is-on", x === b));
+      host.querySelectorAll(".gap").forEach((g) => { g.style.display = (_gapFilter === "all" || g.dataset.cat === _gapFilter) ? "" : "none"; });
+    }));
+  }).catch(() => { host.innerHTML = `<p class="lede">Could not load content gaps.</p>`; });
+}
+
 /* ---- Google integrations (connect GSC/GA4 → real outcome learning) ------ */
 async function connectGoogle() {
   try {
@@ -834,6 +892,7 @@ const VIEW_META = {
   plan: ["Your plan", "What to do this week"],
   signals: ["The signals behind every recommendation", "Market signals"],
   competitors: ["New pages rivals are publishing", "Competitors"],
+  gaps: ["Content competitors have and you don't", "Content gaps"],
   aivis: ["Your presence in AI answers", "AI Visibility"],
   proof: ["Validated across 30 markets", "How it works"],
   learning: ["What the system figured out", "What it's learned"],
@@ -851,6 +910,7 @@ function showView(name) {
   if (name === "dashboard") loadDashboard();
   if (name === "signals") loadSignals();
   if (name === "competitors") loadCompetitors();
+  if (name === "gaps") loadContentGaps();
   if (name === "aivis") loadAiVisibility();
   if (name === "settings") loadIntegrations();
   if (name === "learning") loadPerformance();

@@ -1,0 +1,3407 @@
+{
+ "generated": 1783263812.005688,
+ "total_gaps_scanned": 279,
+ "kept": 166,
+ "by_category": {
+  "Computers": 45,
+  "Laptops": 45,
+  "TVs": 19,
+  "Cameras": 17,
+  "Phones": 13,
+  "Tablets": 13,
+  "Gaming": 8,
+  "Headphones": 3,
+  "Smartwatches": 3
+ },
+ "opportunities": [
+  {
+   "keyword": "best uhd monitors",
+   "category": "Computers",
+   "volume": 16000,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 28,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 10
+    }
+   ],
+   "best_position": 10,
+   "score": 14400
+  },
+  {
+   "keyword": "usb hub",
+   "category": "Computers",
+   "volume": 6300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 30
+    }
+   ],
+   "best_position": 5,
+   "score": 5670
+  },
+  {
+   "keyword": "qled vs oled",
+   "category": "TVs",
+   "volume": 5600,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 9,
+   "type": "Comparison page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 24
+    }
+   ],
+   "best_position": 24,
+   "score": 2548
+  },
+  {
+   "keyword": "best color laser printers",
+   "category": "Computers",
+   "volume": 2600,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 13,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 15
+    },
+    {
+     "name": "The Good Guys",
+     "position": 24
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 27
+    }
+   ],
+   "best_position": 15,
+   "score": 1989
+  },
+  {
+   "keyword": "sublimation printer",
+   "category": "Computers",
+   "volume": 2200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 20
+    }
+   ],
+   "best_position": 20,
+   "score": 1683
+  },
+  {
+   "keyword": "setting up two monitors",
+   "category": "Computers",
+   "volume": 2500,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 5,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 1625
+  },
+  {
+   "keyword": "oled vs qled",
+   "category": "TVs",
+   "volume": 2400,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 9,
+   "type": "Comparison page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 1560
+  },
+  {
+   "keyword": "tv antenna installation",
+   "category": "TVs",
+   "volume": 1400,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 1400
+  },
+  {
+   "keyword": "camera tripod",
+   "category": "Cameras",
+   "volume": 1500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 14
+    }
+   ],
+   "best_position": 5,
+   "score": 1350
+  },
+  {
+   "keyword": "monitor mount",
+   "category": "Computers",
+   "volume": 1400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 1260
+  },
+  {
+   "keyword": "gaming laptops australia",
+   "category": "Gaming",
+   "volume": 1300,
+   "intent": [
+    "Local",
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 4,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 19
+    }
+   ],
+   "best_position": 5,
+   "score": 1170
+  },
+  {
+   "keyword": "clear phone case",
+   "category": "Phones",
+   "volume": 1300,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 17
+    },
+    {
+     "name": "The Good Guys",
+     "position": 25
+    }
+   ],
+   "best_position": 17,
+   "score": 1105
+  },
+  {
+   "keyword": "dash cams australia",
+   "category": "Cameras",
+   "volume": 1500,
+   "intent": [
+    "Local",
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 36,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 29
+    }
+   ],
+   "best_position": 29,
+   "score": 945
+  },
+  {
+   "keyword": "anc headphones",
+   "category": "Headphones",
+   "volume": 1000,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 10,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 18
+    },
+    {
+     "name": "Officeworks",
+     "position": 22
+    },
+    {
+     "name": "The Good Guys",
+     "position": 25
+    }
+   ],
+   "best_position": 18,
+   "score": 765
+  },
+  {
+   "keyword": "ink tank printer",
+   "category": "Computers",
+   "volume": 800,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 4,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    },
+    {
+     "name": "The Good Guys",
+     "position": 8
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 27
+    }
+   ],
+   "best_position": 1,
+   "score": 720
+  },
+  {
+   "keyword": "shipping label printer",
+   "category": "Computers",
+   "volume": 800,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 17
+    }
+   ],
+   "best_position": 17,
+   "score": 680
+  },
+  {
+   "keyword": "a3 laser printer",
+   "category": "Computers",
+   "volume": 700,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 630
+  },
+  {
+   "keyword": "receipt printer",
+   "category": "Computers",
+   "volume": 700,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 18
+    }
+   ],
+   "best_position": 3,
+   "score": 630
+  },
+  {
+   "keyword": "best tablet",
+   "category": "Tablets",
+   "volume": 800,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 7,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 12
+    },
+    {
+     "name": "Officeworks",
+     "position": 18
+    }
+   ],
+   "best_position": 12,
+   "score": 612
+  },
+  {
+   "keyword": "printer stand",
+   "category": "Computers",
+   "volume": 800,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 612
+  },
+  {
+   "keyword": "colour laser multifunction printer",
+   "category": "Computers",
+   "volume": 600,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 3,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 12
+    },
+    {
+     "name": "The Good Guys",
+     "position": 26
+    }
+   ],
+   "best_position": 4,
+   "score": 600
+  },
+  {
+   "keyword": "ssd 4tb",
+   "category": "Computers",
+   "volume": 600,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 600
+  },
+  {
+   "keyword": "phone cover",
+   "category": "Phones",
+   "volume": 700,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 18,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 13
+    },
+    {
+     "name": "The Good Guys",
+     "position": 21
+    }
+   ],
+   "best_position": 13,
+   "score": 595
+  },
+  {
+   "keyword": "dual monitor setup",
+   "category": "Computers",
+   "volume": 900,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 585
+  },
+  {
+   "keyword": "best camera for photography",
+   "category": "Cameras",
+   "volume": 900,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 53,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 26
+    }
+   ],
+   "best_position": 26,
+   "score": 567
+  },
+  {
+   "keyword": "typewriter keyboard",
+   "category": "Computers",
+   "volume": 800,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 26
+    }
+   ],
+   "best_position": 26,
+   "score": 560
+  },
+  {
+   "keyword": "tattoo stencil printer",
+   "category": "Computers",
+   "volume": 600,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 17
+    }
+   ],
+   "best_position": 17,
+   "score": 510
+  },
+  {
+   "keyword": "triple monitor stand",
+   "category": "Computers",
+   "volume": 600,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 510
+  },
+  {
+   "keyword": "best camera",
+   "category": "Cameras",
+   "volume": 800,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 42,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 23
+    }
+   ],
+   "best_position": 23,
+   "score": 504
+  },
+  {
+   "keyword": "oled laptop",
+   "category": "Laptops",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 500
+  },
+  {
+   "keyword": "portable laptop table",
+   "category": "Laptops",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 500
+  },
+  {
+   "keyword": "16 inch laptop",
+   "category": "Laptops",
+   "volume": 600,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 16
+    },
+    {
+     "name": "The Good Guys",
+     "position": 23
+    }
+   ],
+   "best_position": 16,
+   "score": 459
+  },
+  {
+   "keyword": "laptop bag for men",
+   "category": "Laptops",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 450
+  },
+  {
+   "keyword": "curved monitors",
+   "category": "Computers",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 2
+    },
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 2,
+   "score": 450
+  },
+  {
+   "keyword": "difference between oled and qled",
+   "category": "TVs",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 450
+  },
+  {
+   "keyword": "label printers",
+   "category": "Computers",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 3,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 8
+    }
+   ],
+   "best_position": 8,
+   "score": 450
+  },
+  {
+   "keyword": "color laser printer",
+   "category": "Computers",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 10
+    }
+   ],
+   "best_position": 2,
+   "score": 450
+  },
+  {
+   "keyword": "televisions",
+   "category": "TVs",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 12,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 1
+    },
+    {
+     "name": "The Good Guys",
+     "position": 4
+    }
+   ],
+   "best_position": 1,
+   "score": 450
+  },
+  {
+   "keyword": "ink cartridges online",
+   "category": "Computers",
+   "volume": 450,
+   "intent": [
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 50,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    }
+   ],
+   "best_position": 6,
+   "score": 450
+  },
+  {
+   "keyword": "printer table",
+   "category": "Computers",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    }
+   ],
+   "best_position": 5,
+   "score": 450
+  },
+  {
+   "keyword": "wifi routers",
+   "category": "Computers",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 9,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    },
+    {
+     "name": "The Good Guys",
+     "position": 6
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 12
+    }
+   ],
+   "best_position": 4,
+   "score": 450
+  },
+  {
+   "keyword": "inkless printer",
+   "category": "Computers",
+   "volume": 600,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 30
+    }
+   ],
+   "best_position": 30,
+   "score": 420
+  },
+  {
+   "keyword": "keyboard keys",
+   "category": "Computers",
+   "volume": 900,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 36,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 26
+    }
+   ],
+   "best_position": 26,
+   "score": 410
+  },
+  {
+   "keyword": "inkjet printers",
+   "category": "Computers",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    }
+   ],
+   "best_position": 5,
+   "score": 405
+  },
+  {
+   "keyword": "4g router",
+   "category": "Computers",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 4,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 405
+  },
+  {
+   "keyword": "best 16 inch laptops",
+   "category": "Laptops",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 405
+  },
+  {
+   "keyword": "color printer",
+   "category": "Computers",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 3,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 405
+  },
+  {
+   "keyword": "camera memory card",
+   "category": "Cameras",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 6
+    }
+   ],
+   "best_position": 3,
+   "score": 400
+  },
+  {
+   "keyword": "16 inch laptop case",
+   "category": "Laptops",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 7
+    }
+   ],
+   "best_position": 4,
+   "score": 400
+  },
+  {
+   "keyword": "foldable keyboard",
+   "category": "Computers",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 3
+    },
+    {
+     "name": "Officeworks",
+     "position": 12
+    }
+   ],
+   "best_position": 3,
+   "score": 400
+  },
+  {
+   "keyword": "bluetooth gaming headset",
+   "category": "Gaming",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 400
+  },
+  {
+   "keyword": "gaming desktop pc",
+   "category": "Gaming",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 13,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 10
+    }
+   ],
+   "best_position": 3,
+   "score": 400
+  },
+  {
+   "keyword": "mobile phone stand",
+   "category": "Phones",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 13
+    }
+   ],
+   "best_position": 13,
+   "score": 382
+  },
+  {
+   "keyword": "running earbuds",
+   "category": "Headphones",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 12,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 382
+  },
+  {
+   "keyword": "work handbag with laptop compartment",
+   "category": "Laptops",
+   "volume": 600,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 26
+    }
+   ],
+   "best_position": 26,
+   "score": 378
+  },
+  {
+   "keyword": "best laser printer",
+   "category": "Computers",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 1,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 360
+  },
+  {
+   "keyword": "best chromebook",
+   "category": "Laptops",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 22,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 360
+  },
+  {
+   "keyword": "commercial printer",
+   "category": "Computers",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 4,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 360
+  },
+  {
+   "keyword": "best desktop computer",
+   "category": "Computers",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 1,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    },
+    {
+     "name": "The Good Guys",
+     "position": 6
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 8
+    }
+   ],
+   "best_position": 4,
+   "score": 360
+  },
+  {
+   "keyword": "gaming laptop australia",
+   "category": "Gaming",
+   "volume": 400,
+   "intent": [
+    "Local",
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 4,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    }
+   ],
+   "best_position": 5,
+   "score": 360
+  },
+  {
+   "keyword": "laserjet printer",
+   "category": "Computers",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 12
+    }
+   ],
+   "best_position": 2,
+   "score": 360
+  },
+  {
+   "keyword": "computer screen monitor",
+   "category": "Computers",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 4,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 3
+    },
+    {
+     "name": "The Good Guys",
+     "position": 4
+    }
+   ],
+   "best_position": 2,
+   "score": 360
+  },
+  {
+   "keyword": "tattoo printer",
+   "category": "Computers",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 360
+  },
+  {
+   "keyword": "prepaid mobile phone",
+   "category": "Phones",
+   "volume": 400,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 41,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 360
+  },
+  {
+   "keyword": "monitor stand with drawer",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 5
+    },
+    {
+     "name": "Officeworks",
+     "position": 6
+    }
+   ],
+   "best_position": 5,
+   "score": 350
+  },
+  {
+   "keyword": "student laptops",
+   "category": "Laptops",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 5,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 1
+    },
+    {
+     "name": "The Good Guys",
+     "position": 12
+    }
+   ],
+   "best_position": 1,
+   "score": 350
+  },
+  {
+   "keyword": "4k 32 inch monitor",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 9
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 11
+    }
+   ],
+   "best_position": 9,
+   "score": 350
+  },
+  {
+   "keyword": "cheap laser printer",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Category / deals page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 350
+  },
+  {
+   "keyword": "cheap laptop laptop",
+   "category": "Laptops",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Category / deals page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 8
+    },
+    {
+     "name": "The Good Guys",
+     "position": 11
+    }
+   ],
+   "best_position": 8,
+   "score": 350
+  },
+  {
+   "keyword": "black and white laser printer",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 350
+  },
+  {
+   "keyword": "printer ink online",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 64,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 350
+  },
+  {
+   "keyword": "laptop sleeve 13 inch",
+   "category": "Laptops",
+   "volume": 350,
+   "intent": [
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 8
+    }
+   ],
+   "best_position": 6,
+   "score": 350
+  },
+  {
+   "keyword": "dash cam for car",
+   "category": "Cameras",
+   "volume": 500,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 22,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 30
+    }
+   ],
+   "best_position": 30,
+   "score": 315
+  },
+  {
+   "keyword": "backpack laptop",
+   "category": "Laptops",
+   "volume": 450,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 25
+    }
+   ],
+   "best_position": 25,
+   "score": 315
+  },
+  {
+   "keyword": "colour label printer",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 315
+  },
+  {
+   "keyword": "tank printer",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    },
+    {
+     "name": "The Good Guys",
+     "position": 8
+    }
+   ],
+   "best_position": 1,
+   "score": 315
+  },
+  {
+   "keyword": "monitor shelf",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 3,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 315
+  },
+  {
+   "keyword": "a3 printers",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 315
+  },
+  {
+   "keyword": "laser colour printer",
+   "category": "Computers",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 315
+  },
+  {
+   "keyword": "laptop covers",
+   "category": "Laptops",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    }
+   ],
+   "best_position": 6,
+   "score": 315
+  },
+  {
+   "keyword": "laptop table for bed",
+   "category": "Laptops",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 315
+  },
+  {
+   "keyword": "tablet holder for car",
+   "category": "Tablets",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 315
+  },
+  {
+   "keyword": "tablet case",
+   "category": "Tablets",
+   "volume": 350,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 8
+    }
+   ],
+   "best_position": 8,
+   "score": 315
+  },
+  {
+   "keyword": "phone case shop",
+   "category": "Phones",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 40,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    }
+   ],
+   "best_position": 5,
+   "score": 300
+  },
+  {
+   "keyword": "portable laptop desk",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    }
+   ],
+   "best_position": 6,
+   "score": 300
+  },
+  {
+   "keyword": "laptop desk stand",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 300
+  },
+  {
+   "keyword": "portable laptop stand",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 300
+  },
+  {
+   "keyword": "15 inch laptop case",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 10
+    }
+   ],
+   "best_position": 6,
+   "score": 300
+  },
+  {
+   "keyword": "13 inch laptop case",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    }
+   ],
+   "best_position": 6,
+   "score": 300
+  },
+  {
+   "keyword": "difference between qled and oled",
+   "category": "TVs",
+   "volume": 450,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 292
+  },
+  {
+   "keyword": "what is qled",
+   "category": "TVs",
+   "volume": 600,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 10,
+   "type": "Guide / FAQ",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 28
+    }
+   ],
+   "best_position": 28,
+   "score": 273
+  },
+  {
+   "keyword": "best android smartwatch",
+   "category": "Smartwatches",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 37,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 270
+  },
+  {
+   "keyword": "prepaid mobile phones plans",
+   "category": "Phones",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 58,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 270
+  },
+  {
+   "keyword": "best windows tablet",
+   "category": "Tablets",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 4,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 270
+  },
+  {
+   "keyword": "laptop stand for bed",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 270
+  },
+  {
+   "keyword": "32 inch oled monitor",
+   "category": "TVs",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 5,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 270
+  },
+  {
+   "keyword": "wired gaming headset",
+   "category": "Gaming",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 270
+  },
+  {
+   "keyword": "best smartwatch for android",
+   "category": "Smartwatches",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 36,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 270
+  },
+  {
+   "keyword": "best budget tablet",
+   "category": "Tablets",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 23,
+   "type": "Buying guide",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 270
+  },
+  {
+   "keyword": "ai laptop",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 17,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 1
+    },
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 270
+  },
+  {
+   "keyword": "convert tv to smart tv australia",
+   "category": "TVs",
+   "volume": 300,
+   "intent": [
+    "Local",
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 270
+  },
+  {
+   "keyword": "national television and computer recycling scheme",
+   "category": "TVs",
+   "volume": 400,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 5,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 260
+  },
+  {
+   "keyword": "how to connect laptop to monitor",
+   "category": "Laptops",
+   "volume": 400,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 0,
+   "type": "Guide / FAQ",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 260
+  },
+  {
+   "keyword": "gaming pc cheap",
+   "category": "Gaming",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 12,
+   "type": "Category / deals page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 250
+  },
+  {
+   "keyword": "laptop touch screen",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 2
+    },
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 2,
+   "score": 250
+  },
+  {
+   "keyword": "pen camera",
+   "category": "Cameras",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 250
+  },
+  {
+   "keyword": "17 inch laptop bag",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 8
+    }
+   ],
+   "best_position": 8,
+   "score": 250
+  },
+  {
+   "keyword": "16 inch laptop sleeve",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 250
+  },
+  {
+   "keyword": "laptop arm",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 250
+  },
+  {
+   "keyword": "espresso machine cleaning tablets",
+   "category": "Tablets",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 250
+  },
+  {
+   "keyword": "laptop mount",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 250
+  },
+  {
+   "keyword": "oled 4k monitor",
+   "category": "TVs",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 250
+  },
+  {
+   "keyword": "gaming chair with footrest",
+   "category": "Gaming",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 250
+  },
+  {
+   "keyword": "oled ultrawide",
+   "category": "TVs",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    }
+   ],
+   "best_position": 6,
+   "score": 250
+  },
+  {
+   "keyword": "laptop tray",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 230
+  },
+  {
+   "keyword": "how to connect two monitors to one laptop",
+   "category": "Laptops",
+   "volume": 350,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 0,
+   "type": "Guide / FAQ",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 228
+  },
+  {
+   "keyword": "clear ipad case",
+   "category": "Tablets",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 225
+  },
+  {
+   "keyword": "men's laptop bag",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 8
+    }
+   ],
+   "best_position": 8,
+   "score": 225
+  },
+  {
+   "keyword": "tablet pen",
+   "category": "Tablets",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 225
+  },
+  {
+   "keyword": "laptop bed table",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 225
+  },
+  {
+   "keyword": "32 inch 12v smart tv",
+   "category": "TVs",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 4
+    },
+    {
+     "name": "The Good Guys",
+     "position": 11
+    }
+   ],
+   "best_position": 4,
+   "score": 225
+  },
+  {
+   "keyword": "laptop cooling stand",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 225
+  },
+  {
+   "keyword": "15.6 inch laptop",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 225
+  },
+  {
+   "keyword": "2 in one laptop",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 9,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 6
+    },
+    {
+     "name": "The Good Guys",
+     "position": 11
+    }
+   ],
+   "best_position": 2,
+   "score": 225
+  },
+  {
+   "keyword": "laptop pouch",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 5
+    }
+   ],
+   "best_position": 5,
+   "score": 225
+  },
+  {
+   "keyword": "laptop fan",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 212
+  },
+  {
+   "keyword": "11 inch laptop",
+   "category": "Laptops",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 4,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 13
+    }
+   ],
+   "best_position": 13,
+   "score": 212
+  },
+  {
+   "keyword": "case for laptop",
+   "category": "Laptops",
+   "volume": 200,
+   "intent": [
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 200
+  },
+  {
+   "keyword": "camera deals",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Category / deals page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 200
+  },
+  {
+   "keyword": "kids smartwatch",
+   "category": "Smartwatches",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 9
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 10
+    }
+   ],
+   "best_position": 9,
+   "score": 200
+  },
+  {
+   "keyword": "laptop lock",
+   "category": "Laptops",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 6,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 6
+    }
+   ],
+   "best_position": 6,
+   "score": 200
+  },
+  {
+   "keyword": "laptop privacy screen",
+   "category": "Laptops",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 200
+  },
+  {
+   "keyword": "sell laptop",
+   "category": "Laptops",
+   "volume": 200,
+   "intent": [
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 200
+  },
+  {
+   "keyword": "rent a laptop",
+   "category": "Laptops",
+   "volume": 200,
+   "intent": [
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 200
+  },
+  {
+   "keyword": "stand for tablet",
+   "category": "Tablets",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 200
+  },
+  {
+   "keyword": "drawing tablet for kids",
+   "category": "Tablets",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 10
+    }
+   ],
+   "best_position": 10,
+   "score": 200
+  },
+  {
+   "keyword": "motorcycle helmet camera",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 200
+  },
+  {
+   "keyword": "17 laptop",
+   "category": "Laptops",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 3,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 8
+    }
+   ],
+   "best_position": 8,
+   "score": 200
+  },
+  {
+   "keyword": "wireless phone charger for car",
+   "category": "Phones",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 7
+    }
+   ],
+   "best_position": 7,
+   "score": 200
+  },
+  {
+   "keyword": "custom laptop sleeve",
+   "category": "Laptops",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 200
+  },
+  {
+   "keyword": "gaming chair mat",
+   "category": "Gaming",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 200
+  },
+  {
+   "keyword": "tablet stand holder",
+   "category": "Tablets",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 200
+  },
+  {
+   "keyword": "smart tv with dvd player",
+   "category": "TVs",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 3
+    }
+   ],
+   "best_position": 3,
+   "score": 200
+  },
+  {
+   "keyword": "how to connect 2 monitors to laptop",
+   "category": "Laptops",
+   "volume": 300,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 0,
+   "type": "Guide / FAQ",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 195
+  },
+  {
+   "keyword": "oled or qled",
+   "category": "TVs",
+   "volume": 300,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 195
+  },
+  {
+   "keyword": "where to get disposable cameras developed",
+   "category": "Cameras",
+   "volume": 300,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 195
+  },
+  {
+   "keyword": "wired earphones usb c",
+   "category": "Headphones",
+   "volume": 250,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 191
+  },
+  {
+   "keyword": "mobile phone comparison",
+   "category": "Phones",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 29,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 180
+  },
+  {
+   "keyword": "mobile phone stands",
+   "category": "Phones",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 180
+  },
+  {
+   "keyword": "sim only mobile phone plans australia",
+   "category": "Phones",
+   "volume": 200,
+   "intent": [
+    "Local",
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 56,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 180
+  },
+  {
+   "keyword": "lcd televisions",
+   "category": "TVs",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 1
+    },
+    {
+     "name": "The Good Guys",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 180
+  },
+  {
+   "keyword": "dslr camera bag",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 9
+    }
+   ],
+   "best_position": 9,
+   "score": 180
+  },
+  {
+   "keyword": "pc camera",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 24,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 3
+    },
+    {
+     "name": "Harvey Norman",
+     "position": 11
+    }
+   ],
+   "best_position": 3,
+   "score": 180
+  },
+  {
+   "keyword": "tablet cases",
+   "category": "Tablets",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 4
+    }
+   ],
+   "best_position": 4,
+   "score": 180
+  },
+  {
+   "keyword": "camera cases",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 8
+    }
+   ],
+   "best_position": 8,
+   "score": 180
+  },
+  {
+   "keyword": "camera bags australia",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Local",
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 10
+    }
+   ],
+   "best_position": 10,
+   "score": 180
+  },
+  {
+   "keyword": "tablet stands",
+   "category": "Tablets",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 10
+    }
+   ],
+   "best_position": 10,
+   "score": 180
+  },
+  {
+   "keyword": "85 inch tv wall mount",
+   "category": "TVs",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 9
+    },
+    {
+     "name": "The Good Guys",
+     "position": 12
+    }
+   ],
+   "best_position": 9,
+   "score": 180
+  },
+  {
+   "keyword": "phone holder for desk",
+   "category": "Phones",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 170
+  },
+  {
+   "keyword": "automatic cat feeder with camera",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial",
+    "Transactional"
+   ],
+   "kd": 1,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 170
+  },
+  {
+   "keyword": "mobile phone recycling",
+   "category": "Phones",
+   "volume": 250,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 2
+    }
+   ],
+   "best_position": 2,
+   "score": 162
+  },
+  {
+   "keyword": "qled or oled",
+   "category": "TVs",
+   "volume": 250,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 3,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "The Good Guys",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 162
+  },
+  {
+   "keyword": "mobile phone prepaid",
+   "category": "Phones",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 40,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 153
+  },
+  {
+   "keyword": "micro led tv",
+   "category": "TVs",
+   "volume": 200,
+   "intent": [
+    "Informational",
+    "Commercial"
+   ],
+   "kd": 2,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Harvey Norman",
+     "position": 11
+    }
+   ],
+   "best_position": 11,
+   "score": 153
+  },
+  {
+   "keyword": "where to develop disposable cameras",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Informational"
+   ],
+   "kd": 0,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 130
+  },
+  {
+   "keyword": "phone cameras perth",
+   "category": "Cameras",
+   "volume": 200,
+   "intent": [
+    "Local",
+    "Informational"
+   ],
+   "kd": 3,
+   "type": "Landing page",
+   "competitors": [
+    {
+     "name": "Officeworks",
+     "position": 1
+    }
+   ],
+   "best_position": 1,
+   "score": 130
+  }
+ ]
+}

@@ -23,6 +23,7 @@ import assistant as assistant_mod
 import strategist as strategist_mod
 import competitors as competitors_mod
 import ahrefs
+import content_gap
 import forecast
 import google_oauth
 import search_console
@@ -324,6 +325,26 @@ class EngineService:
         if rows:                                   # only cache a real result
             self._aiv_cache = (now, data)
         return data
+
+    def content_gaps(self):
+        """Ranked missing-content opportunities from the Ahrefs content-gap export
+        (keywords where a competitor ranks and JB does not), plus JB's own content
+        strengths from the top-pages export. Empty until exports are imported."""
+        gaps = content_gap.content_gaps()
+        tp = content_gap.top_pages()
+        opps = gaps.get("opportunities", [])
+        return {
+            "available": content_gap.available(),
+            "client": client_config.active_client().name,
+            "generated": gaps.get("generated"),
+            "kept": gaps.get("kept", 0),
+            "scanned": gaps.get("total_gaps_scanned", 0),
+            "addressable_volume": sum(o.get("volume", 0) for o in opps),
+            "by_category": gaps.get("by_category", {}),
+            "opportunities": opps,
+            "jb_strengths": tp.get("jb_strengths", {}),
+            "competitors": [n for n in tp.get("sites", {}) if n != "JB Hi-Fi"],
+        }
 
     def demand_forecast(self):
         """Per-category demand trend, seasonality and next-month forecast from real

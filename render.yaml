@@ -22,7 +22,7 @@ services:
       - key: CLIENT_INDUSTRY
         value: electronics retail
       - key: CLIENT_CATEGORIES
-        value: TVs,Laptops,Headphones,Phones,Cameras,Speakers,Tablets,Smartwatches,Gaming,Soundbars
+        value: TVs,Laptops,Headphones,Phones,Cameras,Speakers,Tablets,Smartwatches,Gaming,Soundbars,Computers
       - key: SITE_URL
         value: https://www.jbhifi.com.au
       - key: ANTHROPIC_API_KEY

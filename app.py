@@ -134,6 +134,13 @@ def get_ai_visibility():
     return ENGINE.ai_visibility()
 
 
+@app.get("/api/content-gaps")
+def get_content_gaps():
+    """Ranked missing-content opportunities from the Ahrefs content-gap export
+    (competitor ranks, JB doesn't), filtered to JB's categories + buyer intent."""
+    return ENGINE.content_gaps()
+
+
 # ---- Google integrations: real outcome-based learning loop ----
 @app.get("/api/google/status")
 def google_status():

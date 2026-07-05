@@ -1,0 +1,3187 @@
+{
+ "generated": 1783263812.133971,
+ "sites": {
+  "JB Hi-Fi": {
+   "total_traffic": 4625256,
+   "pages": [
+    {
+     "url": "https://www.jbhifi.com.au/",
+     "traffic": 2086047,
+     "keyword": "jb hi fi",
+     "volume": 1430000,
+     "position": 1,
+     "page_type": "Site page > Home"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-16-series",
+     "traffic": 149592,
+     "keyword": "iphone 16 pro max",
+     "volume": 142000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/black-friday-sale",
+     "traffic": 102369,
+     "keyword": "black friday sales",
+     "volume": 70000,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-15-series",
+     "traffic": 102032,
+     "keyword": "iphone 15",
+     "volume": 103000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphones",
+     "traffic": 78843,
+     "keyword": "iphone 17",
+     "volume": 358000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/store-finder",
+     "traffic": 71392,
+     "keyword": "jb hi fi",
+     "volume": 1430000,
+     "position": 1,
+     "page_type": "Listing > Business"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/apple-airpods",
+     "traffic": 54515,
+     "keyword": "airpods",
+     "volume": 192000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/all-products-on-sale",
+     "traffic": 47382,
+     "keyword": "jb hi fi",
+     "volume": 1430000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-17-pro-max",
+     "traffic": 45734,
+     "keyword": "iphone 17 pro max",
+     "volume": 176000,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-17-series",
+     "traffic": 45454,
+     "keyword": "iphone 17 release date",
+     "volume": 76000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/current-catalogues",
+     "traffic": 42438,
+     "keyword": "jb hi fi",
+     "volume": 1430000,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/galaxy-s24-series",
+     "traffic": 41820,
+     "keyword": "galaxy s24",
+     "volume": 26000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/airfryers",
+     "traffic": 40049,
+     "keyword": "air fryer",
+     "volume": 116000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-17-pro",
+     "traffic": 37092,
+     "keyword": "iphone 17 pro",
+     "volume": 89000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/apple-watch",
+     "traffic": 35155,
+     "keyword": "apple watch",
+     "volume": 202000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/laptops",
+     "traffic": 35021,
+     "keyword": "laptop",
+     "volume": 46000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/samsung-galaxy-s25-ultra",
+     "traffic": 29357,
+     "keyword": "s25 ultra",
+     "volume": 31000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs",
+     "traffic": 28408,
+     "keyword": "tv",
+     "volume": 32000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/modbury",
+     "traffic": 28061,
+     "keyword": "jb hi fi",
+     "volume": 1430000,
+     "position": 1,
+     "page_type": "Listing > Business"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/brighton-home",
+     "traffic": 26966,
+     "keyword": "jb hi fi",
+     "volume": 1430000,
+     "position": 1,
+     "page_type": "Listing > Business"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/galaxy-s25-series",
+     "traffic": 24384,
+     "keyword": "samsung s25",
+     "volume": 41000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/headphones",
+     "traffic": 24371,
+     "keyword": "headphones",
+     "volume": 33000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/power-banks",
+     "traffic": 24327,
+     "keyword": "power bank",
+     "volume": 18000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/games-consoles/meta-quest",
+     "traffic": 23848,
+     "keyword": "meta quest 3",
+     "volume": 39000,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/samsung-galaxy-s24-ultra",
+     "traffic": 21173,
+     "keyword": "samsung s24 ultra",
+     "volume": 17000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/coffee-machines",
+     "traffic": 20960,
+     "keyword": "coffee machine",
+     "volume": 59000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/apple-macbook-air",
+     "traffic": 20843,
+     "keyword": "macbook air",
+     "volume": 52000,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/games-consoles/nintendo-switch-2-consoles",
+     "traffic": 20054,
+     "keyword": "switch 2",
+     "volume": 93000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/ps5-playstation-5-pro-console",
+     "traffic": 18846,
+     "keyword": "ps5 pro",
+     "volume": 42000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/tradein",
+     "traffic": 18674,
+     "keyword": "jb hi fi trade in",
+     "volume": 6500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/playstation-5",
+     "traffic": 18483,
+     "keyword": "playstation 5",
+     "volume": 78000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/google-pixel-9",
+     "traffic": 18301,
+     "keyword": "pixel 9",
+     "volume": 15000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-16e",
+     "traffic": 18218,
+     "keyword": "16e",
+     "volume": 4200,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-11-series-renewed",
+     "traffic": 18131,
+     "keyword": "iphone 11",
+     "volume": 40000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones",
+     "traffic": 17669,
+     "keyword": "jb hi fi phones",
+     "volume": 2600,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/eufy-security-eufycam-2c-pro-2k-wireless-home-security-system-4-pack",
+     "traffic": 17099,
+     "keyword": "t8853cd1",
+     "volume": 16000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/apple-airpods-4",
+     "traffic": 17042,
+     "keyword": "airpods 4",
+     "volume": 50000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/apple-ipads",
+     "traffic": 16396,
+     "keyword": "apple ipad",
+     "volume": 23000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/smart-watches",
+     "traffic": 16244,
+     "keyword": "smart watch",
+     "volume": 25000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/air-purifiers",
+     "traffic": 16221,
+     "keyword": "air purifier",
+     "volume": 48000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/ai-glasses",
+     "traffic": 15141,
+     "keyword": "meta glasses",
+     "volume": 24000,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/robotic-vacuums",
+     "traffic": 15063,
+     "keyword": "robot vacuum",
+     "volume": 36000,
+     "position": 5,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/apple-airpods-pro-3",
+     "traffic": 14951,
+     "keyword": "airpod pro 3",
+     "volume": 21000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/gaming-monitors",
+     "traffic": 14891,
+     "keyword": "gaming monitor",
+     "volume": 15000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/noise-cancelling-headphones",
+     "traffic": 14865,
+     "keyword": "noise cancelling headphones",
+     "volume": 23000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/apple-macbooks",
+     "traffic": 14596,
+     "keyword": "apple laptop",
+     "volume": 9000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/fire-tv-stick",
+     "traffic": 14579,
+     "keyword": "firestick",
+     "volume": 17000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/apple-airtag",
+     "traffic": 14498,
+     "keyword": "apple airtag",
+     "volume": 17000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/perks",
+     "traffic": 14471,
+     "keyword": "jb hi fi coupon code",
+     "volume": 3700,
+     "position": 1,
+     "page_type": "Site page > Services"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/true-wireless-earbuds",
+     "traffic": 14220,
+     "keyword": "earbuds",
+     "volume": 12000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-12-series-renewed",
+     "traffic": 14176,
+     "keyword": "iphone 12",
+     "volume": 46000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/ebook-readers-kindle",
+     "traffic": 13930,
+     "keyword": "kindle",
+     "volume": 104000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/rog-xbox-ally-x-amd-ryzen-ai-z2-extreme-24gb-1tb-120hz-gaming-handheld-80wh",
+     "traffic": 13883,
+     "keyword": "rog ally x",
+     "volume": 13000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/cheap-laptops",
+     "traffic": 13688,
+     "keyword": "cheap laptop",
+     "volume": 136000,
+     "position": 4,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/samsung-mobile",
+     "traffic": 13590,
+     "keyword": "jb hi fi samsung phones",
+     "volume": 1700,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/ninja-creami-nc300-ice-cream-maker",
+     "traffic": 13511,
+     "keyword": "ninja creami",
+     "volume": 89000,
+     "position": 4,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/google-pixel-10-series",
+     "traffic": 13439,
+     "keyword": "google pixel 10",
+     "volume": 18000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/portable-air-conditioners",
+     "traffic": 13439,
+     "keyword": "portable air conditioner",
+     "volume": 42000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/iphone-13-series",
+     "traffic": 12973,
+     "keyword": "iphone 13",
+     "volume": 83000,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/games-consoles/gaming-headsets",
+     "traffic": 12869,
+     "keyword": "gaming headset",
+     "volume": 7300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/wireless-phone-chargers",
+     "traffic": 12615,
+     "keyword": "wireless charger",
+     "volume": 11000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/apple-iphone-14-pro-max-256gb-purple-refurbished-excellent",
+     "traffic": 12511,
+     "keyword": "iphone 14 pro max",
+     "volume": 25000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/galaxy-s23-series",
+     "traffic": 12315,
+     "keyword": "samsung s23",
+     "volume": 15000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/dyson-airwrap",
+     "traffic": 12246,
+     "keyword": "dyson airwrap",
+     "volume": 97000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/skylight-15-smart-family-calendar-white",
+     "traffic": 12066,
+     "keyword": "skylight calendar",
+     "volume": 30000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/google-pixel-8",
+     "traffic": 11866,
+     "keyword": "google pixel 8",
+     "volume": 10000,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/kodak-pixpro-fz55-digital-compact-camera-blue",
+     "traffic": 11816,
+     "keyword": "kodak pixpro fz55",
+     "volume": 30000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/sd-cards",
+     "traffic": 11771,
+     "keyword": "sd card",
+     "volume": 13000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/tvs-85-100",
+     "traffic": 11677,
+     "keyword": "85 inch tv",
+     "volume": 13000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/mobile-services",
+     "traffic": 11602,
+     "keyword": "jb hi fi mobile",
+     "volume": 1600,
+     "position": 1,
+     "page_type": "Site page > Services"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/drones-robotics/drones",
+     "traffic": 11548,
+     "keyword": "drone",
+     "volume": 18000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/samsung-galaxy-s26-ultra",
+     "traffic": 11548,
+     "keyword": "s26 ultra",
+     "volume": 9500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/eofy-sale",
+     "traffic": 11491,
+     "keyword": "end of financial year sales",
+     "volume": 600,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/jobs",
+     "traffic": 11468,
+     "keyword": "jb hi fi careers",
+     "volume": 2900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/playstation-vr2",
+     "traffic": 11146,
+     "keyword": "psvr2",
+     "volume": 7100,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/wireless-bluetooth-headphones",
+     "traffic": 11085,
+     "keyword": "bluetooth headphones",
+     "volume": 11000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/apple-iphone-13-pro-max-256gb-grey-refurbished-excellent",
+     "traffic": 10911,
+     "keyword": "iphone 13 pro max",
+     "volume": 26000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/apple-macbook-neo",
+     "traffic": 10781,
+     "keyword": "macbook neo",
+     "volume": 63000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/vacuums",
+     "traffic": 10755,
+     "keyword": "vacuum cleaner",
+     "volume": 39000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/starlink-internet",
+     "traffic": 10728,
+     "keyword": "starlink australia",
+     "volume": 67000,
+     "position": 4,
+     "page_type": "Site page > Services"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/games-consoles/nintendo-switch-consoles",
+     "traffic": 10708,
+     "keyword": "nintendo switch",
+     "volume": 148000,
+     "position": 6,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/ninja-slushi-professional-frozen-drink-maker",
+     "traffic": 10553,
+     "keyword": "ninja slushie",
+     "volume": 60000,
+     "position": 5,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/samsung-galaxy-z-fold7",
+     "traffic": 10511,
+     "keyword": "samsung fold 7",
+     "volume": 19000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/gaming-laptops",
+     "traffic": 10376,
+     "keyword": "gaming laptop",
+     "volume": 22000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/turntables",
+     "traffic": 10333,
+     "keyword": "vinyl player",
+     "volume": 7100,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/cameras/compact-cameras",
+     "traffic": 10226,
+     "keyword": "digital camera",
+     "volume": 25000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/ps5-playstation-portal-remote-player",
+     "traffic": 10098,
+     "keyword": "playstation portal",
+     "volume": 12000,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/outdoors-travel/travel-adapters",
+     "traffic": 10066,
+     "keyword": "what is a travel adapter",
+     "volume": 4500,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/apple-airpods-max",
+     "traffic": 10009,
+     "keyword": "airpods max",
+     "volume": 26000,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/christmas-gift-ideas",
+     "traffic": 9942,
+     "keyword": "tech christmas gifts",
+     "volume": 900,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/outdoors-travel/e-scooters",
+     "traffic": 9732,
+     "keyword": "electric scooter",
+     "volume": 44000,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/gps-car-audio/dash-cams",
+     "traffic": 9708,
+     "keyword": "dash cam",
+     "volume": 22000,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/home-office-monitors",
+     "traffic": 9632,
+     "keyword": "monitor",
+     "volume": 24000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/starlink-mini",
+     "traffic": 9456,
+     "keyword": "starlink mini",
+     "volume": 42000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/mini-projectors",
+     "traffic": 9449,
+     "keyword": "portable projector",
+     "volume": 8600,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/cameras/instant-cameras",
+     "traffic": 9410,
+     "keyword": "polaroid camera",
+     "volume": 26000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/tvs-75-83",
+     "traffic": 9384,
+     "keyword": "75 inch tv",
+     "volume": 16000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/cannington-home",
+     "traffic": 9369,
+     "keyword": "jbhifi",
+     "volume": 466000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/nothing-phones",
+     "traffic": 9287,
+     "keyword": "nothing phone 3",
+     "volume": 22000,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/store-finder%20",
+     "traffic": 9273,
+     "keyword": "jbhifi",
+     "volume": 466000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/ps5-dualsense-wireless-controllers",
+     "traffic": 9244,
+     "keyword": "ps5 controller",
+     "volume": 70000,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/chromecast",
+     "traffic": 9098,
+     "keyword": "google chromecast",
+     "volume": 20000,
+     "position": 2,
+     "page_type": "Article > Review"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/portable-bluetooth-speakers",
+     "traffic": 9090,
+     "keyword": "bluetooth speaker",
+     "volume": 14000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/soundbars",
+     "traffic": 9050,
+     "keyword": "soundbar",
+     "volume": 6700,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/washing-machines",
+     "traffic": 8923,
+     "keyword": "washing machine",
+     "volume": 55000,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/connected-home/eufy",
+     "traffic": 8765,
+     "keyword": "eufy camera",
+     "volume": 22000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/party-speakers",
+     "traffic": 8742,
+     "keyword": "jbl partybox",
+     "volume": 15000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/garmin-watches",
+     "traffic": 8695,
+     "keyword": "garmin watch",
+     "volume": 60000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/mandurah-home",
+     "traffic": 8658,
+     "keyword": "jb hifi",
+     "volume": 395000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/sony-wh-1000xm5-premium-noise-cancelling-wireless-over-ear-headphones-black",
+     "traffic": 8613,
+     "keyword": "xm5",
+     "volume": 4300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/projectors",
+     "traffic": 8608,
+     "keyword": "projector",
+     "volume": 28000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/tvs-22-32",
+     "traffic": 8531,
+     "keyword": "small tv",
+     "volume": 2900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/cameras/digital-photo-frames",
+     "traffic": 8443,
+     "keyword": "digital photo frame",
+     "volume": 18000,
+     "position": 1,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/google-pixel-mobile-phones",
+     "traffic": 8435,
+     "keyword": "google pixel",
+     "volume": 36000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/portable-monitors",
+     "traffic": 8280,
+     "keyword": "portable monitor",
+     "volume": 9300,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/tablets",
+     "traffic": 8279,
+     "keyword": "tablet",
+     "volume": 13000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/tvs-65-70",
+     "traffic": 8276,
+     "keyword": "65 inch tv",
+     "volume": 14000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/games-consoles/gaming-chairs",
+     "traffic": 8216,
+     "keyword": "gaming chair",
+     "volume": 36000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/help-and-support/refunds-and-warranties-guide",
+     "traffic": 8097,
+     "keyword": "jb hi fi return policy",
+     "volume": 2800,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/samsung-galaxy-tablets",
+     "traffic": 8084,
+     "keyword": "samsung tablet",
+     "volume": 18000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/fathers-day-gift-guide",
+     "traffic": 7994,
+     "keyword": "gifts for dad",
+     "volume": 4200,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/cameras",
+     "traffic": 7985,
+     "keyword": "camera",
+     "volume": 45000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/microwaves",
+     "traffic": 7935,
+     "keyword": "jb hi fi microwave",
+     "volume": 1100,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/apple-iphone-renewed",
+     "traffic": 7843,
+     "keyword": "refurbished iphone",
+     "volume": 18000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/range-extenders",
+     "traffic": 7835,
+     "keyword": "wifi booster",
+     "volume": 11000,
+     "position": 2,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/connected-home/security-cameras",
+     "traffic": 7798,
+     "keyword": "wireless security cameras",
+     "volume": 5500,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/cheap-phones",
+     "traffic": 7774,
+     "keyword": "cheap phones",
+     "volume": 2600,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/connected-home/home-security",
+     "traffic": 7657,
+     "keyword": "home security cameras",
+     "volume": 5900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/headphones-speakers-audio/speakers",
+     "traffic": 7635,
+     "keyword": "speaker",
+     "volume": 8400,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/galaxy-s26-series",
+     "traffic": 7622,
+     "keyword": "samsung s26",
+     "volume": 6300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/help-and-support/360053193014-what-is-the-jb-hi-fi-price-match-policy",
+     "traffic": 7588,
+     "keyword": "jb hi fi price match",
+     "volume": 9000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/games-consoles/nintendo-switch-controllers",
+     "traffic": 7576,
+     "keyword": "switch controller",
+     "volume": 7500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/apple-watch-series-10",
+     "traffic": 7565,
+     "keyword": "apple watch series 10",
+     "volume": 33000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/lenovo-laptops",
+     "traffic": 7555,
+     "keyword": "lenovo thinkpad",
+     "volume": 9100,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/bar-fridges",
+     "traffic": 7511,
+     "keyword": "mini fridge",
+     "volume": 26000,
+     "position": 5,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/frankston-home",
+     "traffic": 7447,
+     "keyword": "jb hifi",
+     "volume": 395000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/computers-tablets/modem-routers",
+     "traffic": 7331,
+     "keyword": "nbn modem",
+     "volume": 7800,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/samsung-gear",
+     "traffic": 7323,
+     "keyword": "samsung galaxy watch",
+     "volume": 11000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/pages/myaree-home",
+     "traffic": 7316,
+     "keyword": "jb hifi",
+     "volume": 395000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/apple-watch-bands",
+     "traffic": 7312,
+     "keyword": "apple watch band",
+     "volume": 14000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/mobile-phones/samsung-galaxy-s22-refurbished-phones",
+     "traffic": 7276,
+     "keyword": "galaxy s22 to buy",
+     "volume": 2600,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/home-appliances/fridges",
+     "traffic": 7232,
+     "keyword": "jb hi fi fridges",
+     "volume": 1000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/tvs/tvs-40-44",
+     "traffic": 7126,
+     "keyword": "40 inch tv",
+     "volume": 4300,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/apple-watch-ultra",
+     "traffic": 7006,
+     "keyword": "apple watch ultra 3",
+     "volume": 22000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/sony-alpha-a6400-mirrorless-camera-with-16-50mm-ii-lens-black",
+     "traffic": 6966,
+     "keyword": "sony a6400",
+     "volume": 10000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/kodak-charmera-digital-keyring-camera-blind-box",
+     "traffic": 6827,
+     "keyword": "kodak charmera",
+     "volume": 10000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/collections/health-fitness-wearables/massage-guns-handhelds",
+     "traffic": 6782,
+     "keyword": "massage gun",
+     "volume": 32000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/shark-flexstyle-air-styling-drying-system-stone",
+     "traffic": 6770,
+     "keyword": "shark flexstyle",
+     "volume": 20000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/meta-quest-3s-128gb",
+     "traffic": 6664,
+     "keyword": "meta quest 3s",
+     "volume": 17000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.jbhifi.com.au/products/sony-wf-1000xm5-true-wireless-noise-cancelling-earbuds-black",
+     "traffic": 6626,
+     "keyword": "wf-1000xm5",
+     "volume": 4700,
+     "position": 2,
+     "page_type": ""
+    }
+   ]
+  },
+  "Harvey Norman": {
+   "total_traffic": 1443647,
+   "pages": [
+    {
+     "url": "https://www.harveynorman.com.au/",
+     "traffic": 698587,
+     "keyword": "harvey norman",
+     "volume": 782000,
+     "position": 1,
+     "page_type": "Site page > Home"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/washing-machines-dryers/washing-machines",
+     "traffic": 43197,
+     "keyword": "washing machine",
+     "volume": 55000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/fridges",
+     "traffic": 35094,
+     "keyword": "fridge",
+     "volume": 42000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/coffee-beverage/coffee-machines",
+     "traffic": 33713,
+     "keyword": "coffee machine",
+     "volume": 59000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/tv-blu-ray-home-theatre/tvs-by-screen-size/all-tvs",
+     "traffic": 29126,
+     "keyword": "harvey norman",
+     "volume": 782000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/black-friday",
+     "traffic": 27577,
+     "keyword": "when does black friday sales end",
+     "volume": 1200,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/furniture-outdoor-bbqs",
+     "traffic": 23062,
+     "keyword": "harvey norman",
+     "volume": 782000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/vacuum-cleaners/robotic-vacuum-cleaners",
+     "traffic": 19629,
+     "keyword": "robot vacuum",
+     "volume": 36000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/ninja-slushi-professional-frozen-drink-maker.html",
+     "traffic": 17202,
+     "keyword": "ninja slushie",
+     "volume": 60000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/computers-tablets",
+     "traffic": 16576,
+     "keyword": "harvey norman",
+     "volume": 782000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances",
+     "traffic": 16439,
+     "keyword": "harvey norman",
+     "volume": 782000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/health-fitness-beauty/home-gym-equipment/walking-pads",
+     "traffic": 16163,
+     "keyword": "walking pad",
+     "volume": 66000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://stores.harveynorman.com.au/harvey-norman-alice-springs-nt",
+     "traffic": 15202,
+     "keyword": "harvey norman near me",
+     "volume": 43000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/canon-powershot-sx740-hs-black.html",
+     "traffic": 13834,
+     "keyword": "canon powershot sx740",
+     "volume": 10000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/furniture-outdoor-bbqs/living-room/lounges",
+     "traffic": 13829,
+     "keyword": "harvey norman couches",
+     "volume": 2200,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/washing-machines-dryers/dryers",
+     "traffic": 12152,
+     "keyword": "dryer",
+     "volume": 22000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://stores.harveynorman.com.au/",
+     "traffic": 12050,
+     "keyword": "harvey norman near me",
+     "volume": 43000,
+     "position": 3,
+     "page_type": "Listing collection > Business"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/computers-tablets/computers/laptops",
+     "traffic": 11141,
+     "keyword": "harvey norman laptops",
+     "volume": 4000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/microwave-ovens",
+     "traffic": 10878,
+     "keyword": "microwave",
+     "volume": 40000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/washing-machines-dryers/washer-dryer-combos",
+     "traffic": 10325,
+     "keyword": "washer dryer combo",
+     "volume": 11000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/beds-manchester/bedroom/bed-frames",
+     "traffic": 9595,
+     "keyword": "harvey norman beds",
+     "volume": 2400,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/vacuum-cleaners/stick-vacuum-cleaners",
+     "traffic": 9428,
+     "keyword": "stick vacuum",
+     "volume": 13000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/heating-cooling-air-treatment/air-treatment/air-purifiers",
+     "traffic": 9291,
+     "keyword": "air purifier",
+     "volume": 48000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/small-kitchen-appliances/kettles",
+     "traffic": 9030,
+     "keyword": "kettle",
+     "volume": 24000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/mobile-phones-wearables/apple-iphone/iphone-17-series",
+     "traffic": 8840,
+     "keyword": "iphone 17 release date",
+     "volume": 76000,
+     "position": 15,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/dishwashers/benchtop+dishwashers/1065",
+     "traffic": 8611,
+     "keyword": "benchtop dishwasher",
+     "volume": 6400,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/catalogues/current-catalogue",
+     "traffic": 8593,
+     "keyword": "harvey norman catalogue",
+     "volume": 2200,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/freezers/chest+freezers/1065",
+     "traffic": 8089,
+     "keyword": "chest freezer",
+     "volume": 12000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/ovens",
+     "traffic": 8051,
+     "keyword": "oven",
+     "volume": 11000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/sale/tv-audio/tv-sale",
+     "traffic": 7999,
+     "keyword": "harvey norman tv sale",
+     "volume": 2600,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/health-fitness-beauty/home-gym-equipment/treadmills",
+     "traffic": 7827,
+     "keyword": "treadmill",
+     "volume": 28000,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/starlink-mini-with-integrated-wi-fi.html",
+     "traffic": 7598,
+     "keyword": "starlink mini",
+     "volume": 42000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/coffee-beverage/drink-ice-makers/ice+makers/1065",
+     "traffic": 7571,
+     "keyword": "ice maker",
+     "volume": 16000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/dishwashers",
+     "traffic": 7250,
+     "keyword": "harvey norman dishwasher",
+     "volume": 2300,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/mobile-phones-wearables/apple-iphone/iphone-16",
+     "traffic": 7115,
+     "keyword": "iphone 16",
+     "volume": 212000,
+     "position": 9,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/sale/computers-technology/laptop-sale",
+     "traffic": 7090,
+     "keyword": "laptop sale",
+     "volume": 13000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/heating-cooling-air-treatment/air-conditioning/split-system-airconditioners",
+     "traffic": 7001,
+     "keyword": "split system aircon",
+     "volume": 3700,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/heating-cooling-air-treatment/air-treatment/dehumidifiers",
+     "traffic": 6954,
+     "keyword": "dehumidifier",
+     "volume": 35000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/computers-tablets/monitors",
+     "traffic": 6941,
+     "keyword": "computer monitor",
+     "volume": 5300,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/apple-iphone-16-pro-max-256gb-desert-titanium.html",
+     "traffic": 6798,
+     "keyword": "iphone 16 pro max",
+     "volume": 142000,
+     "position": 9,
+     "page_type": "Listing > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/mobile-phones-wearables/apple-iphone",
+     "traffic": 6667,
+     "keyword": "harvey norman iphone",
+     "volume": 2200,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/brands/microsoft/office",
+     "traffic": 6659,
+     "keyword": "microsoft 365",
+     "volume": 138000,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/games-hub/gaming-furniture/gaming-desks",
+     "traffic": 6592,
+     "keyword": "gaming desk",
+     "volume": 16000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/sale/bedroom-manchester/mattress-sale",
+     "traffic": 6549,
+     "keyword": "mattress sale",
+     "volume": 6100,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/tv-blu-ray-home-theatre/tvs-by-screen-size/39-50-inch-tvs",
+     "traffic": 6454,
+     "keyword": "40 inch smart tv",
+     "volume": 2900,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/cameras-printers-photocentre/cameras/digital-cameras",
+     "traffic": 6402,
+     "keyword": "digital camera",
+     "volume": 25000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/clearance",
+     "traffic": 6239,
+     "keyword": "harvey norman clearance",
+     "volume": 1600,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/washing-machines-dryers/dryers/heat+pump+dryers/1065",
+     "traffic": 6173,
+     "keyword": "heat pump dryer",
+     "volume": 24000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/cameras-printers-photocentre/frames-albums/photo-frames/digital+photo+frames/1065",
+     "traffic": 6025,
+     "keyword": "digital photo frame",
+     "volume": 18000,
+     "position": 5,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/freezers",
+     "traffic": 5735,
+     "keyword": "freezer",
+     "volume": 10000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/mobile-phones-wearables/smart-watches",
+     "traffic": 5732,
+     "keyword": "smart watch",
+     "volume": 25000,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/eofy-sale",
+     "traffic": 5631,
+     "keyword": "harvey norman sale",
+     "volume": 3200,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/mobile-phones-wearables/wearables/oura-smart-rings",
+     "traffic": 5573,
+     "keyword": "oura ring 4",
+     "volume": 11000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/freezers/vertical+freezers/1065",
+     "traffic": 5462,
+     "keyword": "upright freezer",
+     "volume": 8300,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/furniture-outdoor-bbqs/living-room/sofa-beds",
+     "traffic": 5318,
+     "keyword": "sofa bed harvey norman",
+     "volume": 2200,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/health-fitness-beauty/massage/massage-chairs",
+     "traffic": 5234,
+     "keyword": "massage chair harvey norman",
+     "volume": 1000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/furniture-outdoor-bbqs/living-room",
+     "traffic": 5168,
+     "keyword": "harvey norman furniture",
+     "volume": 5300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/buy/mini-fridge",
+     "traffic": 5155,
+     "keyword": "mini fridge",
+     "volume": 26000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/boxing-day-sale",
+     "traffic": 5128,
+     "keyword": "jbhifi boxing day sale",
+     "volume": 800,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/mobile-phones-wearables/mobile-phones",
+     "traffic": 5026,
+     "keyword": "harvey norman phones",
+     "volume": 1300,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/sale",
+     "traffic": 4934,
+     "keyword": "harvey norman clearance sale",
+     "volume": 5400,
+     "position": 5,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://stores.harveynorman.com.au/harvey-norman-cairns-qld",
+     "traffic": 4917,
+     "keyword": "harvey norman cairns",
+     "volume": 7500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/mobile-phones-wearables/apple-iphone/iphone-17",
+     "traffic": 4904,
+     "keyword": "iphone 17",
+     "volume": 358000,
+     "position": 13,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/washing-machines-dryers/washing-machines/front+load+washing+machines/1065",
+     "traffic": 4843,
+     "keyword": "harvey norman washing machines",
+     "volume": 2700,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/tv-blu-ray-home-theatre/tvs-by-screen-size/tvs-75-inch-and-above",
+     "traffic": 4810,
+     "keyword": "75 inch tv",
+     "volume": 16000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/food-preparation/vacuum-sealers-bags",
+     "traffic": 4803,
+     "keyword": "vacuum sealer",
+     "volume": 9800,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/cooktops/induction+cooktops/1065",
+     "traffic": 4714,
+     "keyword": "induction cooktop",
+     "volume": 27000,
+     "position": 4,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/appliances/fridges/mitsubishi/993",
+     "traffic": 4678,
+     "keyword": "mitsubishi fridge",
+     "volume": 3300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/tv-blu-ray-home-theatre/tvs-by-screen-size/tvs-32-inch-and-below-tvs",
+     "traffic": 4671,
+     "keyword": "32 inch smart tv",
+     "volume": 4500,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/coffee-beverage/coffee-machines/nespresso/993",
+     "traffic": 4599,
+     "keyword": "nespresso machine",
+     "volume": 29000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/kitchen-appliances/small-kitchen-appliances/air-fryers/air+fryers/1065",
+     "traffic": 4590,
+     "keyword": "harvey norman air fryer",
+     "volume": 2500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/heating-cooling-air-treatment/air-conditioning/window-wall-airconditioners",
+     "traffic": 4497,
+     "keyword": "window air conditioner",
+     "volume": 4100,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/steam-cleaners-shampooers/carpet-cleaners",
+     "traffic": 4399,
+     "keyword": "carpet cleaner",
+     "volume": 28000,
+     "position": 5,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/tv-blu-ray-home-theatre/tvs-by-screen-size/tvs-85-inch-and-above",
+     "traffic": 4389,
+     "keyword": "100 inch tv",
+     "volume": 8500,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/buying-guides/security-camera-buying-guide",
+     "traffic": 4382,
+     "keyword": "security cameras",
+     "volume": 24000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/samsung-galaxy-s25-ultra.html",
+     "traffic": 4296,
+     "keyword": "samsung galaxy s25 ultra",
+     "volume": 19000,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/apple-airpods-max-midnight.html",
+     "traffic": 4289,
+     "keyword": "airpods max",
+     "volume": 26000,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.harveynorman.com.au/computers-tablets/ipads-surface-tablets/ipads",
+     "traffic": 4255,
+     "keyword": "ipad harvey norman",
+     "volume": 1300,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/heating-cooling-air-treatment/air-conditioning/portable-airconditioners",
+     "traffic": 4185,
+     "keyword": "portable air conditioner sale",
+     "volume": 200,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.harveynorman.com.au/vacuum-laundry-appliances/vacuum-cleaners/vacuum-cleaners",
+     "traffic": 4122,
+     "keyword": "harvey norman vacuum",
+     "volume": 1400,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    }
+   ]
+  },
+  "The Good Guys": {
+   "total_traffic": 822648,
+   "pages": [
+    {
+     "url": "https://www.thegoodguys.com.au/",
+     "traffic": 319361,
+     "keyword": "good guys",
+     "volume": 295000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/small-kitchen-appliances/benchtop-cooking/air-fryers",
+     "traffic": 26150,
+     "keyword": "airfryer",
+     "volume": 31000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/buying-guide/apple-iphone-16-pro-range",
+     "traffic": 22162,
+     "keyword": "iphone 16 pro",
+     "volume": 85000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores",
+     "traffic": 19664,
+     "keyword": "good guys",
+     "volume": 295000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/phones-and-wearables/mobile-phones/iphone-17-pro-max",
+     "traffic": 18530,
+     "keyword": "iphone 17 pro max",
+     "volume": 176000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/fridges-and-freezers",
+     "traffic": 16560,
+     "keyword": "fridge",
+     "volume": 42000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/black-friday-sale",
+     "traffic": 16032,
+     "keyword": "when is black friday",
+     "volume": 50000,
+     "position": 7,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/cooking-and-dishwashers/dishwashers",
+     "traffic": 15439,
+     "keyword": "dishwasher",
+     "volume": 35000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/heating-and-cooling/air-conditioners/portable-air-conditioners",
+     "traffic": 14565,
+     "keyword": "portable ac",
+     "volume": 4400,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/deals",
+     "traffic": 13645,
+     "keyword": "good guys",
+     "volume": 295000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/cooking-and-dishwashers/microwaves",
+     "traffic": 12878,
+     "keyword": "microwave",
+     "volume": 40000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/home-services/air-conditioning-installation",
+     "traffic": 11467,
+     "keyword": "aircon installation",
+     "volume": 3000,
+     "position": 1,
+     "page_type": "Site page > Services"
+    },
+    {
+     "url": "https://commercial.thegoodguys.com.au/",
+     "traffic": 10840,
+     "keyword": "good guys commercial",
+     "volume": 7300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/phones-and-wearables/mobile-phones/iphone-17-pro",
+     "traffic": 9546,
+     "keyword": "iphone 17 pro",
+     "volume": 89000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/boxing-day-sale",
+     "traffic": 9504,
+     "keyword": "good guys boxing day sale",
+     "volume": 1300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/darwin",
+     "traffic": 8986,
+     "keyword": "good guys",
+     "volume": 295000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/laundry/washing-machines",
+     "traffic": 8827,
+     "keyword": "washing machine",
+     "volume": 55000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/heating-and-cooling/air-conditioners",
+     "traffic": 8780,
+     "keyword": "aircon",
+     "volume": 7000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/deals/fridges",
+     "traffic": 8774,
+     "keyword": "fridge sale",
+     "volume": 9900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/laundry/dryers",
+     "traffic": 8665,
+     "keyword": "clothes dryer",
+     "volume": 12000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/deals/tvs",
+     "traffic": 8408,
+     "keyword": "tv sale",
+     "volume": 5800,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/breville/small-kitchen-appliances/coffee-machines-and-beverages",
+     "traffic": 8290,
+     "keyword": "breville coffee machine",
+     "volume": 59000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/vacuums-and-cleaners",
+     "traffic": 8055,
+     "keyword": "vacuum cleaner",
+     "volume": 39000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/fridges-and-freezers/refrigerators/bar-fridges",
+     "traffic": 7659,
+     "keyword": "bar fridge",
+     "volume": 16000,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/deals/laptops",
+     "traffic": 6593,
+     "keyword": "laptop sale",
+     "volume": 13000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/clearance",
+     "traffic": 6409,
+     "keyword": "good guys",
+     "volume": 295000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/gaming/gaming-hardware/playstation-consoles",
+     "traffic": 5835,
+     "keyword": "ps5 disc",
+     "volume": 5900,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/townsville",
+     "traffic": 5790,
+     "keyword": "the good guys",
+     "volume": 162000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/catalogues",
+     "traffic": 5726,
+     "keyword": "good guys",
+     "volume": 295000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/geelong",
+     "traffic": 5626,
+     "keyword": "the good guys geelong",
+     "volume": 4800,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/televisions",
+     "traffic": 5527,
+     "keyword": "good guys tv",
+     "volume": 3100,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/vacuums-and-cleaners/vacuum-cleaners",
+     "traffic": 5371,
+     "keyword": "best vacuum cleaner australia",
+     "volume": 4200,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/cairns",
+     "traffic": 5009,
+     "keyword": "good guys cairns",
+     "volume": 4500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/deals/washing-machines",
+     "traffic": 4957,
+     "keyword": "washing machine sale",
+     "volume": 6300,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/vacuums-and-cleaners/vacuum-cleaners/stick-vacuums",
+     "traffic": 4764,
+     "keyword": "cordless vacuum",
+     "volume": 6800,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/mackay",
+     "traffic": 4762,
+     "keyword": "good guys mackay",
+     "volume": 2500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/whats-new/how-to-clean-washing-machine",
+     "traffic": 4178,
+     "keyword": "how to clean washing machine",
+     "volume": 5000,
+     "position": 2,
+     "page_type": "Article > How-to"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/whats-new/what-temperature-should-my-fridge-be",
+     "traffic": 4169,
+     "keyword": "what temp should a freezer be at",
+     "volume": 600,
+     "position": 2,
+     "page_type": "Article > How-to"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/heating-and-cooling/heaters/electric-heaters",
+     "traffic": 4052,
+     "keyword": "electric heater",
+     "volume": 4700,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/laundry/dryers/heat-pump-dryers",
+     "traffic": 4043,
+     "keyword": "heat pump dryer",
+     "volume": 24000,
+     "position": 5,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/cyber-monday",
+     "traffic": 3977,
+     "keyword": "cyber monday 2025",
+     "volume": 2200,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/heating-and-cooling/air-conditioners/split-system-air-conditioners",
+     "traffic": 3965,
+     "keyword": "good guys air conditioner",
+     "volume": 300,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/laundry/ironing/irons",
+     "traffic": 3931,
+     "keyword": "iron",
+     "volume": 18000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/whats-new/10-ways-to-pay-less-at-the-good-guys",
+     "traffic": 3818,
+     "keyword": "good guys price match",
+     "volume": 2400,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/cooking-and-dishwashers",
+     "traffic": 3817,
+     "keyword": "the good guys",
+     "volume": 162000,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/bosch/cooking-and-dishwashers/dishwashers",
+     "traffic": 3763,
+     "keyword": "bosch dishwasher",
+     "volume": 17000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/buying-guide/google-nest-range",
+     "traffic": 3758,
+     "keyword": "google nest hub",
+     "volume": 18000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/jbl/audio/portable-audio/party-speakers",
+     "traffic": 3742,
+     "keyword": "jbl partybox",
+     "volume": 15000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/small-kitchen-appliances/toasters-and-kettles/kettles-and-urns",
+     "traffic": 3670,
+     "keyword": "glass kettle",
+     "volume": 4000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/deals/dishwashers",
+     "traffic": 3603,
+     "keyword": "dishwasher sale",
+     "volume": 8600,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/ninja",
+     "traffic": 3570,
+     "keyword": "ninja",
+     "volume": 22000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/fridges-and-freezers/freezers/chest-freezers",
+     "traffic": 3559,
+     "keyword": "deep freezer",
+     "volume": 2800,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/small-kitchen-appliances/coffee-machines-and-beverages/coffee-machines",
+     "traffic": 3554,
+     "keyword": "coffee machine",
+     "volume": 59000,
+     "position": 6,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/small-kitchen-appliances/grills-and-sandwich-presses/sandwich-presses",
+     "traffic": 3551,
+     "keyword": "sandwich press",
+     "volume": 18000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/ninja/small-kitchen-appliances/mixers-and-food-processors/blenders",
+     "traffic": 3483,
+     "keyword": "ninja blender",
+     "volume": 19000,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/vacuums-and-cleaners/vacuum-cleaners/car-cleaning-vacuums",
+     "traffic": 3417,
+     "keyword": "car vacuum cleaner",
+     "volume": 5900,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/cooking-and-dishwashers/cooktops/induction-cooktops",
+     "traffic": 3415,
+     "keyword": "induction cooktop",
+     "volume": 27000,
+     "position": 5,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/buying-guide/samsung-galaxy-phone-range",
+     "traffic": 3284,
+     "keyword": "galaxy s to buy",
+     "volume": 2600,
+     "position": 5,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/televisions/all-tvs",
+     "traffic": 3269,
+     "keyword": "60 inch tv",
+     "volume": 3600,
+     "position": 3,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/vacuums-and-cleaners/vacuum-cleaners/handheld-vacuums",
+     "traffic": 3183,
+     "keyword": "hand held vacuum",
+     "volume": 2200,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/small-kitchen-appliances/mixers-and-food-processors/stick-mixers",
+     "traffic": 3092,
+     "keyword": "stick blender",
+     "volume": 9500,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/vacuums-and-cleaners/carpet-cleaners-and-steam-mops/steam-mops",
+     "traffic": 3079,
+     "keyword": "steam mop",
+     "volume": 18000,
+     "position": 5,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/health-and-grooming/health-and-fitness/massage-guns",
+     "traffic": 2993,
+     "keyword": "massage gun",
+     "volume": 32000,
+     "position": 5,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/dyson-airwrap-id-multi-styler-and-dryer-ceramic-pink-601887-01",
+     "traffic": 2987,
+     "keyword": "dyson airwrap",
+     "volume": 97000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/osborne-park",
+     "traffic": 2829,
+     "keyword": "good guys osborne park",
+     "volume": 4000,
+     "position": 1,
+     "page_type": "Listing > Business"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/small-kitchen-appliances/toasters-and-kettles/toaster-and-kettle-packs",
+     "traffic": 2789,
+     "keyword": "kettle and toaster set",
+     "volume": 6000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/heating-and-cooling/heaters/oil-heaters",
+     "traffic": 2771,
+     "keyword": "oil heater",
+     "volume": 14000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/dyson/vacuums-and-cleaners",
+     "traffic": 2766,
+     "keyword": "dyson vacuum",
+     "volume": 49000,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/cooking-and-dishwashers/dishwashers/drawer-dishwashers",
+     "traffic": 2761,
+     "keyword": "double drawer dishwasher",
+     "volume": 900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/phones-and-wearables/mobile-phones/iphone",
+     "traffic": 2751,
+     "keyword": "good guys iphone",
+     "volume": 350,
+     "position": 1,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/laundry/washing-machines/front-load-washing-machines",
+     "traffic": 2750,
+     "keyword": "best front loader washing machine",
+     "volume": 2100,
+     "position": 2,
+     "page_type": "Listing collection > Product"
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/buying-guide/what-is-a-robot-vacuum",
+     "traffic": 2722,
+     "keyword": "robot vacuum",
+     "volume": 36000,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/oxley",
+     "traffic": 2657,
+     "keyword": "the good guys oxley",
+     "volume": 2500,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/stores/morayfield",
+     "traffic": 2639,
+     "keyword": "good guys morayfield",
+     "volume": 2800,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/televisions/all-tvs/smart-tvs",
+     "traffic": 2543,
+     "keyword": "smart tv",
+     "volume": 12000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/computers-tablets-and-gaming/ipad-and-tablets/tablets",
+     "traffic": 2536,
+     "keyword": "tablets",
+     "volume": 5900,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/vacuums-and-cleaners/carpet-cleaners-and-steam-mops/upholstery-cleaners",
+     "traffic": 2527,
+     "keyword": "upholstery cleaner",
+     "volume": 11000,
+     "position": 5,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/buying-guide/apple-watch-series-10-range",
+     "traffic": 2515,
+     "keyword": "apple watch series 10",
+     "volume": 33000,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/laundry/washing-machines/washer-dryer-combo",
+     "traffic": 2509,
+     "keyword": "stackable washer and dryer",
+     "volume": 600,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.thegoodguys.com.au/dyson/heating-and-cooling",
+     "traffic": 2505,
+     "keyword": "dyson heater",
+     "volume": 5600,
+     "position": 5,
+     "page_type": ""
+    }
+   ]
+  },
+  "Officeworks": {
+   "total_traffic": 959112,
+   "pages": [
+    {
+     "url": "https://www.officeworks.com.au/",
+     "traffic": 232884,
+     "keyword": "officeworks",
+     "volume": 301000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/storelocator",
+     "traffic": 157252,
+     "keyword": "officeworks near me",
+     "volume": 27000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones/iphone-17",
+     "traffic": 35330,
+     "keyword": "iphone 17",
+     "volume": 358000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones/iphone-14",
+     "traffic": 30802,
+     "keyword": "iphone 14",
+     "volume": 73000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/information/school-holidays/nsw-school-holidays",
+     "traffic": 26626,
+     "keyword": "nsw school holidays 2026",
+     "volume": 58000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/information/school-holidays/vic-school-holidays",
+     "traffic": 22793,
+     "keyword": "victoria school holidays 2025",
+     "volume": 49000,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/home",
+     "traffic": 22385,
+     "keyword": "officeworks printing",
+     "volume": 16000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/laptops",
+     "traffic": 18593,
+     "keyword": "cheap laptop",
+     "volume": 136000,
+     "position": 5,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/headphones-earphones/apple-airpods",
+     "traffic": 16177,
+     "keyword": "air pods",
+     "volume": 25000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/furniture/chairs-seating",
+     "traffic": 15092,
+     "keyword": "office chair",
+     "volume": 29000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones/iphone-16",
+     "traffic": 12192,
+     "keyword": "iphone 16",
+     "volume": 212000,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones/iphone-15",
+     "traffic": 10852,
+     "keyword": "iphone 15",
+     "volume": 103000,
+     "position": 5,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones",
+     "traffic": 10640,
+     "keyword": "mobile phones",
+     "volume": 3400,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/printers",
+     "traffic": 10024,
+     "keyword": "printer",
+     "volume": 18000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/campaigns/brands/samsung/galaxy-a55",
+     "traffic": 9536,
+     "keyword": "samsung a55",
+     "volume": 32000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://mycareer.officeworks.com.au/",
+     "traffic": 8735,
+     "keyword": "officeworks careers",
+     "volume": 4000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/campaigns/black-friday",
+     "traffic": 8667,
+     "keyword": "black friday sales",
+     "volume": 70000,
+     "position": 8,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/hard-drives-data-storage/sd-cards",
+     "traffic": 8617,
+     "keyword": "micro sd card",
+     "volume": 8300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones/iphone-13",
+     "traffic": 8413,
+     "keyword": "iphone 13",
+     "volume": 83000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/info/pcc-passport-and-id-photos",
+     "traffic": 8270,
+     "keyword": "officeworks passport photos",
+     "volume": 1700,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/information/school-holidays/wa-school-holidays",
+     "traffic": 7892,
+     "keyword": "school holidays wa 2026",
+     "volume": 16000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/office-supplies/calculators",
+     "traffic": 7853,
+     "keyword": "calculator",
+     "volume": 923000,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/furniture/chairs-seating/gaming-chairs",
+     "traffic": 7586,
+     "keyword": "gaming chair",
+     "volume": 36000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/p/airpods-4-apairpods4",
+     "traffic": 7500,
+     "keyword": "airpods 4",
+     "volume": 50000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/information/policies/price-beat-guarantee",
+     "traffic": 7465,
+     "keyword": "officeworks price match",
+     "volume": 3700,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/furniture/desks-tables",
+     "traffic": 7412,
+     "keyword": "officeworks desk",
+     "volume": 1900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/internet-wi-fi/nbn-modem-routers",
+     "traffic": 7359,
+     "keyword": "nbn modem",
+     "volume": 7800,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/info/pcc-print-and-copy-self-serve",
+     "traffic": 7124,
+     "keyword": "officeworks printing prices",
+     "volume": 1800,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/smart-watches/apple-watch",
+     "traffic": 6778,
+     "keyword": "apple watch series 10",
+     "volume": 33000,
+     "position": 5,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/c/pcc/labels--stamps-stickers",
+     "traffic": 6709,
+     "keyword": "officeworks sticker printing",
+     "volume": 600,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/powerbanks",
+     "traffic": 6609,
+     "keyword": "powerbank",
+     "volume": 13000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/chargers/usb-c-chargers",
+     "traffic": 6404,
+     "keyword": "usb c charger",
+     "volume": 11000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/furniture",
+     "traffic": 5795,
+     "keyword": "officeworks",
+     "volume": 301000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/c/pcc/business-cards",
+     "traffic": 5713,
+     "keyword": "business cards",
+     "volume": 8900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/p/photo-prints-pcpgphtocp",
+     "traffic": 5558,
+     "keyword": "officeworks photo printing",
+     "volume": 5200,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/hard-drives-data-storage/solid-state-drives--ssd-",
+     "traffic": 5423,
+     "keyword": "ssd",
+     "volume": 13000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/office-supplies/labels--label-makers-tapes/handheld-label-makers",
+     "traffic": 5407,
+     "keyword": "label maker",
+     "volume": 9100,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/laptops/laptop-accessories/laptop-stands",
+     "traffic": 5391,
+     "keyword": "laptop stand",
+     "volume": 15000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/tablets/apple-ipads",
+     "traffic": 5133,
+     "keyword": "ipad sale",
+     "volume": 3600,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/hard-drives-data-storage/usb-flash-drives",
+     "traffic": 5050,
+     "keyword": "usb",
+     "volume": 9900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/office-supplies/diaries-year-planners",
+     "traffic": 4911,
+     "keyword": "2026 planner",
+     "volume": 5600,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/hard-drives-data-storage/external-hard-drives",
+     "traffic": 4909,
+     "keyword": "external hard drive",
+     "volume": 5400,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology",
+     "traffic": 4705,
+     "keyword": "officeworks",
+     "volume": 301000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/desktops",
+     "traffic": 4687,
+     "keyword": "computer",
+     "volume": 14000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/storepage",
+     "traffic": 4646,
+     "keyword": "officeworks eastern creek",
+     "volume": 2500,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/AjaxStoreLocatorDisplayView",
+     "traffic": 4637,
+     "keyword": "officeworks cairns",
+     "volume": 4900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/chargers/laptop-chargers",
+     "traffic": 4596,
+     "keyword": "usb c laptop charger",
+     "volume": 1600,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/search",
+     "traffic": 4590,
+     "keyword": "officeworks",
+     "volume": 301000,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/cameras/instant-film",
+     "traffic": 4368,
+     "keyword": "polaroid film",
+     "volume": 7200,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/campaigns/brands/apple/ipad",
+     "traffic": 4315,
+     "keyword": "ipad 10th generation",
+     "volume": 25000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/p/ipad-a16-11-wifi-128gb-blue-ipda16w12b",
+     "traffic": 4299,
+     "keyword": "ipad a16",
+     "volume": 32000,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/p/t-shirt-printing-pcaptshcp",
+     "traffic": 4225,
+     "keyword": "tshirt printing",
+     "volume": 2900,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/printers/laser-printers",
+     "traffic": 4166,
+     "keyword": "colour laser printer",
+     "volume": 1500,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/webapp/wcs/stores/servlet/officeworks/storelocator",
+     "traffic": 4109,
+     "keyword": "officeworks near me",
+     "volume": 27000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones",
+     "traffic": 4061,
+     "keyword": "iphone 16 plus to buy",
+     "volume": 2900,
+     "position": 9,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/software/microsoft-365",
+     "traffic": 3995,
+     "keyword": "microsoft 365",
+     "volume": 138000,
+     "position": 9,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/furniture/chairs-seating/desk-chairs",
+     "traffic": 3981,
+     "keyword": "desk chair",
+     "volume": 14000,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/computer-accessories/keyboards",
+     "traffic": 3921,
+     "keyword": "keyboard",
+     "volume": 38000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/furniture/desks-tables/office-desks",
+     "traffic": 3908,
+     "keyword": "computer desk",
+     "volume": 5900,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/monitors",
+     "traffic": 3888,
+     "keyword": "pc monitor",
+     "volume": 3300,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/computer-accessories/mice",
+     "traffic": 3831,
+     "keyword": "wireless mouse",
+     "volume": 6800,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones/iphone-16e",
+     "traffic": 3808,
+     "keyword": "iphone 16e",
+     "volume": 51000,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/furniture/desks-tables/standing-desks",
+     "traffic": 3658,
+     "keyword": "stand up desk",
+     "volume": 6400,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/internet-wi-fi/all-wi-fi-modems-routers",
+     "traffic": 3619,
+     "keyword": "modem",
+     "volume": 8400,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/monitors/all-monitors",
+     "traffic": 3579,
+     "keyword": "monitor",
+     "volume": 24000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/cables/cable-adapters/hdmi-adapters",
+     "traffic": 3564,
+     "keyword": "hdmi adapter",
+     "volume": 1700,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/print-copy/c/pcc/banners-signs",
+     "traffic": 3548,
+     "keyword": "signage near me",
+     "volume": 1400,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/information/school-holidays/qld-school-holidays",
+     "traffic": 3435,
+     "keyword": "qld school holidays 2025",
+     "volume": 59000,
+     "position": 11,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/headphones-earphones/noise-cancelling-headphones",
+     "traffic": 3434,
+     "keyword": "noise cancelling headphones",
+     "volume": 23000,
+     "position": 4,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/monitors/curved-monitors",
+     "traffic": 3407,
+     "keyword": "curved monitor",
+     "volume": 7800,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/information/school-holidays/sa-school-holidays",
+     "traffic": 3393,
+     "keyword": "school holidays sa 2026",
+     "volume": 11000,
+     "position": 6,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/hard-drives-data-storage/card-readers",
+     "traffic": 3381,
+     "keyword": "sd card reader",
+     "volume": 6300,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/p/macbook-air-13-m4-10-core-cpu-10-core-gpu-16-512gb-sky-blue-mbam4ts5bl",
+     "traffic": 3279,
+     "keyword": "macbook air m4",
+     "volume": 25000,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/apple-iphones/iphone-17-pro-max",
+     "traffic": 3235,
+     "keyword": "apple iphone 17 pro max",
+     "volume": 34000,
+     "position": 7,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/cables/phone-cables/usb-type-c-cables",
+     "traffic": 3215,
+     "keyword": "usbc to usbc",
+     "volume": 1200,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/office-supplies/whiteboards-boards/whiteboards",
+     "traffic": 3205,
+     "keyword": "white board",
+     "volume": 6300,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/monitors/monitor-arms",
+     "traffic": 3195,
+     "keyword": "dual monitor stand",
+     "volume": 1900,
+     "position": 1,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/mobile-phones/prepaid-mobile-broadband",
+     "traffic": 3154,
+     "keyword": "wifi dongle",
+     "volume": 3500,
+     "position": 3,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/cables/audio-visual-cables/hdmi-cables",
+     "traffic": 3142,
+     "keyword": "hdmi cable",
+     "volume": 12000,
+     "position": 2,
+     "page_type": ""
+    },
+    {
+     "url": "https://www.officeworks.com.au/shop/officeworks/c/technology/cables/cable-adapters/usb-adapters",
+     "traffic": 3072,
+     "keyword": "usb c to usb adapter",
+     "volume": 3100,
+     "position": 3,
+     "page_type": ""
+    }
+   ]
+  }
+ },
+ "jb_strengths": {
+  "Phones": {
+   "traffic": 636346,
+   "pages": 18
+  },
+  "Gaming": {
+   "traffic": 196902,
+   "pages": 15
+  },
+  "Headphones": {
+   "traffic": 195372,
+   "pages": 12
+  },
+  "Cameras": {
+   "traffic": 107149,
+   "pages": 12
+  },
+  "Laptops": {
+   "traffic": 94929,
+   "pages": 5
+  },
+  "Smartwatches": {
+   "traffic": 89300,
+   "pages": 7
+  },
+  "Tablets": {
+   "traffic": 82458,
+   "pages": 8
+  },
+  "Computers": {
+   "traffic": 25243,
+   "pages": 3
+  },
+  "Speakers": {
+   "traffic": 16725,
+   "pages": 2
+  },
+  "Soundbars": {
+   "traffic": 9050,
+   "pages": 1
+  }
+ }
+}
