@@ -25,6 +25,7 @@ import competitors as competitors_mod
 import ahrefs
 import content_gap
 import forecast
+import ideas as ideas_mod
 import google_oauth
 import search_console
 import ga4
@@ -345,6 +346,13 @@ class EngineService:
             "jb_strengths": tp.get("jb_strengths", {}),
             "competitors": [n for n in tp.get("sites", {}) if n != "JB Hi-Fi"],
         }
+
+    def marketing_ideas(self):
+        """Topics discovered from the content gaps, each with many ranked marketing
+        ideas across SEO / Content / Social / Commercial / AI Visibility."""
+        data = ideas_mod.generate()
+        data["client"] = client_config.active_client().name
+        return data
 
     def demand_forecast(self):
         """Per-category demand trend, seasonality and next-month forecast from real

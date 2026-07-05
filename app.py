@@ -141,6 +141,13 @@ def get_content_gaps():
     return ENGINE.content_gaps()
 
 
+@app.get("/api/ideas")
+def get_ideas():
+    """Topics discovered from the content gaps, each with many ranked marketing
+    ideas across SEO / Content / Social / Commercial / AI Visibility."""
+    return ENGINE.marketing_ideas()
+
+
 # ---- Google integrations: real outcome-based learning loop ----
 @app.get("/api/google/status")
 def google_status():

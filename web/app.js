@@ -784,6 +784,66 @@ function loadContentGaps() {
   }).catch(() => { host.innerHTML = `<p class="lede">Could not load content gaps.</p>`; });
 }
 
+/* ---- Marketing Ideas: topics → many ranked ideas (v2 phase 2) ----------- */
+function loadMarketingIdeas() {
+  const host = $("ideas");
+  if (!host.children.length) host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  return api("/api/ideas").then((d) => {
+    if (!d.available) {
+      host.innerHTML = `<p class="lede">Marketing ideas appear once the content-gap data is imported
+        — run <code>import_ahrefs.py</code> to populate the topics.</p>`;
+      return;
+    }
+    const topics = d.topics || [];
+    if (!topics.length) { host.innerHTML = `<p class="lede">No topics generated yet.</p>`; return; }
+    const compact = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(n);
+    const laneCls = (l) => ({ "SEO": "seo", "Commercial": "com", "Content": "con", "Social": "soc", "AI Visibility": "ai" })[l] || "con";
+
+    const card = (lbl, big, sub) => `<div class="aivcard"><div class="aivcard__lbl">${lbl}</div><div class="aivcard__big">${big}</div><div class="aivcard__sub">${sub}</div></div>`;
+    const summary = `<div class="aivcards">
+        ${card("Topics", d.topic_count, "discovered from your gaps")}
+        ${card("Marketing ideas", d.idea_count, "generated and ranked")}
+        ${card("Addressable demand", compact(d.addressable_volume || 0) + "/mo", "across all topics")}
+        ${card("Most-used lane", d.top_lane || "—", "where the wins cluster")}
+      </div>`;
+
+    const topicHTML = (t) => {
+      const rival = t.competitors[0];
+      const ev = `${t.total_volume.toLocaleString()}/mo unmet demand · ${t.gap_count} gap${t.gap_count > 1 ? "s" : ""}` +
+        (rival ? ` · ${rival.name} ranks #${rival.position} for “${t.top_keyword}”` : "");
+      const ideas = t.ideas.map((i) => `
+          <div class="idea">
+            <span class="idea__lane idea__lane--${laneCls(i.lane)}">${i.lane}</span>
+            <div class="idea__body">
+              <div class="idea__what">${i.what}</div>
+              <div class="idea__why">${i.why}</div>
+              <div class="idea__meta"><span class="idea__type">${i.type}</span>
+                <span class="ipill">${i.confidence} confidence</span>
+                <span class="ipill">${i.impact} impact</span>
+                <span class="ipill">${i.effort} effort</span>
+                <span class="idea__whynow">Why now — ${i.why_now}</span></div>
+            </div>
+            <span class="idea__score" title="opportunity score">${i.score}</span>
+          </div>`).join("");
+      return `<div class="topic">
+          <div class="topic__head">
+            <div><div class="topic__title">${t.topic}<span class="topic__cat">${t.category}</span></div>
+              <div class="topic__ev">${ev}</div></div>
+            <span class="topic__count">${t.idea_count} ideas</span>
+          </div>
+          <div class="topic__ideas">${ideas}</div>
+        </div>`;
+    };
+
+    const method = `<div class="aivmethod"><b>How this works.</b> Each topic is discovered from your content-gap
+      keywords (the shared theme inside a category); the engine then generates ideas across five lanes and ranks
+      them by search demand × buyer intent × how hard rivals already rank — grounded in real data, no guesswork.
+      Connect Google and it will learn which idea <i>types</i> actually pay off, and let those rise.</div>`;
+
+    host.innerHTML = summary + topics.map(topicHTML).join("") + method;
+  }).catch(() => { host.innerHTML = `<p class="lede">Could not load marketing ideas.</p>`; });
+}
+
 /* ---- Google integrations (connect GSC/GA4 → real outcome learning) ------ */
 async function connectGoogle() {
   try {
@@ -893,6 +953,7 @@ const VIEW_META = {
   signals: ["The signals behind every recommendation", "Market signals"],
   competitors: ["New pages rivals are publishing", "Competitors"],
   gaps: ["Content competitors have and you don't", "Content gaps"],
+  ideas: ["Many ideas per topic, ranked", "Marketing ideas"],
   aivis: ["Your presence in AI answers", "AI Visibility"],
   proof: ["Validated across 30 markets", "How it works"],
   learning: ["What the system figured out", "What it's learned"],
@@ -911,6 +972,7 @@ function showView(name) {
   if (name === "signals") loadSignals();
   if (name === "competitors") loadCompetitors();
   if (name === "gaps") loadContentGaps();
+  if (name === "ideas") loadMarketingIdeas();
   if (name === "aivis") loadAiVisibility();
   if (name === "settings") loadIntegrations();
   if (name === "learning") loadPerformance();
