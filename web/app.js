@@ -427,7 +427,7 @@ function sigrowHTML(it, demand) {
       `<span class="sig__trend ${cls}">${arrow} ${f.trend_pct > 0 ? "+" : ""}${f.trend_pct}% demand` +
       `<span class="sig__trend-sub"> · 18-mo${peak}</span></span></div>`;
   }
-  return `<div class="sigrow">
+  return `<div class="sigrow sigrow--click" data-cat="${it.category || it.topic}">
     <div class="sigrow__top">
       <div><div class="sigrow__name">${it.topic}</div>${vol}</div>
       <div class="sigrow__roi prio ${pc}">${p}<span>priority</span></div>
@@ -438,8 +438,10 @@ function sigrowHTML(it, demand) {
       ${sigBar(s.semantic_gap, "Gap on your site")}
     </div>
     ${demandLine}${heads}
+    <div class="sigrow__more">View full detail and sources →</div>
   </div>`;
 }
+let _sig = { items: [], demand: {}, gaps: {} };
 function loadSignals() {
   const host = $("signals");
   if (host.dataset.loaded) return Promise.resolve();
@@ -447,15 +449,94 @@ function loadSignals() {
   return api("/api/signals").then((d) => {
     const items = d.items || [];
     if (!items.length) { host.innerHTML = '<p class="lede">No signals loaded yet.</p>'; return; }
+    _sig.items = items;
     const render = (demand) => { host.innerHTML = items.map((it) => sigrowHTML(it, demand)).join(""); };
     render(null);                              // render signals immediately …
     host.dataset.loaded = "1";
+    host.onclick = (e) => {                     // click a category -> full detail
+      const row = e.target.closest(".sigrow");
+      if (row && row.dataset.cat) showCategoryDetail(row.dataset.cat);
+    };
     api("/api/demand").then((dem) => {         // … then enhance with demand history when it arrives
       const demand = {};
       (dem.categories || []).forEach((c) => { demand[String(c.category).toLowerCase()] = c; });
+      _sig.demand = demand;
       if (Object.keys(demand).length) render(demand);
     }).catch(() => {});
+    api("/api/content-gaps").then((g) => {     // … and the real content gaps per category
+      const by = {};
+      (g.opportunities || []).forEach((o) => { (by[o.category] = by[o.category] || []).push(o); });
+      _sig.gaps = by;
+    }).catch(() => {});
   }).catch(() => { host.innerHTML = '<p class="lede">Could not load market signals.</p>'; });
+}
+
+function showCategoryDetail(cat) {
+  state.view = "category";
+  document.querySelectorAll(".view").forEach((v) => v.classList.toggle("view--active", v.id === "view-category"));
+  document.querySelectorAll(".nav__item").forEach((n) => n.classList.toggle("is-active", n.dataset.view === "signals"));
+  $("viewEyebrow").textContent = "Market signal detail";
+  $("viewTitle").textContent = cat;
+  window.scrollTo(0, 0);
+  renderCategoryDetail(cat);
+}
+
+function cdSignal(label, score, real, source) {
+  const p = Math.round((score || 0) * 100);
+  return `<div class="cdsig__row">
+      <div class="cdsig__head"><span class="cdsig__label">${label}</span><span class="cdsig__score">${p}</span></div>
+      <div class="cdbar"><div class="cdbar__fill" style="width:${p}%"></div></div>
+      <div class="cdsig__real">${real} <span class="cdsig__src">· source: ${source}</span></div>
+    </div>`;
+}
+
+function renderCategoryDetail(cat) {
+  const host = $("category");
+  const it = _sig.items.find((i) => String(i.category || i.topic) === cat) || {};
+  const s = it.signals || {};
+  const dem = _sig.demand[String(cat).toLowerCase()];
+  const gaps = _sig.gaps[cat] || [];
+  const heads = it.headlines || [];
+  const back = `<button class="cdback" onclick="showView('signals')">← Back to all signals</button>`;
+
+  const sig = `<div class="panel">
+      <div class="panel__head"><div class="eyebrow">What we track for ${cat}</div>
+        <h2 class="panel__title">The signals behind the score</h2></div>
+      ${cdSignal("Search demand", s.trend_surprise, it.volume != null ? `≈ ${it.volume.toLocaleString()} searches/mo across all ${cat.toLowerCase()} keywords` : "search interest", "Ahrefs")}
+      ${cdSignal("In the news", s.news_relevance, `${heads.length} recent headline${heads.length !== 1 ? "s" : ""} we crawled`, "Google News RSS")}
+      ${cdSignal("Gap on your site", s.semantic_gap, `${gaps.length} keyword${gaps.length !== 1 ? "s" : ""} rivals rank for that you don't`, "Ahrefs content-gap")}
+      <p class="panel__note">The bars are <b>0–100 scores</b>, relative to your other categories — a way to
+        compare where to focus, not raw counts. The <b>real figures</b> are shown beside each.</p></div>`;
+
+  let trend = "";
+  if (dem) {
+    const cls = dem.trend_pct > 4 ? "up" : dem.trend_pct < -4 ? "down" : "";
+    const peak = dem.seasonal ? `typically peaks in <b>${dem.peak_month}</b> (+${dem.peak_lift}%)` : "no strong seasonal pattern";
+    trend = `<div class="panel">
+        <div class="panel__head"><div class="eyebrow">18-month demand · source: Ahrefs volume history</div>
+          <h2 class="panel__title">How demand has trended</h2></div>
+        <div class="cdtrend"><span class="spark--wrap ${cls}">${sparkline(dem.series, 280, 64)}</span>
+          <div><div class="cdtrend__pct ${cls}">${dem.trend_pct > 0 ? "+" : ""}${dem.trend_pct}% over 18 months</div>
+            <div class="cdtrend__sub">${peak}</div></div></div></div>`;
+  }
+
+  const gapType = (t) => /Comparison/.test(t) ? "cmp" : /Buying/.test(t) ? "guide" : /Guide|FAQ|Review/.test(t) ? "info" : "land";
+  const gapList = gaps.length ? gaps.slice(0, 8).map((o) => {
+    const comp = o.competitors[0];
+    return `<div class="cdgap"><span class="gaptype gaptype--${gapType(o.type)}">${o.type}</span>
+        <div class="cdgap__body"><div class="cdgap__kw">${o.keyword}</div>
+          <div class="cdgap__meta">${o.volume.toLocaleString()}/mo · ${comp.name} ranks #${comp.position}, you don't</div></div></div>`;
+  }).join("") : `<p class="panel__note">No open content gaps here — you already cover this category well.</p>`;
+  const gapPanel = `<div class="panel">
+      <div class="panel__head"><div class="eyebrow">From the Ahrefs content-gap export</div>
+        <h2 class="panel__title">What rivals cover that you don't</h2></div>${gapList}</div>`;
+
+  const newsPanel = heads.length ? `<div class="panel">
+      <div class="panel__head"><div class="eyebrow">Google News · this week</div>
+        <h2 class="panel__title">In the news</h2></div>
+      ${heads.map((h) => `<div class="sig__news">📰 ${h}</div>`).join("")}</div>` : "";
+
+  host.innerHTML = back + sig + trend + gapPanel + newsPanel;
 }
 
 /* ---- what the system has learned matters (plain language) -------------- */
