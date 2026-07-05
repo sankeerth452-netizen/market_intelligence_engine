@@ -384,8 +384,13 @@ class EngineService:
         return data
 
     def _category_volumes(self):
-        """Real monthly search volume per category via Ahrefs (cached 24h; one
-        batched call). Empty {} unless AHREFS_API_KEY is set."""
+        """Per-category monthly search demand. Prefers TRUE aggregated demand across
+        ALL of a category's keywords (from the Ahrefs content-gap export) — so 'Phones'
+        counts phone + mobile + smartphone + iphone, not one seed keyword. Falls back
+        to live Ahrefs seed-keyword volume, then to {}."""
+        demand = content_gap.content_gaps().get("category_demand") or {}
+        if demand:
+            return {c.lower(): v for c, v in demand.items()}
         if not ahrefs.enabled():
             return {}
         now = time.time()

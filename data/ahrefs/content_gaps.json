@@ -1,5 +1,5 @@
 {
- "generated": 1783263812.005688,
+ "generated": 1783287691.161231,
  "total_gaps_scanned": 279,
  "kept": 166,
  "by_category": {
@@ -13,6 +13,20 @@
   "Headphones": 3,
   "Smartwatches": 3
  },
+ "category_demand": {
+  "Phones": 3283700,
+  "Gaming": 2102300,
+  "Laptops": 1320650,
+  "Computers": 1282800,
+  "Headphones": 1204400,
+  "Smartwatches": 1123600,
+  "Cameras": 1030050,
+  "Tablets": 874450,
+  "Speakers": 312650,
+  "TVs": 278650,
+  "Soundbars": 84300
+ },
+ "total_demand": 12897550,
  "opportunities": [
   {
    "keyword": "best uhd monitors",

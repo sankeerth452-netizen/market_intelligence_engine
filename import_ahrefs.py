@@ -133,19 +133,23 @@ def _rows(path):
 
 def build_content_gaps(gap_csv):
     opps = []
+    demand, seen = {}, set()                          # TRUE per-category demand: every keyword
     for row in _rows(gap_csv):
         if len(row) <= 35:
             continue
+        vol = _num(row[4]) or 0
+        cat = categorise(row[0])
+        if cat and vol > 0:                            # aggregate demand across ALL keywords
+            kw = row[0].strip().lower()               # (phone + mobile + smartphone all count)
+            if kw not in seen:
+                seen.add(kw)
+                demand[cat] = demand.get(cat, 0) + vol
         if _num(row[JB_POS]) is not None:          # JB already ranks -> not a gap
             continue
-        vol = _num(row[4]) or 0
-        if vol < MIN_VOLUME:
+        if vol < MIN_VOLUME or not cat:              # a gap needs volume + a mapped category
             continue
         intents = [i.strip() for i in (row[2] or "").split(",") if i.strip()]
         if not intents or DROP_INTENTS & set(intents):   # brand / nav queries -> skip
-            continue
-        cat = categorise(row[0])
-        if not cat:                                  # not in JB's business -> skip
             continue
         ranked = [(n, _num(row[i])) for n, i in COMPETITORS if _num(row[i]) is not None]
         ranked = [(n, p) for n, p in ranked if p <= MAX_COMP_POSITION]
@@ -181,6 +185,8 @@ def build_content_gaps(gap_csv):
         "total_gaps_scanned": len(opps),
         "kept": len(kept),
         "by_category": dict(sorted(by_cat.items(), key=lambda x: -x[1])),
+        "category_demand": dict(sorted(demand.items(), key=lambda x: -x[1])),
+        "total_demand": sum(demand.values()),
         "opportunities": kept,
     }
 
