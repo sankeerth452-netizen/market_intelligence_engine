@@ -166,11 +166,22 @@ function cardEl(c) {
   const news = (c.headlines && c.headlines[0])
     ? `<div class="card__news">📰 In the news: “${c.headlines[0]}”</div>` : "";
 
+  // A 'create page' rec names the SPECIFIC missing page (a real gap), not the
+  // category page JB already has.
+  const specific = c.target && !c.leads;
+  const title = specific
+    ? `Create a ${c.target.type.toLowerCase()}: “${c.target.keyword}”`
+    : `${verb} ${c.topic}${suffix}`;
+  const catTag = specific ? ` <span class="card__cat">in ${c.topic}</span>` : "";
+  const targetWhy = specific
+    ? `<b>${c.target.competitor} ranks #${c.target.position} for this (${Number(c.target.volume).toLocaleString()}/mo) — you don't.</b> `
+    : "";
+
   el.innerHTML = `
     <div class="card__rank">${pad2(c.rank)}</div>
     <div class="card__main">
-      <h3 class="card__topic">${verb} ${c.topic}${suffix}</h3>
-      <p class="card__why">${whyLine(c)}</p>
+      <h3 class="card__topic">${title}${catTag}</h3>
+      <p class="card__why">${targetWhy}${whyLine(c)}</p>
       ${news}
       <div class="card__meta">
         <span class="tag tag--effort-${c.effort}">${EFFORT_LABEL[c.effort] || c.effort} effort</span>
@@ -356,12 +367,15 @@ async function loadDashboard() {
 
   $("dashPlan").innerHTML = brief.length ? brief.map((c) => {
     const [p, pc] = prioOf(c);
+    const spec = c.target && !c.leads;
+    const topic = spec ? c.target.keyword : c.topic;
+    const actionLabel = spec ? c.target.type : (c.leads ? "Defend your lead" : c.action);
     return `<button class="dpitem" data-goto="plan">
       <div class="dpitem__rank">${pad2(c.rank)}</div>
       <div class="dpitem__main">
-        <div class="dpitem__topic">${c.topic}</div>
+        <div class="dpitem__topic">${topic}</div>
         <div class="dpitem__meta">
-          <span class="tag tag--action">${c.action}</span>
+          <span class="tag tag--action">${actionLabel}</span>
           <span class="tag tag--effort-${c.effort}">${EFFORT_LABEL[c.effort] || c.effort} effort</span>
         </div>
       </div>

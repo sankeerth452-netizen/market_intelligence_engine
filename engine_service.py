@@ -139,13 +139,24 @@ class EngineService:
             # Re-weight by JB's real competitive position: don't push 'strengthen X'
             # where JB already leads; lift the categories rivals own and JB doesn't.
             ctx = self._category_context()
+            top_gaps = self._top_gap_by_category()
             for c in out:
-                info = ctx.get((c.get("category") or "").lower())
+                cat = c.get("category") or ""
+                info = ctx.get(cat.lower())
                 if info:
                     c["roi"] = round(c["roi"] * info["mult"], 3)
                     c["leads"] = info["leads"]
                     if info["note"]:
                         c["evidence"] = [info["note"]] + c["evidence"]
+                # 'Create new page' must name the SPECIFIC missing page, not the category
+                # page JB already has — retarget to the top real gap in that category.
+                if not c.get("leads") and c.get("action") == "Create new page":
+                    gap = top_gaps.get(cat)
+                    if gap:
+                        comp = gap["competitors"][0]
+                        c["target"] = {"keyword": gap["keyword"], "type": gap["type"],
+                                       "volume": gap["volume"], "competitor": comp["name"],
+                                       "position": comp["position"]}
             out.sort(key=lambda c: -c["roi"])
             scored = self._all_scored()
             cuts = self._priority_cuts([o["roi"] for o in scored])
@@ -419,21 +430,37 @@ class EngineService:
         Used to stop recommending 'strengthen X' where JB is already the leader, and to
         lift categories where rivals rank and JB doesn't."""
         strengths = content_gap.top_pages().get("jb_strengths", {})   # {cat:{traffic,pages}}
-        gaps = content_gap.content_gaps().get("by_category", {})       # {cat: gap_count}
-        if not strengths and not gaps:
+        cg = content_gap.content_gaps()
+        gaps = cg.get("by_category", {})                              # {cat: gap_count}
+        opps = cg.get("opportunities", [])
+        if not strengths and not opps:
             return {}
+        gap_value = {}                                               # top gap volume per category
+        for o in opps:
+            gap_value[o["category"]] = max(gap_value.get(o["category"], 0), o.get("volume", 0))
         max_traf = max((v.get("traffic", 0) for v in strengths.values()), default=0) or 1
         max_gaps = max(gaps.values(), default=0) or 1
+        max_val = max(gap_value.values(), default=0) or 1
         out = {}
-        for cat in set(list(strengths) + list(gaps)):
+        for cat in set(list(strengths) + list(gaps) + list(gap_value)):
             traf = strengths.get(cat, {}).get("traffic", 0)
             gc = gaps.get(cat, 0)
-            opp = gc / max_gaps
+            # opportunity = how much rivals own (count) AND how big the best gap is (value)
+            opp = 0.5 * (gc / max_gaps) + 0.5 * (gap_value.get(cat, 0) / max_val)
             leads = gc <= 4 and traf >= 0.15 * max_traf     # covered well + real presence
-            mult = round(0.6 + 0.8 * opp, 3)                # few gaps -> down-weight; many -> lift
+            mult = round(0.6 + 0.8 * opp, 3)                # weak/covered -> down-weight; strong -> lift
             note = "you already lead here" if leads else ("wide-open vs rivals" if opp > 0.55 else None)
             out[cat.lower()] = {"mult": mult, "leads": leads, "note": note}
         return out
+
+    def _top_gap_by_category(self):
+        """The single highest-value real content gap per category (from the content-gap
+        export). Lets a 'create page' recommendation name the SPECIFIC missing page —
+        not the category page JB already has (e.g. 'best UHD monitors', not 'Computers')."""
+        top = {}
+        for o in content_gap.content_gaps().get("opportunities", []):
+            top.setdefault(o["category"], o)         # opportunities are pre-sorted by score
+        return top
 
     def signals(self, k: int = 14):
         with self.lock:

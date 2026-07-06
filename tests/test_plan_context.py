@@ -16,3 +16,13 @@ def test_context_flags_leader_and_downweights():
     # Computers is wide open (many gaps) -> not a leader, lifted above the leader
     assert comp["leads"] is False
     assert comp["mult"] > hp["mult"]
+
+
+def test_top_gap_names_a_specific_page_per_category():
+    top = engine_service.ENGINE._top_gap_by_category()
+    assert top, "expected a top gap per category from the committed export"
+    # each category maps to a SPECIFIC missing page (a keyword + a content type),
+    # not the generic category name
+    for cat, gap in top.items():
+        assert gap["keyword"] and gap["type"] and gap["competitors"]
+        assert gap["keyword"].lower() != cat.lower()
