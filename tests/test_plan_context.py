@@ -26,3 +26,11 @@ def test_top_gap_names_a_specific_page_per_category():
     for cat, gap in top.items():
         assert gap["keyword"] and gap["type"] and gap["competitors"]
         assert gap["keyword"].lower() != cat.lower()
+
+
+def test_stronger_gap_outranks_weaker_by_value():
+    # the plan ranks by the gap's real value: TVs ('qled vs oled', 5.6k) must beat
+    # Laptops (whose best gap is only 'oled laptop', 500/mo)
+    top = engine_service.ENGINE._top_gap_by_category()
+    assert top["TVs"]["score"] > top["Laptops"]["score"]
+    assert top["Computers"]["score"] > top["Laptops"]["score"]   # 'best uhd monitors' 16k

@@ -32,7 +32,7 @@ import ga4
 import outcome_evaluator
 import principles
 import reward_engine
-from world import build_world
+from world import build_world, Topic
 from bandit import LinUCB
 from engine_core import iter_candidates, run_head_to_head
 import recommender as rec
@@ -136,36 +136,69 @@ class EngineService:
                                   p["exploring"]),
                     context_json=json.dumps(p["x"]))
                 out.append(self._serialize(rid, i, p, week))
-            # Re-weight by JB's real competitive position: don't push 'strengthen X'
-            # where JB already leads; lift the categories rivals own and JB doesn't.
-            ctx = self._category_context()
-            top_gaps = self._top_gap_by_category()
-            for c in out:
-                cat = c.get("category") or ""
-                info = ctx.get(cat.lower())
-                if info:
-                    c["roi"] = round(c["roi"] * info["mult"], 3)
-                    c["leads"] = info["leads"]
-                    if info["note"]:
-                        c["evidence"] = [info["note"]] + c["evidence"]
-                # 'Create new page' must name the SPECIFIC missing page, not the category
-                # page JB already has — retarget to the top real gap in that category.
-                if not c.get("leads") and c.get("action") == "Create new page":
-                    gap = top_gaps.get(cat)
-                    if gap:
-                        comp = gap["competitors"][0]
-                        c["target"] = {"keyword": gap["keyword"], "type": gap["type"],
-                                       "volume": gap["volume"], "competitor": comp["name"],
-                                       "position": comp["position"]}
-            out.sort(key=lambda c: -c["roi"])
-            scored = self._all_scored()
+            if DATA_MODE == "real":
+                return self._gap_rank(out, week)     # gap-driven: rank by real opportunity value
+            scored = self._all_scored()              # synthetic demo: original roi ranking
             cuts = self._priority_cuts([o["roi"] for o in scored])
-            top = out[0]["roi"] if out else (scored[0]["roi"] if scored else 1.0)
-            for i, c in enumerate(out, 1):
-                c["rank"] = i
+            top = scored[0]["roi"] if scored else 1.0
+            for c in out:
                 c["priority"] = self._priority_label(c["roi"], cuts)
                 c["strength"] = round(min(1.0, c["roi"] / top), 3) if top > 0 else 0.0
             return out
+
+    def _gap_rank(self, out, week):
+        """Real-mode plan: (1) inject any strong-gap category the live signal layer
+        missed, (2) point each 'create page' rec at the SPECIFIC missing page, and
+        (3) rank by REAL opportunity value — the specific gap's score — so the biggest,
+        most-winnable gaps lead. Defend-your-lead items sit mid-plan."""
+        ctx = self._category_context()
+        top_gaps = self._top_gap_by_category()
+        have = {(c.get("category") or "").lower() for c in out}
+        for cat, gap in top_gaps.items():
+            if cat.lower() in have or gap.get("score", 0) < 1500:
+                continue
+            try:                                      # best-effort — never break the plan
+                sig = {f: 0.5 for f in config.FEATURE_NAMES[1:]}
+                sig["semantic_gap"] = 0.7             # there IS a real gap in this category
+                x = [1.0] + [sig[f] for f in config.FEATURE_NAMES[1:]]
+                pred = self.bandit.predict(x)
+                rid = store.save_recommendation(
+                    self.engine, week, cat, cat, "real", rec.roi_score(pred, "med"),
+                    pred["mean"], pred["uncertainty"], "med",
+                    rec.rationale(sig, pred, "med", False), context_json=json.dumps(x))
+                topic = Topic(id=900 + len(out), name=cat, category=cat, kind="real",
+                              latent_value=0.0, effort="med", demand_text=cat.lower())
+                p = {"topic": topic, "x": x, "signals": sig, "pred": pred,
+                     "roi": rec.roi_score(pred, "med"), "exploring": False, "headlines": []}
+                out.append(self._serialize(rid, len(out) + 1, p, week))
+            except Exception:
+                continue
+        for c in out:
+            cat = c.get("category") or ""
+            info = ctx.get(cat.lower())
+            if info:
+                c["leads"] = info["leads"]
+                if info["note"]:
+                    c["evidence"] = [info["note"]] + c["evidence"]
+            if not c.get("leads") and c.get("action") == "Create new page":
+                gap = top_gaps.get(cat)
+                if gap:
+                    comp = gap["competitors"][0]
+                    c["target"] = {"keyword": gap["keyword"], "type": gap["type"],
+                                   "volume": gap["volume"], "competitor": comp["name"],
+                                   "position": comp["position"], "score": gap["score"]}
+        gv = sorted(c["target"]["score"] for c in out if c.get("target"))
+        med = gv[len(gv) // 2] if gv else 1
+        for c in out:
+            c["opp"] = c["target"]["score"] if c.get("target") else (med * 0.6 if c.get("leads") else med * 0.4)
+        out.sort(key=lambda c: -c["opp"])
+        cuts = self._priority_cuts([c["opp"] for c in out])
+        top = out[0]["opp"] if out else 1.0
+        for i, c in enumerate(out, 1):
+            c["rank"] = i
+            c["priority"] = self._priority_label(c["opp"], cuts)
+            c["strength"] = round(min(1.0, c["opp"] / top), 3) if top > 0 else 0.0
+        return out
 
     def _real_candidates(self):
         """Live candidates from the adapters, cached. Fetching ~12 live sources is
