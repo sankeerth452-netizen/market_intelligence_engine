@@ -44,25 +44,42 @@ def _llm_plan(item):
     if not key:
         return None
     headline = (item.get("headlines") or [None])[0]
+    target = item.get("target") or {}
     grounding = {
+        "target_page": {k: target.get(k) for k in
+                        ("keyword", "type", "volume", "intent", "kd", "competitor", "position")}
+                        if target.get("keyword") else None,
         "topic": item.get("topic"),
         "recommended_action": item.get("action"),
         "effort": item.get("effort"),
         "news_headline": headline,
         "signals_0_to_1": _plain_signals(item.get("signals", {})),
     }
-    system = (
-        "You are a senior content-marketing strategist advising a client. Using ONLY "
-        "the real market signals and the actual news headline provided, write a concise, "
-        "client-ready action plan for ONE web page. Never invent facts, numbers, statistics, "
-        "dates, or competitor names beyond what is given; if the headline is null, don't "
-        "reference the news. Speak plainly to a non-technical marketer — no ML/SEO jargon. "
-        'Output STRICT JSON only, no prose, with exactly these keys: '
-        '{"title": "<compelling page title, max ~60 chars>", '
-        '"angle": "<one sentence: the strategic angle>", '
-        '"why_now": "<one sentence grounded in the signals/headline>", '
-        '"points": ["<2-4 short bullets of what the page should cover>"]}'
-    )
+    if target.get("keyword"):
+        system = (
+            "You are a senior SEO strategist advising an SEO manager at a retailer. Using ONLY the "
+            "real data provided — especially target_page (the specific missing page: its keyword, page "
+            "type, monthly search volume, search intent, keyword difficulty, and which competitor ranks) "
+            "— write a concise, actionable SEO brief for that ONE page. Be concrete and SEO-literate "
+            "(the target keyword, the page type, beating the named competitor's ranking page, internal "
+            "linking, schema) without fluff. Never invent numbers, competitors, or facts beyond what is "
+            'given. Output STRICT JSON only with exactly: {"title": "<page title, ~60 chars>", '
+            '"angle": "<one sentence strategic angle>", "why_now": "<one sentence grounded in the data>", '
+            '"points": ["<2-4 concrete SEO actions>"]}'
+        )
+    else:
+        system = (
+            "You are a senior content-marketing strategist advising a client. Using ONLY "
+            "the real market signals and the actual news headline provided, write a concise, "
+            "client-ready action plan for ONE web page. Never invent facts, numbers, statistics, "
+            "dates, or competitor names beyond what is given; if the headline is null, don't "
+            "reference the news. Speak plainly to a non-technical marketer — no ML/SEO jargon. "
+            'Output STRICT JSON only, no prose, with exactly these keys: '
+            '{"title": "<compelling page title, max ~60 chars>", '
+            '"angle": "<one sentence: the strategic angle>", '
+            '"why_now": "<one sentence grounded in the signals/headline>", '
+            '"points": ["<2-4 short bullets of what the page should cover>"]}'
+        )
     body = json.dumps({
         "model": _MODEL, "max_tokens": 500, "system": system,
         "messages": [{"role": "user", "content": json.dumps(grounding)}],
@@ -107,7 +124,60 @@ def _parse_plan(text):
 
 
 # ------------------------------------------------------------ template tier ----
+def _target_plan(item, t):
+    """SEO-manager action brief for a SPECIFIC missing page (a real content gap)."""
+    kw = (t.get("keyword") or "this topic").strip()
+    typ = t.get("type") or "Landing page"
+    vol = t.get("volume") or 0
+    comp = t.get("competitor") or "a competitor"
+    pos = t.get("position")
+    kd = t.get("kd")
+    intents = t.get("intent") or []
+    headline = (item.get("headlines") or [None])[0]
+    title_kw = kw[:1].upper() + kw[1:]
+
+    if "Comparison" in typ:
+        title = f"{title_kw.replace(' vs ', ' vs. ')} — full comparison"
+    elif "Buying" in typ:
+        title = f"{title_kw} — 2026 buyer's guide"
+    elif "Guide" in typ or "FAQ" in typ:
+        title = f"{title_kw}: everything you need to know"
+    else:
+        title = title_kw
+
+    pos_txt = f"ranks #{pos}" if pos else "ranks"
+    angle = (f"Capture the “{kw}” query ({vol:,}/mo): {comp} {pos_txt} for it and JB Hi-Fi has no page. "
+             f"A dedicated {typ.lower()} closes the gap.")
+    if headline:
+        why_now = f"News momentum right now — “{headline}” — and {vol:,} searches/mo with no JB page yet."
+    else:
+        why_now = f"{vol:,} searches/mo of unmet demand and a rival already ranks — proven, open opportunity."
+
+    points = [f"Target “{kw}” as the primary keyword in the H1, title tag, meta and URL slug."]
+    if "Comparison" in typ:
+        points += ["Lead with a scannable spec-and-price comparison table — that's what wins this SERP.",
+                   f"Out-cover {comp}'s page: add the buyer questions and product picks they omit."]
+    elif "Buying" in typ:
+        points += ["Structure it buyer criteria → ranked top picks → price/availability, linking to product pages.",
+                   f"Match then beat the depth of {comp}'s ranking page, with JB stock and pricing."]
+    else:
+        points += ["Cover the related long-tail sub-topics to build topical authority for the cluster.",
+                   f"Benchmark {comp}'s ranking page and go deeper on intent and specifics."]
+    points.append("Internal-link from the parent category page and mark up with Product/FAQ schema.")
+
+    ev = [f"page type: {typ.lower()}"]
+    if intents:
+        ev.append("search intent: " + ", ".join(intents).lower())
+    if kd is not None:
+        ev.append(f"keyword difficulty {kd}")
+    return {"title": title[:90], "angle": angle[:220], "why_now": why_now[:220],
+            "points": points[:4], "evidence": ev, "source": "template"}
+
+
 def _template_plan(item):
+    t = item.get("target")
+    if t and t.get("keyword"):
+        return _target_plan(item, t)
     topic = item.get("topic", "this topic")
     sig = item.get("signals", {})
     headline = (item.get("headlines") or [None])[0]

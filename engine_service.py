@@ -185,8 +185,10 @@ class EngineService:
                 if gap:
                     comp = gap["competitors"][0]
                     c["target"] = {"keyword": gap["keyword"], "type": gap["type"],
-                                   "volume": gap["volume"], "competitor": comp["name"],
-                                   "position": comp["position"], "score": gap["score"]}
+                                   "volume": gap["volume"], "intent": gap.get("intent", []),
+                                   "kd": gap.get("kd"), "competitors": gap["competitors"],
+                                   "competitor": comp["name"], "position": comp["position"],
+                                   "score": gap["score"]}
         gv = sorted(c["target"]["score"] for c in out if c.get("target"))
         med = gv[len(gv) // 2] if gv else 1
         for c in out:
@@ -614,14 +616,15 @@ class EngineService:
 
     # ------------------------------------------------ AI strategist (cached) ----
     def playbook(self, item: dict):
-        """A grounded, client-ready action plan for one recommendation. Cached by
-        topic so the (possibly LLM-backed) plan is computed once per session."""
-        topic = (item.get("topic") or "").strip()
-        if topic and topic in self._plan_cache:
-            return self._plan_cache[topic]
+        """A grounded, client-ready action plan for one recommendation. Cached by the
+        specific target page (or topic) so the (possibly LLM-backed) plan runs once."""
+        tgt = item.get("target") or {}
+        key = (tgt.get("keyword") or item.get("topic") or "").strip()
+        if key and key in self._plan_cache:
+            return self._plan_cache[key]
         plan = strategist_mod.action_plan(item)
-        if topic:
-            self._plan_cache[topic] = plan
+        if key:
+            self._plan_cache[key] = plan
         return plan
 
     # ------------------------------------------ competitor monitoring ----------

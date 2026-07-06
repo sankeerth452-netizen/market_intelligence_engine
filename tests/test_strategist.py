@@ -43,3 +43,18 @@ def test_parse_plan_extracts_json_with_fences():
 def test_parse_plan_rejects_garbage_or_incomplete():
     assert strategist._parse_plan("no json here") is None
     assert strategist._parse_plan('{"title":"only"}') is None   # missing required keys
+
+
+def test_action_plan_aligns_to_specific_target():
+    """With a target gap, the plan names the SPECIFIC page (not the category) and
+    cites the real competitor — SEO-manager aligned."""
+    import strategist
+    item = {"topic": "Computers", "action": "Create new page", "headlines": [],
+            "target": {"keyword": "best uhd monitors", "type": "Buying guide", "volume": 16000,
+                       "intent": ["Commercial"], "kd": 28, "competitor": "Officeworks", "position": 10,
+                       "competitors": [{"name": "Officeworks", "position": 10}]}}
+    p = strategist.action_plan(item)          # no ANTHROPIC key -> template tier
+    blob = (p["title"] + p["angle"] + " ".join(p["points"])).lower()
+    assert "best uhd monitors" in blob        # the specific page, not "Computers"
+    assert "officeworks" in blob              # the actual competitor to beat
+    assert p["title"] != "Computers — a buyer's guide"

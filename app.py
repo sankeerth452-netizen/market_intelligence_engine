@@ -98,6 +98,7 @@ class PlaybookReq(BaseModel):
     effort: str = Field(default="", max_length=12)
     headlines: list[str] = Field(default_factory=list)
     signals: dict = Field(default_factory=dict)
+    target: dict = Field(default_factory=dict)
 
 
 @app.post("/api/playbook")

@@ -152,7 +152,9 @@ function setConviction(el, strength, confidence, roi) {
 }
 
 /* ---- opportunity cards --------------------------------------------------- */
+let _recs = {};
 function cardEl(c) {
+  _recs[c.id] = c;
   const el = document.createElement("article");
   el.className = "card";
   el.dataset.id = c.id;
@@ -188,6 +190,7 @@ function cardEl(c) {
         ${test}
         <button class="planbtn" type="button">✦ Get the AI action plan</button>
         <button class="markdone" type="button" title="Mark this recommendation as shipped so we can track its real results">✓ We built this</button>
+        <button class="evbtn" type="button">Full evidence &amp; SEO brief →</button>
       </div>
       <div class="plan" hidden></div>
     </div>
@@ -212,6 +215,7 @@ function cardEl(c) {
   const planBtn = el.querySelector(".planbtn");
   const planHost = el.querySelector(".plan");
   planBtn.addEventListener("click", () => loadPlan(c, planBtn, planHost));
+  el.querySelector(".evbtn").addEventListener("click", () => showRecDetail(c.id));
   const doneBtn = el.querySelector(".markdone");
   if (doneBtn) doneBtn.addEventListener("click", () => markDone(c, doneBtn));
   return el;
@@ -245,7 +249,8 @@ async function loadPlan(c, btn, host) {
     const p = await api("/api/playbook", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ topic: c.topic, action: c.action, effort: c.effort,
-                             headlines: c.headlines || [], signals: c.signals || {} }),
+                             headlines: c.headlines || [], signals: c.signals || {},
+                             target: c.target || {} }),
     });
     host.innerHTML = planHTML(p);
     host.dataset.loaded = "1";
@@ -283,7 +288,7 @@ async function recordLikert(recId, reward, el, btn) {
 /* after a result, slide the visible cards to the system's updated view */
 async function refreshBriefInPlace() {
   try {
-    const data = await api(`/api/brief?week=${state.week}&k=3`);
+    const data = await api(`/api/brief?week=${state.week}&k=20`);
     const host = $("cards");
     const shown = [...host.querySelectorAll(".card")];
     const shownIds = shown.map((e) => Number(e.dataset.id)).sort((a, b) => a - b);
@@ -305,7 +310,7 @@ function loadBrief() {
   const host = $("cards");
   host.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
   setWeekLabel();
-  return api(`/api/brief?week=${state.week}&k=3`).then((data) => {
+  return api(`/api/brief?week=${state.week}&k=20`).then((data) => {
     host.innerHTML = "";
     if (!data.length) {
       host.innerHTML = '<p class="lede">No clear opportunities this week. Step forward a week.</p>';
@@ -321,7 +326,7 @@ function loadBrief() {
 async function loadDashboard() {
   const [status, brief, sig] = await Promise.all([
     api("/api/status").catch(() => ({})),
-    api(`/api/brief?week=${state.week}&k=3`).catch(() => []),
+    api(`/api/brief?week=${state.week}&k=20`).catch(() => []),
     api("/api/signals").catch(() => ({ items: [] })),
   ]);
   const top = brief[0];
@@ -551,6 +556,107 @@ function renderCategoryDetail(cat) {
       ${heads.map((h) => `<div class="sig__news">📰 ${h}</div>`).join("")}</div>` : "";
 
   host.innerHTML = back + sig + trend + gapPanel + newsPanel;
+}
+
+/* ---- plan recommendation: full evidence + SEO brief (for an SEO manager) - */
+async function showRecDetail(id) {
+  const c = _recs[id];
+  if (!c) return;
+  state.view = "recdetail";
+  document.querySelectorAll(".view").forEach((v) => v.classList.toggle("view--active", v.id === "view-recdetail"));
+  document.querySelectorAll(".nav__item").forEach((n) => n.classList.toggle("is-active", n.dataset.view === "plan"));
+  $("viewEyebrow").textContent = "Full evidence · SEO brief";
+  $("viewTitle").textContent = c.target ? c.target.keyword : c.topic;
+  window.scrollTo(0, 0);
+  if (!Object.keys(_sig.demand || {}).length) {          // make sure the trend is available
+    try {
+      const dem = await api("/api/demand");
+      _sig.demand = {};
+      (dem.categories || []).forEach((x) => { _sig.demand[String(x.category).toLowerCase()] = x; });
+    } catch (e) { /* trend just won't show */ }
+  }
+  renderRecDetail(c);
+}
+
+function _rdRow(k, v) { return `<tr><td class="rd__k">${k}</td><td class="rd__v">${v}</td></tr>`; }
+
+function renderRecDetail(c) {
+  const host = $("recdetail");
+  const t = c.target, s = c.signals || {};
+  const [prio] = prioOf(c);
+  const dem = (_sig.demand || {})[String(c.category || "").toLowerCase()];
+  const back = `<button class="cdback" onclick="showView('plan')">← Back to the plan</button>`;
+
+  const rows = [];
+  if (t) {
+    rows.push(_rdRow("Target keyword", `“${t.keyword}”`));
+    rows.push(_rdRow("Monthly search volume", `${Number(t.volume).toLocaleString()} / mo`));
+    if (t.intent && t.intent.length) rows.push(_rdRow("Search intent", t.intent.join(", ")));
+    if (t.kd != null) rows.push(_rdRow("Keyword difficulty (KD)", `${t.kd} / 100`));
+    rows.push(_rdRow("Your organic position", "Not ranking — no page for this yet"));
+    rows.push(_rdRow("Competitors ranking", (t.competitors || []).map((x) => `${x.name} #${x.position}`).join(" · ") || "—"));
+    rows.push(_rdRow("Recommended page type", t.type));
+  } else {
+    rows.push(_rdRow("Category", c.topic));
+    rows.push(_rdRow("Recommended action", c.action));
+    if (c.leads) rows.push(_rdRow("Your position", "You already lead this category"));
+  }
+  const evTable = `<table class="rd__tbl">${rows.join("")}</table>`;
+
+  const why = t
+    ? `Ranked by <b>opportunity value</b> = search volume × buyer intent × the fact a competitor already ranks and you don't.
+       This is <b>${prio} priority</b> because “${t.keyword}” draws <b>${Number(t.volume).toLocaleString()}/mo</b>${t.volume >= 5000 ? " (≥ 5,000/mo)" : ""},
+       ${t.competitor} ${t.position ? "ranks #" + t.position : "ranks"} for it, and JB Hi-Fi has no page to compete.`
+    : (c.leads
+        ? "You already rank well across this category, so this is a <b>defend</b> — hold the lead, don't rebuild what you have."
+        : "Surfaced by this week's live market signals.");
+
+  const bar = (label, v, sub) => {
+    const p = Math.round((v || 0) * 100);
+    return `<div class="rdsig"><div class="rdsig__top"><span>${label}</span><b>${p}</b></div>
+        <div class="cdbar"><div class="cdbar__fill" style="width:${p}%"></div></div>
+        <div class="rdsig__sub">${sub}</div></div>`;
+  };
+  const sigPanel = `<div class="panel"><div class="panel__head"><div class="eyebrow">Signal profile</div>
+      <h2 class="panel__title">The evidence behind the score</h2></div>
+      ${bar("Search demand", s.trend_surprise, "unmet search interest vs your other categories")}
+      ${bar("Content gap", s.semantic_gap, "how under-covered this is on your own site")}
+      ${bar("News momentum", s.news_relevance, "current press / industry attention")}
+      ${bar("Cross-source agreement", s.cross_source_agreement, "whether independent live signals corroborate")}
+      <p class="panel__note">Scores are <b>0–100</b>, relative to your other categories — signal strength, not raw counts.
+        Model confidence: <b>${confidenceOf(c.confidence)[0]}</b>.</p></div>`;
+
+  let trend = "";
+  if (dem) {
+    const cls = dem.trend_pct > 4 ? "up" : dem.trend_pct < -4 ? "down" : "";
+    const peak = dem.seasonal ? `typically peaks in <b>${dem.peak_month}</b> (+${dem.peak_lift}%)` : "no strong seasonal pattern";
+    trend = `<div class="panel"><div class="panel__head"><div class="eyebrow">18-month demand · Ahrefs volume history</div>
+        <h2 class="panel__title">Demand trend</h2></div>
+        <div class="cdtrend"><span class="spark--wrap ${cls}">${sparkline(dem.series, 280, 64)}</span>
+          <div><div class="cdtrend__pct ${cls}">${dem.trend_pct > 0 ? "+" : ""}${dem.trend_pct}% over 18 months</div>
+            <div class="cdtrend__sub">${peak}</div></div></div></div>`;
+  }
+
+  const news = (c.headlines || []).length ? `<div class="panel"><div class="panel__head">
+      <div class="eyebrow">Google News · this week</div><h2 class="panel__title">In the news</h2></div>
+      ${c.headlines.map((h) => `<div class="sig__news">📰 ${h}</div>`).join("")}</div>` : "";
+
+  const oppPanel = `<div class="panel"><div class="panel__head"><div class="eyebrow">The opportunity</div>
+      <h2 class="panel__title">Why this is a ${prio.toLowerCase()} priority</h2></div>
+      ${evTable}<p class="rd__why">${why}</p></div>`;
+
+  host.innerHTML = back + oppPanel + sigPanel + trend + news +
+    `<div class="panel" id="rdBrief"><div class="panel__head"><div class="eyebrow">SEO action brief</div>
+        <h2 class="panel__title">What to build</h2></div><div class="plan__loading">Writing the SEO brief…</div></div>`;
+
+  api("/api/playbook", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic: c.topic, action: c.action, effort: c.effort,
+                             headlines: c.headlines || [], signals: c.signals || {}, target: c.target || {} }) })
+    .then((p) => {
+      const el = document.querySelector("#rdBrief");
+      if (el) el.innerHTML = `<div class="panel__head"><div class="eyebrow">SEO action brief${p.source === "ai" ? " · AI-written" : ""}</div>
+          <h2 class="panel__title">What to build</h2></div>` + planHTML(p);
+    }).catch(() => {});
 }
 
 /* ---- what the system has learned matters (plain language) -------------- */

@@ -876,6 +876,25 @@ html { scroll-behavior: smooth; }
 .cdgap__kw { font-family: var(--display); font-weight: 600; font-size: 14px; color: var(--ink); }
 .cdgap__meta { font-size: 12px; color: var(--mute); margin-top: 2px; }
 
+/* ---- plan recommendation detail (SEO evidence + brief) ----------------- */
+.evbtn { font-family: var(--mono); font-size: 11px; color: var(--teal); background: none; border: none;
+  cursor: pointer; padding: 4px 2px; margin-left: auto; }
+.evbtn:hover { text-decoration: underline; }
+.rd__tbl { width: 100%; border-collapse: collapse; }
+.rd__tbl td { padding: 9px 0; border-top: 1px solid var(--line-soft); font-size: 13px; vertical-align: top; }
+.rd__tbl tr:first-child td { border-top: none; }
+.rd__k { color: var(--mute); width: 220px; }
+.rd__v { color: var(--ink); font-weight: 500; }
+.rd__why { font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); margin: 16px 0 0; }
+.rd__why b { color: var(--ink); }
+.rdsig { margin-bottom: 13px; }
+.rdsig__top { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; }
+.rdsig__top span { font-weight: 600; color: var(--ink); }
+.rdsig__top b { font-family: var(--mono); color: var(--teal); font-variant-numeric: tabular-nums; }
+.rdsig__sub { font-size: 11.5px; color: var(--mute); margin-top: 4px; }
+
+@media (max-width: 720px) { .rd__k { width: 45%; } }
+
 /* ---- Integrations (Connect Google) + Recommendation performance -------- */
 .integrations { display: flex; flex-direction: column; gap: 12px; }
 .intg { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
