@@ -192,12 +192,14 @@ class EngineService:
         for c in out:
             c["opp"] = c["target"]["score"] if c.get("target") else (med * 0.6 if c.get("leads") else med * 0.4)
         out.sort(key=lambda c: -c["opp"])
-        cuts = self._priority_cuts([c["opp"] for c in out])
-        top = out[0]["opp"] if out else 1.0
         for i, c in enumerate(out, 1):
             c["rank"] = i
-            c["priority"] = self._priority_label(c["opp"], cuts)
-            c["strength"] = round(min(1.0, c["opp"] / top), 3) if top > 0 else 0.0
+            if c.get("target"):                       # priority by the gap's real demand
+                v = c["target"]["volume"]
+                c["priority"] = "High" if v >= 5000 else "Medium" if v >= 1200 else "Low"
+            else:
+                c["priority"] = "Medium" if c.get("leads") else "Low"
+            c["strength"] = {"High": 0.9, "Medium": 0.62, "Low": 0.38}[c["priority"]]
         return out
 
     def _real_candidates(self):
