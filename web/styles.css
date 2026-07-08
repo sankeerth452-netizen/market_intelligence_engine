@@ -628,24 +628,6 @@ html { scroll-behavior: smooth; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
-/* ---- weekly summary card (Dashboard) ----------------------------------- */
-.summary {
-  background: var(--surface);
-  border: 1px solid var(--line); border-radius: var(--r-card);
-  padding: 20px 24px; margin-bottom: 6px; box-shadow: var(--shadow);
-}
-.summary:empty { display: none; }
-.summary__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.summary__mode { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--teal); background: var(--teal-wash); border: 1px solid rgba(15,118,110,.25); padding: 3px 9px; border-radius: var(--r-pill); white-space: nowrap; }
-.summary__learned { font-size: 15px; color: var(--ink); line-height: 1.55; margin: 11px 0 18px; max-width: 80ch; }
-.summary__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.summary__lbl { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 10px; }
-.summary__lbl::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--mute-2); flex-shrink: 0; }
-.summary__col--up .summary__lbl::before { background: var(--teal); }
-.summary__col--gap .summary__lbl::before { background: var(--amber); }
-.schip { display: inline-block; font-size: 12px; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 7px; padding: 4px 9px; margin: 0 5px 6px 0; }
-@media (max-width: 720px) { .summary__grid { grid-template-columns: 1fr; gap: 16px; } }
-
 /* ---- Signals view ------------------------------------------------------ */
 .siglist { display: flex; flex-direction: column; gap: 12px; }
 .sigrow { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px 18px; box-shadow: var(--shadow); }
@@ -953,7 +935,6 @@ html { scroll-behavior: smooth; }
 .asst__form button:hover { background: var(--teal); }
 
 @media (max-width: 560px) {
-  .summary__grid { grid-template-columns: 1fr; }
   .sigrow__bars { grid-template-columns: 1fr; gap: 8px; }
   .wrow { grid-template-columns: 116px 1fr 76px; gap: 8px; }
   .asst { right: 8px; bottom: 8px; }

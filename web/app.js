@@ -415,25 +415,6 @@ async function loadDashboard() {
   wireGoto();
 }
 
-/* ---- weekly intelligence summary (Dashboard) --------------------------- */
-function loadSummary() {
-  return api("/api/summary").then((s) => {
-    if (!s || !s.learned) return;
-    const chips = (arr) => (arr || []).map((x) => `<span class="schip">${x}</span>`).join("");
-    $("summaryCard").innerHTML = `
-      <div class="summary__head">
-        <span class="eyebrow">This week's read on the market</span>
-        <span class="summary__mode">${shortToday()}</span>
-      </div>
-      <p class="summary__learned">${s.learned}</p>
-      <div class="summary__grid">
-        <div class="summary__col summary__col--up"><div class="summary__lbl">Demand rising fastest</div>${chips(s.rising)}</div>
-        <div class="summary__col summary__col--gap"><div class="summary__lbl">Biggest gaps on your site</div>${chips(s.gaps)}</div>
-        <div class="summary__col summary__col--ok"><div class="summary__lbl">Already well covered</div>${chips(s.covered)}</div>
-      </div>`;
-  }).catch(() => {});
-}
-
 /* ---- Market signals view ------------------------------------------------ */
 function sparkline(series, w = 118, h = 26) {
   if (!series || series.length < 2) return "";
@@ -1307,7 +1288,6 @@ loadWeights();
 loadStatus();
 loadProof();
 loadDashboard();
-loadSummary();
 loadCompetitors();
 loadAiVisibility();
 loadPerformance();
