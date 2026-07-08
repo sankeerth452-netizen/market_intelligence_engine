@@ -176,7 +176,7 @@ function cardEl(c) {
     : `${verb} ${c.topic}${suffix}`;
   const catTag = specific ? ` <span class="card__cat">in ${c.topic}</span>` : "";
   const targetWhy = specific
-    ? `<b>${c.target.competitor} ranks #${c.target.position} for this (${Number(c.target.volume).toLocaleString()}/mo) — you don't.</b> `
+    ? `<b>${c.target.competitor} ranks #${c.target.position} for this (${Number(c.target.volume).toLocaleString("en-US")}/mo) — you don't.</b> `
     : "";
 
   el.innerHTML = `
@@ -323,40 +323,65 @@ function loadBrief() {
 }
 
 /* ---- Dashboard overview (KPIs + hero + plan preview) -------------------- */
+function kpiIcon(name) {
+  const p = {
+    target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+    search: '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+    trend: '<polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/>',
+    spark: '<path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/>',
+    grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  }[name] || "";
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+}
+
 async function loadDashboard() {
-  const [status, brief, sig] = await Promise.all([
+  const [status, brief, sig, gaps, aiv] = await Promise.all([
     api("/api/status").catch(() => ({})),
     api(`/api/brief?week=${state.week}&k=20`).catch(() => []),
     api("/api/signals").catch(() => ({ items: [] })),
+    api("/api/content-gaps").catch(() => ({})),
+    api("/api/ai-visibility").catch(() => ({})),
   ]);
   const top = brief[0];
   const cats = (status.client && status.client.categories) || "—";
-  const updates = status.model_updates != null ? String(status.model_updates) : "—";
+  const compact = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(n);
   const topVol = (sig.items || []).filter((i) => i.volume != null).sort((a, b) => b.volume - a.volume)[0];
 
-  const demandKpi = topVol
-    ? { label: "Biggest search demand", big: topVol.topic,
-        sub: topVol.volume.toLocaleString() + " searches/mo", accent: "teal" }
-    : { label: "This week", big: weekRange(), sub: "your market snapshot", accent: "teal" };
+  const topSpec = top && top.target && !top.leads;
+  const k1 = { icon: "target", label: "Do this first", accent: "teal",
+    big: top ? (topSpec ? top.target.keyword : top.topic) : "—",
+    sub: top ? `${prioOf(top)[0]} priority · ${topSpec ? top.target.type.toLowerCase()
+          : (top.leads ? "defend your lead" : (top.action || "").toLowerCase())}` : "" };
 
-  const kpis = [
-    { label: "Do this first", big: top ? top.topic : "—",
-      sub: top ? `${prioOf(top)[0]} priority · ${(top.action || "").toLowerCase()}` : "", accent: "teal" },
-    { label: "Categories watched", big: String(cats),
-      sub: "monitored every week", accent: "ink" },
-    demandKpi,
-    { label: "Results learned from", big: updates,
-      sub: "sharper with every one", accent: "amber" },
-  ];
-  $("kpis").innerHTML = kpis.map((k) => `
+  const gapCount = gaps.kept || 0, gapCats = Object.keys(gaps.by_category || {}).length;
+  const k2 = gapCount
+    ? { icon: "search", label: "Content gaps found", accent: "amber",
+        big: String(gapCount), sub: `rivals rank, you don't · ${gapCats} categories` }
+    : { icon: "grid", label: "Categories tracked", accent: "ink", big: String(cats), sub: "monitored every week" };
+
+  const k3 = topVol
+    ? { icon: "trend", label: "Biggest search demand", accent: "teal",
+        big: topVol.topic, sub: compact(topVol.volume) + " searches/mo" }
+    : { icon: "trend", label: "This week", accent: "teal", big: weekRange(), sub: "your market snapshot" };
+
+  let k4;
+  const brands = (aiv && aiv.enabled) ? [...(aiv.brands || [])].sort((a, b) => b.sov - a.sov) : [];
+  if (brands.length) {
+    const me = brands.find((b) => b.brand === aiv.client) || brands[0];
+    k4 = { icon: "spark", label: "AI share of voice", accent: "teal",
+           big: Math.round(me.sov * 100) + "%", sub: `#${brands.indexOf(me) + 1} of ${brands.length} in AI answers` };
+  } else {
+    k4 = { icon: "grid", label: "Categories tracked", accent: "ink", big: String(cats), sub: "monitored every week" };
+  }
+
+  $("kpis").innerHTML = [k1, k2, k3, k4].map((k) => `
     <div class="kpi kpi--${k.accent}">
-      <div class="kpi__label">${k.label}</div>
+      <div class="kpi__top"><span class="kpi__ico">${kpiIcon(k.icon)}</span><span class="kpi__label">${k.label}</span></div>
       <div class="kpi__big">${k.big}</div>
       <div class="kpi__sub">${k.sub}</div>
     </div>`).join("");
 
   const totalVol = (sig.items || []).reduce((a, i) => a + (i.volume || 0), 0);
-  const compact = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(n);
   if (totalVol > 0) {
     $("heroStat").textContent = compact(totalVol);
     $("heroCap").innerHTML =
@@ -393,12 +418,8 @@ async function loadDashboard() {
 /* ---- weekly intelligence summary (Dashboard) --------------------------- */
 function loadSummary() {
   return api("/api/summary").then((s) => {
-    if (!s || !s.actions) return;
+    if (!s || !s.learned) return;
     const chips = (arr) => (arr || []).map((x) => `<span class="schip">${x}</span>`).join("");
-    const acts = s.actions.map((a) => {
-      const [p] = prioOf(a);
-      return `<li><b>${a.action}</b> — ${a.topic} <span class="schip__roi">${p} priority</span></li>`;
-    }).join("");
     $("summaryCard").innerHTML = `
       <div class="summary__head">
         <span class="eyebrow">This week's read on the market</span>
@@ -406,12 +427,10 @@ function loadSummary() {
       </div>
       <p class="summary__learned">${s.learned}</p>
       <div class="summary__grid">
-        <div><div class="summary__lbl">Demand rising fastest</div>${chips(s.rising)}</div>
-        <div><div class="summary__lbl">Biggest gaps on your site</div>${chips(s.gaps)}</div>
-        <div><div class="summary__lbl">Already well covered</div>${chips(s.covered)}</div>
-      </div>
-      <div class="summary__lbl">What to do</div>
-      <ol class="summary__acts">${acts}</ol>`;
+        <div class="summary__col summary__col--up"><div class="summary__lbl">Demand rising fastest</div>${chips(s.rising)}</div>
+        <div class="summary__col summary__col--gap"><div class="summary__lbl">Biggest gaps on your site</div>${chips(s.gaps)}</div>
+        <div class="summary__col summary__col--ok"><div class="summary__lbl">Already well covered</div>${chips(s.covered)}</div>
+      </div>`;
   }).catch(() => {});
 }
 
@@ -435,7 +454,7 @@ function sigrowHTML(it, demand) {
   const [p, pc] = prioOf(it);
   const heads = (it.headlines || []).slice(0, 2).map((h) => `<div class="sig__news">📰 ${h}</div>`).join("");
   const vol = it.volume != null
-    ? `<div class="sigrow__vol">🔍 ${it.volume.toLocaleString()} searches/mo</div>` : "";
+    ? `<div class="sigrow__vol">🔍 ${it.volume.toLocaleString("en-US")} searches/mo</div>` : "";
   const f = demand && demand[String(it.category || it.topic).toLowerCase()];
   let demandLine = "";
   if (f) {
@@ -521,7 +540,7 @@ function renderCategoryDetail(cat) {
   const sig = `<div class="panel">
       <div class="panel__head"><div class="eyebrow">What we track for ${cat}</div>
         <h2 class="panel__title">The signals behind the score</h2></div>
-      ${cdSignal("Search demand", s.trend_surprise, it.volume != null ? `≈ ${it.volume.toLocaleString()} searches/mo across all ${cat.toLowerCase()} keywords` : "search interest", "Ahrefs")}
+      ${cdSignal("Search demand", s.trend_surprise, it.volume != null ? `≈ ${it.volume.toLocaleString("en-US")} searches/mo across all ${cat.toLowerCase()} keywords` : "search interest", "Ahrefs")}
       ${cdSignal("In the news", s.news_relevance, `${heads.length} recent headline${heads.length !== 1 ? "s" : ""} we crawled`, "Google News RSS")}
       ${cdSignal("Gap on your site", s.semantic_gap, `${gaps.length} keyword${gaps.length !== 1 ? "s" : ""} rivals rank for that you don't`, "Ahrefs content-gap")}
       <p class="panel__note">The bars are <b>0–100 scores</b>, relative to your other categories — a way to
@@ -544,7 +563,7 @@ function renderCategoryDetail(cat) {
     const comp = o.competitors[0];
     return `<div class="cdgap"><span class="gaptype gaptype--${gapType(o.type)}">${o.type}</span>
         <div class="cdgap__body"><div class="cdgap__kw">${o.keyword}</div>
-          <div class="cdgap__meta">${o.volume.toLocaleString()}/mo · ${comp.name} ranks #${comp.position}, you don't</div></div></div>`;
+          <div class="cdgap__meta">${o.volume.toLocaleString("en-US")}/mo · ${comp.name} ranks #${comp.position}, you don't</div></div></div>`;
   }).join("") : `<p class="panel__note">No open content gaps here — you already cover this category well.</p>`;
   const gapPanel = `<div class="panel">
       <div class="panel__head"><div class="eyebrow">From the Ahrefs content-gap export</div>
@@ -590,7 +609,7 @@ function renderRecDetail(c) {
   const rows = [];
   if (t) {
     rows.push(_rdRow("Target keyword", `“${t.keyword}”`));
-    rows.push(_rdRow("Monthly search volume", `${Number(t.volume).toLocaleString()} / mo`));
+    rows.push(_rdRow("Monthly search volume", `${Number(t.volume).toLocaleString("en-US")} / mo`));
     if (t.intent && t.intent.length) rows.push(_rdRow("Search intent", t.intent.join(", ")));
     if (t.kd != null) rows.push(_rdRow("Keyword difficulty (KD)", `${t.kd} / 100`));
     rows.push(_rdRow("Your organic position", "Not ranking — no page for this yet"));
@@ -605,7 +624,7 @@ function renderRecDetail(c) {
 
   const why = t
     ? `Ranked by <b>opportunity value</b> = search volume × buyer intent × the fact a competitor already ranks and you don't.
-       This is <b>${prio} priority</b> because “${t.keyword}” draws <b>${Number(t.volume).toLocaleString()}/mo</b>${t.volume >= 5000 ? " (≥ 5,000/mo)" : ""},
+       This is <b>${prio} priority</b> because “${t.keyword}” draws <b>${Number(t.volume).toLocaleString("en-US")}/mo</b>${t.volume >= 5000 ? " (≥ 5,000/mo)" : ""},
        ${t.competitor} ${t.position ? "ranks #" + t.position : "ranks"} for it, and JB Hi-Fi has no page to compete.`
     : (c.leads
         ? "You already rank well across this category, so this is a <b>defend</b> — hold the lead, don't rebuild what you have."
@@ -837,7 +856,7 @@ function compCard(c) {
       <span class="comp__badge ${c.new_count ? "comp__badge--new" : ""}">${
         c.new_count ? c.new_count + " new" : "tracked"}</span>
     </div>
-    <div class="comp__meta">${(c.total || 0).toLocaleString()} pages tracked · crawled ${timeAgo(c.last_crawled)}${
+    <div class="comp__meta">${(c.total || 0).toLocaleString("en-US")} pages tracked · crawled ${timeAgo(c.last_crawled)}${
       c.note ? ` · <span class="comp__src">${c.note}</span>` : ""}</div>
     ${pages}
   </div>`;
@@ -964,7 +983,7 @@ function loadContentGaps() {
           <span class="gaptype gaptype--${typeCls(o.type)}">${o.type}</span>
           <div class="gap__main">
             <div class="gap__kw">${o.keyword}</div>
-            <div class="gap__meta"><span class="gap__vol">${o.volume.toLocaleString()}/mo</span>
+            <div class="gap__meta"><span class="gap__vol">${o.volume.toLocaleString("en-US")}/mo</span>
               <span class="gap__sep">·</span>${intents}<span class="gap__sep">·</span>
               <span class="gap__comp">${comp.name} ranks #${comp.position}${others} — you don't</span></div>
           </div>
@@ -1011,7 +1030,7 @@ function loadMarketingIdeas() {
 
     const topicHTML = (t) => {
       const rival = t.competitors[0];
-      const ev = `${t.total_volume.toLocaleString()}/mo unmet demand · ${t.gap_count} gap${t.gap_count > 1 ? "s" : ""}` +
+      const ev = `${t.total_volume.toLocaleString("en-US")}/mo unmet demand · ${t.gap_count} gap${t.gap_count > 1 ? "s" : ""}` +
         (rival ? ` · ${rival.name} ranks #${rival.position} for “${t.top_keyword}”` : "");
       const ideas = t.ideas.map((i) => `
           <div class="idea">
