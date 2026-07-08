@@ -63,6 +63,8 @@ class EngineService:
         self._sim_cache = None
         self._real_cache = None             # (timestamp, candidates, index)
         self._plan_cache = {}               # topic -> AI action plan (stable per session)
+        self._last_plan = []                # most recent brief() result — so the assistant
+                                            # answers from the SAME plan the UI shows (no re-save)
         self._comp_cache = None             # (timestamp, competitor report)
         self._comp_refreshing = False
         self._vol_cache = None              # (timestamp, {category_lower: volume})
@@ -137,13 +139,15 @@ class EngineService:
                     context_json=json.dumps(p["x"]))
                 out.append(self._serialize(rid, i, p, week))
             if DATA_MODE == "real":
-                return self._gap_rank(out, week)     # gap-driven: rank by real opportunity value
+                self._last_plan = self._gap_rank(out, week)   # gap-driven: rank by real opportunity value
+                return self._last_plan
             scored = self._all_scored()              # synthetic demo: original roi ranking
             cuts = self._priority_cuts([o["roi"] for o in scored])
             top = scored[0]["roi"] if scored else 1.0
             for c in out:
                 c["priority"] = self._priority_label(c["roi"], cuts)
                 c["strength"] = round(min(1.0, c["roi"] / top), 3) if top > 0 else 0.0
+            self._last_plan = out
             return out
 
     def _gap_rank(self, out, week):
@@ -548,6 +552,8 @@ class EngineService:
             items = self._all_scored()[:14]
             weights = self._weights_list()
             n = self.bandit.n_updates
+            cctx = self._category_context()             # per-category leads/gap position ({} in synthetic)
+            plan = list(self._last_plan or [])[:7]      # the plan the UI currently shows
         vols = self._category_volumes()                 # cached
         docs = []
         for it in items:
@@ -565,8 +571,34 @@ class EngineService:
                 parts.append(f"TikTok velocity {round(s['tiktok_velocity'] * 100)}/100.")
             if heads:
                 parts.append(f"In the news: {heads}.")
-            parts.append(f"Recommended: {'create a new page' if gap >= 0.45 else 'strengthen the existing page'}.")
+            leads = (cctx.get((it.get("category") or it["topic"]).lower()) or {}).get("leads")
+            if leads:
+                parts.append("You already lead here — keep the page fresh and defend the position "
+                             "(don't rebuild what already ranks).")
+            else:
+                parts.append(f"Recommended: {'create a new page' if gap >= 0.45 else 'strengthen the existing page'}.")
             docs.append({"title": f"Category — {it['topic']}", "text": " ".join(parts)})
+
+        if plan:
+            steps = []
+            for i, c in enumerate(plan, 1):
+                prio = c.get("priority", "")
+                if c.get("leads"):
+                    steps.append(f"{i}. {c.get('topic')} — {prio} priority: defend your lead "
+                                 f"(you already rank well; keep it fresh, don't rebuild).")
+                elif c.get("target"):
+                    t = c["target"]
+                    vol = t.get("volume")
+                    vtxt = f" (about {vol:,} searches/mo)" if isinstance(vol, (int, float)) else ""
+                    steps.append(f"{i}. {c.get('topic')} — {prio} priority: create a "
+                                 f"{(t.get('type') or 'new page').lower()} targeting "
+                                 f"\"{t.get('keyword')}\"{vtxt}.")
+                else:
+                    verb = ("create a new page" if (c.get("action") or "").lower().startswith("create")
+                            else "strengthen the existing page")
+                    steps.append(f"{i}. {c.get('topic')} — {prio} priority: {verb}.")
+            docs.append({"title": "This week's plan — what to do first (priority order)",
+                         "text": "The current recommended plan, in priority order: " + " ".join(steps)})
 
         if weights and n > 0:
             top = config.FEATURE_LABELS.get(weights[0]["name"], weights[0]["name"])
@@ -608,6 +640,12 @@ class EngineService:
                 "client": client_config.active_client().name,
                 "data_mode": DATA_MODE,
                 "items": self._all_scored()[:14],
+                # the SAME plan the UI shows (gap-ranked, defend-your-lead, specific
+                # targets) so "what should we do first?" never contradicts the plan.
+                "plan": [{"topic": c.get("topic"), "category": c.get("category"),
+                          "action": c.get("action"), "leads": bool(c.get("leads")),
+                          "target": c.get("target"), "priority": c.get("priority")}
+                         for c in (self._last_plan or [])[:7]],
                 "weights": self._weights_list(),
                 "model_updates": self.bandit.n_updates,
                 "robustness": (self.robustness() or {}).get("robustness"),

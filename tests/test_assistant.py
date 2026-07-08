@@ -74,3 +74,34 @@ def test_category_question_prefers_rich_retrieved_fact():
     retrieved = assistant.retrieve("how are TVs doing?", _DOCS)
     a = assistant._rule_answer("how are TVs doing?", _CTX, retrieved)
     assert "4,300 per month" in a           # the rich fact (volume) beats the short computed answer
+
+
+# ---- "do first" must mirror the real plan (gap-ranked, defend-your-lead) ---
+_PLAN_CTX = {
+    "client": "JB Hi-Fi",
+    "items": _CTX["items"],
+    "plan": [
+        {"topic": "Computers", "category": "Computers", "action": "Create new page",
+         "leads": False, "priority": "High",
+         "target": {"keyword": "best uhd monitors", "type": "Buying guide", "volume": 16000}},
+        {"topic": "Headphones", "category": "Headphones", "action": "Optimise existing page",
+         "leads": True, "priority": "Medium", "target": None},
+    ],
+}
+
+
+def test_do_first_names_the_specific_target_page_from_the_plan():
+    a = assistant._rule_answer("what should we do first?", _PLAN_CTX)
+    assert "best uhd monitors" in a          # the specific missing page, not just "Computers"
+    assert a.index("best uhd monitors") < a.index("Headphones")   # gap-ranked order preserved
+
+
+def test_do_first_defends_where_the_client_leads_never_strengthen():
+    a = assistant._rule_answer("what should we do first?", _PLAN_CTX)
+    assert "defend" in a.lower()             # JB leads Headphones -> defend...
+    assert "strengthen" not in a.lower()     # ...never "strengthen the page"
+
+
+def test_do_first_falls_back_to_items_when_no_plan_yet():
+    a = assistant._rule_answer("what should we do first?", _CTX)   # no "plan" key (cold start)
+    assert "TVs" in a and "priority" in a.lower()

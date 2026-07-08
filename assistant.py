@@ -131,7 +131,25 @@ def _rule_answer(question, ctx, retrieved=None):
                 "\"what's the search volume for TVs?\", or \"what has it learned?\"")
 
     if any(w in q for w in ("do first", "top", "recommend", "opportunit", "priorit", "plan", "should we", "next")):
-        top = items[:3]
+        # answer from the ACTUAL plan the UI shows (gap-ranked, defend-your-lead,
+        # specific target pages) so the assistant never contradicts the dashboard.
+        plan = ctx.get("plan") or []
+        if plan:
+            lines = []
+            for i, c in enumerate(plan[:3], 1):
+                if c.get("leads"):
+                    what, verb = c.get("topic"), "defend your lead — you already rank well here"
+                elif c.get("target"):
+                    tgt = c["target"]
+                    what = tgt.get("keyword") or c.get("topic")
+                    verb = f"create a {(tgt.get('type') or 'new page').lower()}"
+                else:
+                    what = c.get("topic")
+                    verb = ("create a new page" if (c.get("action") or "").lower().startswith("create")
+                            else "strengthen the page")
+                lines.append(f"{i}. {what} — {c.get('priority', '')} priority ({verb})")
+            return "Here's what to do first:\n" + "\n".join(lines)
+        top = items[:3]                              # fallback: cold start before any plan loaded
         if top:
             lines = [f"{i+1}. {t['topic']} — {_prio(t['roi'])} priority "
                      f"({'create a new page' if t['signals']['semantic_gap'] >= 0.45 else 'strengthen the page'})"
