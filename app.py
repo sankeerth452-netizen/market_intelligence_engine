@@ -246,6 +246,12 @@ async def ahrefs_upload(
                 pass
 
 
+@app.post("/api/ahrefs/revert")
+def ahrefs_revert():
+    """Drop uploaded exports and fall back to the built-in committed snapshot (live)."""
+    return ENGINE.revert_ahrefs()
+
+
 # ---- Google integrations: real outcome-based learning loop ----
 @app.get("/api/google/status")
 def google_status():

@@ -444,6 +444,21 @@ class EngineService:
             self._last_plan = []              # assistant re-reads the fresh plan
         return self.ahrefs_status()
 
+    def revert_ahrefs(self):
+        """Drop any uploaded exports and fall back to the built-in committed snapshot:
+        delete the persisted blobs (so it STAYS reverted after a restart), clear the
+        in-memory override, and clear the derived caches so the plan, gaps and demand
+        rebuild from the shipped snapshot — live."""
+        with self.lock:
+            store.delete_model(self.engine, "ahrefs:content_gaps", "ahrefs:top_pages")
+            content_gap.set_override("content_gaps.json", None)
+            content_gap.set_override("top_pages.json", None)
+            content_gap._load.cache_clear()
+            self._vol_cache = None
+            self._demand_cache = None
+            self._last_plan = []
+        return self.ahrefs_status()
+
     def ahrefs_status(self):
         """What market data is in use right now — powers the Data page."""
         cg = content_gap.content_gaps()

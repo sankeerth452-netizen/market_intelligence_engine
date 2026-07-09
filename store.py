@@ -226,6 +226,14 @@ def load_model(engine, key: str):
     return json.loads(row[0]) if row and row[0] else None
 
 
+def delete_model(engine, *keys) -> None:
+    """Remove stored model_state rows (e.g. to fall back to a built-in default)."""
+    if not keys:
+        return
+    with engine.begin() as conn:
+        conn.execute(model_state.delete().where(model_state.c.key.in_(keys)))
+
+
 def reset_all(engine) -> None:
     """Wipe recommendations, outcomes and the saved model (the demo reset).
     Competitor crawl history and Google connections/metrics are deliberately kept

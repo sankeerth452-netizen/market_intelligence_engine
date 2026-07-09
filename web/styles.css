@@ -935,6 +935,10 @@ html { scroll-behavior: smooth; }
 .asst__form button:hover { background: var(--teal); }
 
 /* ---- Data page (Ahrefs upload) ----------------------------------------- */
+.revertbtn { background: var(--surface); color: var(--ink-soft); border: 1px solid var(--line); border-radius: 9px; padding: 8px 14px; font-family: var(--body); font-size: 13px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; flex-shrink: 0; }
+.revertbtn:hover:not(:disabled) { border-color: var(--amber); color: var(--amber); }
+.revertbtn:disabled { opacity: .6; cursor: default; }
+.revertbtn[hidden] { display: none; }
 .datastatus { }
 .dgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .dstat { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }

@@ -1221,6 +1221,7 @@ function loadDataPage() {
       <div class="dsub">Content gaps by category</div>
       <div class="dchips">${cats}</div>
       ${sites ? `<div class="dsub">Competitor traffic tracked</div><div class="dsites">${sites}</div>` : ""}`;
+    $("revertBtn").hidden = s.source !== "uploaded";   // only offer a fall-back when there IS an upload
   }).catch(() => { $("dataStatus").innerHTML = "<p class='lede'>Could not load the data status.</p>"; });
 }
 function renderUploadResult(res) {
@@ -1326,6 +1327,21 @@ $("compRefresh").addEventListener("click", async () => {
   setTimeout(() => { loadCompetitors(); b.disabled = false; b.textContent = "Refresh now"; }, 6000);
 });
 $("ahrefsForm").addEventListener("submit", submitAhrefs);
+$("revertBtn").addEventListener("click", async () => {
+  if (!confirm("Drop the uploaded exports and go back to the built-in snapshot?\nThe engine will use the shipped data again — your uploaded data is removed.")) return;
+  const b = $("revertBtn"); b.disabled = true; b.textContent = "Reverting…";
+  try {
+    await api("/api/ahrefs/revert", { method: "POST" });
+    toast("Reverted to the built-in snapshot — the plan and gaps updated.");
+    $("uplResult").innerHTML = "";
+    loadDataPage();
+    loadDashboard(); loadBrief();                 // refresh the AI-facing views live
+  } catch (e) {
+    toast("Couldn't revert just now.");
+  } finally {
+    b.disabled = false; b.textContent = "↺ Revert to built-in snapshot";
+  }
+});
 
 /* ---- virtual assistant -------------------------------------------------- */
 const asst = { open: false, busy: false };

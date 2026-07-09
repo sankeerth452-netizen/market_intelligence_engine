@@ -240,9 +240,12 @@
           logic all update <b>live</b>. Uploads are saved, so they survive restarts.</p>
 
         <div class="panel">
-          <div class="panel__head">
-            <div class="eyebrow">What the engine is running on right now</div>
-            <h2 class="panel__title">Current market data</h2>
+          <div class="panel__head row-between">
+            <div>
+              <div class="eyebrow">What the engine is running on right now</div>
+              <h2 class="panel__title">Current market data</h2>
+            </div>
+            <button id="revertBtn" class="revertbtn" hidden>↺ Revert to built-in snapshot</button>
           </div>
           <div id="dataStatus" class="datastatus"></div>
         </div>

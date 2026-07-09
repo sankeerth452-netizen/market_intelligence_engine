@@ -128,3 +128,18 @@ def test_upload_with_no_files_is_rejected():
     r = client.post("/api/ahrefs/upload")
     assert r.status_code == 400
     assert r.json()["ok"] is False
+
+
+def test_revert_drops_upload_and_falls_back_to_snapshot(tmp_path, _restore_ahrefs):
+    with open(_make_gap_csv(tmp_path), "rb") as gap:
+        client.post("/api/ahrefs/upload", files={"content_gap": ("g.csv", gap, "text/csv")})
+    assert client.get("/api/ahrefs/status").json()["source"] == "uploaded"
+
+    r = client.post("/api/ahrefs/revert")
+    assert r.status_code == 200
+    assert r.json()["source"] in ("committed", "none")          # back to the built-in snapshot
+    # the uploaded test keyword is gone from the AI-facing endpoint...
+    kws = {o["keyword"] for o in client.get("/api/content-gaps").json()["opportunities"]}
+    assert "4k monitor" not in kws
+    # ...and the persisted blob is deleted, so it won't restore on restart
+    assert store.load_model(ENGINE.engine, "ahrefs:content_gaps") is None
