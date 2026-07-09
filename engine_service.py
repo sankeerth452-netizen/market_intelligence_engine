@@ -59,6 +59,7 @@ class EngineService:
         self.lock = threading.Lock()
         self.topics, self.index, _ = build_world()
         self.engine = store.connect(DB_URL)
+        self._restore_ahrefs()              # re-apply any in-app uploaded exports (survives restart)
         self.bandit = self._load_bandit()   # ships pre-trained on first boot
         self._sim_cache = None
         self._real_cache = None             # (timestamp, candidates, index)
@@ -410,6 +411,59 @@ class EngineService:
             "opportunities": opps,
             "jb_strengths": tp.get("jb_strengths", {}),
             "competitors": [n for n in tp.get("sites", {}) if n != "JB Hi-Fi"],
+        }
+
+    # ------------------------------------------------- Ahrefs data (uploads) ----
+    def _restore_ahrefs(self):
+        """On boot, re-apply any exports uploaded in-app (persisted in model_state),
+        so a weekly upload survives restarts/redeploys without re-uploading."""
+        for key, name in (("ahrefs:content_gaps", "content_gaps.json"),
+                          ("ahrefs:top_pages", "top_pages.json")):
+            try:
+                data = store.load_model(self.engine, key)
+                if data:
+                    content_gap.set_override(name, data)
+            except Exception:
+                pass
+
+    def apply_ahrefs(self, content_gaps=None, top_pages=None):
+        """Install freshly-imported exports: persist to the DB (survives restart),
+        override the in-memory data, and clear the derived caches so the plan,
+        gaps, demand and defend-your-lead logic all rebuild from the new data —
+        live, no redeploy."""
+        with self.lock:
+            if content_gaps is not None:
+                store.save_model(self.engine, "ahrefs:content_gaps", json.dumps(content_gaps))
+                content_gap.set_override("content_gaps.json", content_gaps)
+            if top_pages is not None:
+                store.save_model(self.engine, "ahrefs:top_pages", json.dumps(top_pages))
+                content_gap.set_override("top_pages.json", top_pages)
+            content_gap._load.cache_clear()
+            self._vol_cache = None            # hero + per-category demand
+            self._demand_cache = None         # demand trend/forecast
+            self._last_plan = []              # assistant re-reads the fresh plan
+        return self.ahrefs_status()
+
+    def ahrefs_status(self):
+        """What market data is in use right now — powers the Data page."""
+        cg = content_gap.content_gaps()
+        tp = content_gap.top_pages()
+        return {
+            "available": content_gap.available(),
+            "source": content_gap.source("content_gaps.json"),   # uploaded | committed | none
+            "generated": cg.get("generated"),
+            "kept": cg.get("kept", 0),
+            "total_gaps_scanned": cg.get("total_gaps_scanned", 0),
+            "total_demand": cg.get("total_demand", 0),
+            "by_category": cg.get("by_category", {}),
+            "sites": {s: v.get("total_traffic", 0) for s, v in (tp.get("sites") or {}).items()},
+            "expected": [
+                {"field": "content_gap", "label": "Content Gap — JB vs rivals", "required": True},
+                {"field": "jbhifi", "label": "JB Hi-Fi — Top Pages", "required": False},
+                {"field": "harveynorman", "label": "Harvey Norman — Top Pages", "required": False},
+                {"field": "thegoodguys", "label": "The Good Guys — Top Pages", "required": False},
+                {"field": "officeworks", "label": "Officeworks — Top Pages", "required": False},
+            ],
         }
 
     def marketing_ideas(self):

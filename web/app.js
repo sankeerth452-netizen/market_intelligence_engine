@@ -1170,6 +1170,97 @@ async function markDone(c, btn) {
   } catch (e) { toast("Couldn't save that just now."); }
 }
 
+/* ---- Data page: upload the weekly Ahrefs exports ------------------------ */
+const _fmtBig = (n) => {
+  n = +n || 0;
+  return n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(n);
+};
+const UPLOAD_FIELDS = [
+  ["content_gap", "Content Gap — JB vs rivals", "the keywords rivals rank for that you don't"],
+  ["jbhifi", "JB Hi-Fi — Top Pages", "your strongest pages — needed for “defend your lead”"],
+  ["harveynorman", "Harvey Norman — Top Pages", ""],
+  ["thegoodguys", "The Good Guys — Top Pages", ""],
+  ["officeworks", "Officeworks — Top Pages", ""],
+];
+function renderUploadRows() {
+  const host = $("uplRows");
+  if (host.children.length) return;              // build once
+  host.innerHTML = UPLOAD_FIELDS.map(([f, label, hint]) => `
+    <label class="uplrow" data-field="${f}">
+      <span class="uplrow__l"><b>${label}</b>${hint ? `<span>${hint}</span>` : ""}</span>
+      <span class="uplrow__file"><span class="uplrow__name" data-name>Choose .csv…</span>
+        <input type="file" accept=".csv" data-field="${f}" hidden></span>
+    </label>`).join("");
+  host.querySelectorAll('input[type="file"]').forEach((inp) => {
+    inp.addEventListener("change", () => {
+      const name = inp.closest(".uplrow").querySelector("[data-name]");
+      name.textContent = inp.files[0] ? inp.files[0].name : "Choose .csv…";
+      inp.closest(".uplrow").classList.toggle("is-set", !!inp.files[0]);
+    });
+  });
+}
+function loadDataPage() {
+  renderUploadRows();
+  return api("/api/ahrefs/status").then((s) => {
+    const srcLabel = { uploaded: "Your uploaded exports", committed: "Built-in snapshot", none: "None yet" };
+    const srcClass = s.source === "uploaded" ? "is-live" : s.source === "none" ? "is-none" : "";
+    const when = s.generated
+      ? new Date(s.generated * 1000).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+      : "—";
+    const cats = Object.entries(s.by_category || {})
+      .map(([c, n]) => `<span class="dchip">${c} <b>${n}</b></span>`).join("") || "<span class='dmuted'>none yet</span>";
+    const sites = Object.entries(s.sites || {})
+      .map(([n, t]) => `<div class="dsite"><span>${n}</span><b>${_fmtBig(t)} traffic</b></div>`).join("");
+    $("dataStatus").innerHTML = `
+      <div class="dgrid">
+        <div class="dstat ${srcClass}"><span>Source</span><b>${srcLabel[s.source] || "—"}</b></div>
+        <div class="dstat"><span>Last updated</span><b>${when}</b></div>
+        <div class="dstat"><span>Gaps kept</span><b>${(s.kept || 0).toLocaleString("en-US")}</b></div>
+        <div class="dstat"><span>Total demand</span><b>${_fmtBig(s.total_demand)}/mo</b></div>
+      </div>
+      <div class="dsub">Content gaps by category</div>
+      <div class="dchips">${cats}</div>
+      ${sites ? `<div class="dsub">Competitor traffic tracked</div><div class="dsites">${sites}</div>` : ""}`;
+  }).catch(() => { $("dataStatus").innerHTML = "<p class='lede'>Could not load the data status.</p>"; });
+}
+function renderUploadResult(res) {
+  const parts = [];
+  const cg = res.content_gaps, tp = res.top_pages;
+  if (cg) parts.push(`<div class="uplres__ok">✓ Content gaps rebuilt — kept <b>${(cg.kept || 0).toLocaleString("en-US")}</b>
+    of ${(cg.total_gaps_scanned || 0).toLocaleString("en-US")} scanned · demand <b>${_fmtBig(cg.total_demand)}/mo</b></div>`);
+  if (tp) parts.push(`<div class="uplres__ok">✓ Top pages rebuilt — ${Object.entries(tp.sites || {})
+    .map(([n, t]) => `${n} ${_fmtBig(t)}`).join(" · ")}</div>`);
+  if (cg && !cg.kept) parts.push(`<div class="uplres__warn">⚠ 0 gaps kept — was that the raw Ahrefs
+    <b>Content Gap</b> export (UTF-16 .csv)? Nothing else was changed.</div>`);
+  $("uplResult").innerHTML = parts.length ? `<div class="uplres">${parts.join("")}</div>` : "";
+}
+async function submitAhrefs(e) {
+  e.preventDefault();
+  const inputs = [...$("uplRows").querySelectorAll('input[type="file"]')];
+  const fd = new FormData();
+  let n = 0;
+  inputs.forEach((inp) => { if (inp.files[0]) { fd.append(inp.dataset.field, inp.files[0]); n++; } });
+  if (!n) { toast("Choose at least one CSV to upload."); return; }
+  const btn = $("uplBtn"), label = btn.textContent;
+  btn.disabled = true; btn.textContent = "Uploading…";
+  $("uplMsg").textContent = ""; $("uplMsg").className = "upl__msg";
+  try {
+    const r = await fetch("/api/ahrefs/upload", { method: "POST", body: fd });
+    const res = await r.json().catch(() => ({}));
+    if (!r.ok || !res.ok) throw new Error(res.error || "Upload failed.");
+    renderUploadResult(res);
+    toast("Applied — the plan and gaps just updated from your new data.");
+    inputs.forEach((inp) => { inp.value = ""; inp.dispatchEvent(new Event("change")); });
+    loadDataPage();
+    loadDashboard(); loadBrief();                 // refresh the AI-facing views live
+  } catch (err) {
+    $("uplMsg").textContent = String(err.message || err).slice(0, 160);
+    $("uplMsg").className = "upl__msg upl__msg--err";
+  } finally {
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
 /* ---- view routing ------------------------------------------------------- */
 const VIEW_META = {
   dashboard: ["Overview", "Dashboard"],
@@ -1181,6 +1272,7 @@ const VIEW_META = {
   aivis: ["Your presence in AI answers", "AI Visibility"],
   proof: ["Validated across 30 markets", "How it works"],
   learning: ["What the system figured out", "What it's learned"],
+  data: ["This week's Ahrefs exports, straight into the AI", "Market data"],
   settings: ["Configuration", "Client & settings"],
 };
 
@@ -1199,6 +1291,7 @@ function showView(name) {
   if (name === "ideas") loadMarketingIdeas();
   if (name === "aivis") loadAiVisibility();
   if (name === "settings") loadIntegrations();
+  if (name === "data") loadDataPage();
   if (name === "learning") { loadPerformance(); loadPrinciples(); }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1232,6 +1325,7 @@ $("compRefresh").addEventListener("click", async () => {
   toast("Crawling competitors in the background — this refreshes in a moment.");
   setTimeout(() => { loadCompetitors(); b.disabled = false; b.textContent = "Refresh now"; }, 6000);
 });
+$("ahrefsForm").addEventListener("submit", submitAhrefs);
 
 /* ---- virtual assistant -------------------------------------------------- */
 const asst = { open: false, busy: false };

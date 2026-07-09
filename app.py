@@ -17,13 +17,16 @@ Endpoints
     POST /api/reset             forget the learned model (demo reset)
 """
 import os
+import tempfile
 
-from fastapi import FastAPI
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import (FileResponse, HTMLResponse, JSONResponse,
+                               RedirectResponse)
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 import config
+import import_ahrefs
 from engine_service import ENGINE
 
 app = FastAPI(title="Market Intelligence Engine")
@@ -154,6 +157,93 @@ def get_principles():
     """Learned marketing principles — which idea TYPES pay off (expert prior now,
     refined by real GSC/GA4 outcomes over time)."""
     return ENGINE.principles()
+
+
+# ---- Ahrefs exports: upload the weekly CSVs; they go straight into the AI ----
+_MAX_UPLOAD = 30 * 1024 * 1024        # 30 MB per file — an Ahrefs export is a few MB
+_TOP_PAGE_FILES = {                    # form field -> (site name, pages to keep)
+    "jbhifi": ("JB Hi-Fi", 150), "harveynorman": ("Harvey Norman", 80),
+    "thegoodguys": ("The Good Guys", 80), "officeworks": ("Officeworks", 80),
+}
+_READ_ERRORS = (UnicodeError, OSError, ValueError, IndexError, StopIteration)
+
+
+async def _save_upload(f: UploadFile) -> str:
+    """Persist an uploaded file to a temp path so the importer can read it. Rejects
+    oversized files."""
+    data = await f.read()
+    if len(data) > _MAX_UPLOAD:
+        raise ValueError(f"{f.filename or 'file'} is larger than 30 MB.")
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".csv")
+    tmp.write(data)
+    tmp.close()
+    return tmp.name
+
+
+@app.get("/api/ahrefs/status")
+def ahrefs_status():
+    """What market data the engine is running on right now (uploaded vs built-in)."""
+    return ENGINE.ahrefs_status()
+
+
+@app.post("/api/ahrefs/upload")
+async def ahrefs_upload(
+    content_gap: UploadFile | None = File(default=None),
+    jbhifi: UploadFile | None = File(default=None),
+    harveynorman: UploadFile | None = File(default=None),
+    thegoodguys: UploadFile | None = File(default=None),
+    officeworks: UploadFile | None = File(default=None),
+):
+    """Accept this week's Ahrefs CSV exports, run the same import as the CLI, and
+    apply them live — persisted to the DB (survives restarts) and reflected in the
+    plan/gaps/demand immediately, with no redeploy. Any subset of files is allowed."""
+    fields = {"content_gap": content_gap, **{k: v for k, v in
+              (("jbhifi", jbhifi), ("harveynorman", harveynorman),
+               ("thegoodguys", thegoodguys), ("officeworks", officeworks))}}
+    saved, paths = {}, []
+    try:
+        for field, f in fields.items():
+            if f is not None and f.filename:
+                path = await _save_upload(f)
+                saved[field] = path
+                paths.append(path)
+        if not saved:
+            return JSONResponse({"ok": False, "error": "No files were uploaded."}, status_code=400)
+
+        cg = tp = None
+        if "content_gap" in saved:
+            try:
+                cg = import_ahrefs.build_content_gaps(saved["content_gap"])
+            except _READ_ERRORS as e:
+                return JSONResponse({"ok": False, "error": "Could not read the Content Gap file — is "
+                                     f"it the raw Ahrefs UTF-16 .csv export? ({type(e).__name__})"},
+                                    status_code=400)
+        tp_files = [(site, saved[field], limit)
+                    for field, (site, limit) in _TOP_PAGE_FILES.items() if field in saved]
+        if tp_files:
+            try:
+                tp = import_ahrefs.build_top_pages(tp_files)
+            except _READ_ERRORS as e:
+                return JSONResponse({"ok": False, "error": "Could not read a Top Pages file — a raw "
+                                     f"Ahrefs UTF-16 .csv export is expected. ({type(e).__name__})"},
+                                    status_code=400)
+
+        ENGINE.apply_ahrefs(content_gaps=cg, top_pages=tp)
+        return {
+            "ok": True,
+            "updated": [n for n, d in (("content_gaps", cg), ("top_pages", tp)) if d is not None],
+            "content_gaps": (None if cg is None else {
+                "kept": cg["kept"], "total_gaps_scanned": cg["total_gaps_scanned"],
+                "total_demand": cg["total_demand"], "by_category": cg["by_category"]}),
+            "top_pages": (None if tp is None else {
+                "sites": {s: v["total_traffic"] for s, v in tp["sites"].items()}}),
+        }
+    finally:
+        for p in paths:
+            try:
+                os.unlink(p)
+            except OSError:
+                pass
 
 
 # ---- Google integrations: real outcome-based learning loop ----
