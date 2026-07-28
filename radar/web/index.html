@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Radar — daily social trend discovery</title>
+  <meta name="description" content="A daily read of what's starting to trend, turned into five social content ideas.">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <span class="brand__dot" aria-hidden="true"></span>
+        <div>
+          <div class="brand__name">THE RADAR</div>
+          <div class="brand__sub" id="sub">Daily social trend discovery</div>
+        </div>
+      </div>
+      <div class="top__right">
+        <span class="badge" id="modeBadge">—</span>
+        <button id="refresh" class="refresh">Refresh</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero__l">
+        <div class="eyebrow">Today's read</div>
+        <h1 id="heroTitle">What's trending in <span id="topic">crafts</span></h1>
+        <p class="hero__meta" id="heroMeta">—</p>
+      </div>
+      <div class="hero__stat">
+        <div class="hero__num" id="trendCount">—</div>
+        <div class="hero__lbl">trends detected</div>
+      </div>
+    </section>
+
+    <div class="eyebrow section-eyebrow">Today's 5 — content ideas to pitch</div>
+    <section id="ideas" class="ideas" aria-live="polite">
+      <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+    </section>
+
+    <div class="eyebrow section-eyebrow">Trending now — the signals behind the ideas</div>
+    <section id="trends" class="trends"></section>
+
+    <footer class="foot" id="foot"></footer>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
