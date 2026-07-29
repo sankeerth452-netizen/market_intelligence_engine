@@ -165,17 +165,33 @@ def _llm_ideas(topic, trends):
         return None
 
 
+_HOOKS_FAST = [
+    "Open cold on the finished “%s” in the first second, then rewind to show how.",
+    "Text-on-screen hook: “%s is trending — here's how in 60 seconds.”",
+    "Duet/stitch a top “%s” post and react with your own version.",
+]
+_HOOKS_BUILD = [
+    "Carousel: slide 1 teases “%s”, slides 2–5 walk through the how-to.",
+    "Save-this-for-later caption anchored on “%s”, posted as a Reel with materials pinned in the comments.",
+]
+
+
 def _rule_ideas(trends):
-    """Grounded fallback when no AI key: one idea per top trend, with a sensible play."""
+    """Grounded fallback when no AI key: one concrete, platform-specific post per
+    top trend — a single filmable/postable concept naming the exact micro-trend,
+    not a category-level statement."""
     ideas = []
     for i, t in enumerate(trends[:5]):
         fast = t["speed"] == "right-now"
         play = "Organic social" if fast else ("Creator campaign" if t["score"] >= 0.85 else "Publisher partnership")
-        title = ("Jump on “%s” now" % t["term"]) if fast else ("Build a series around “%s”" % t["term"])
-        why = ("Right-now moment — %s across %s. Window: %s." %
-               ("breakout" if t["base"] >= 0.9 else "rising", _srcs(t["sources"]), t["window"])) if fast else \
-              ("Building trend on %s — get ahead before it's common knowledge. Window: %s." %
-               (_srcs(t["sources"]), t["window"]))
+        platform = "TikTok" if "tiktok" in t["sources"] else ("Instagram" if "instagram" in t["sources"] else "Google-driven Reel")
+        hook = (_HOOKS_FAST[i % len(_HOOKS_FAST)] if fast else _HOOKS_BUILD[i % len(_HOOKS_BUILD)]) % t["term"]
+        title = ("%s Reel: “%s” in 15 seconds" % (platform, t["term"])) if fast else \
+                ("%s carousel: the “%s” how-to" % (platform, t["term"]))
+        why = ("Right-now moment — %s across %s. Post within %s or it's stale. Hook: %s" %
+               ("breakout" if t["base"] >= 0.9 else "rising", _srcs(t["sources"]), t["window"], hook)) if fast else \
+              ("Building trend on %s — get ahead before it's common knowledge. Window: %s. Hook: %s" %
+               (_srcs(t["sources"]), t["window"], hook))
         ideas.append({"title": title, "signal": t["metrics"][0], "why_now": why, "play": play})
     return ideas
 
