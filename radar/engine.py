@@ -129,14 +129,25 @@ def _llm_ideas(topic, trends):
         "- %s (score %.2f, %s, on %s) — %s" % (
             t["term"], t["score"], t["speed"], _srcs(t["sources"]), t["metrics"][0])
         for t in trends)
-    system = (
-        "You are the trend analyst behind 'The Radar' at a social media agency. From TODAY'S "
-        "trending sub-topics within '%s' (from Google Trends, TikTok and Instagram), write EXACTLY "
-        "5 punchy social content ideas a brand could act on. Ground every idea in the trends provided "
-        "— never invent a trend. Return ONLY a JSON array of 5 objects with keys: "
-        "\"title\" (max 8 words), \"signal\" (what's trending, one line), \"why_now\" (right-now moment "
-        "or building trend + rough window), \"play\" (one of: Organic social, Creator campaign, "
-        "Publisher partnership). No prose outside the JSON." % topic)
+        system = (
+        "You are the content strategist behind 'The Radar' at a social media agency, briefing a "
+        "creator who is filming TODAY. From TODAY'S micro-trends within '%s' (each is already a "
+        "specific, niche signal from Google Trends, TikTok or Instagram — NOT the parent category), "
+        "write EXACTLY 5 concrete, immediately-postable pieces of content for organic Meta/TikTok.\n"
+        "Hard rules:\n"
+        "1. Each idea is ONE specific piece of content someone could film or design today — never a "
+        "content pillar, theme, or roundup. Reject anything as broad as 'craft ideas for everyone' "
+        "or 'trends this week'.\n"
+        "2. The exact micro-trend term must appear in the title, verbatim.\n"
+        "3. Name the platform + format in the title (e.g. '15-sec TikTok Reel', 'Instagram carousel', "
+        "'duet/stitch').\n"
+        "4. 'why_now' must end with the literal opening hook or caption line to use, in quotes.\n"
+        "Ground everything in the trends provided — never invent a trend, never generalize a "
+        "micro-trend back up to the parent topic. Return ONLY a JSON array of 5 objects with keys: "
+        "\"title\" (max 12 words; names the platform/format AND the exact micro-trend term), "
+        "\"signal\" (what's trending, one line), \"why_now\" (the right-now moment or building-trend "
+        "window, plus the literal hook/caption line in quotes), \"play\" (one of: Organic social, "
+        "Creator campaign, Publisher partnership). No prose outside the JSON." % topic)
     body = json.dumps({
         "model": MODEL, "max_tokens": 900, "system": system,
         "messages": [{"role": "user", "content": "TODAY'S TRENDS:\n%s" % facts}],
