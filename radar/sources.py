@@ -155,10 +155,21 @@ def _trends_rising(query, geo=GEO, timeframe=TIMEFRAME):
         return None
 
 
+_STOPWORDS = {"and", "for", "the", "with", "your", "into", "from", "this", "that",
+              "are", "was", "were", "have", "has", "you", "our", "how", "why",
+              "what", "new", "top", "best", "get", "can", "will", "all", "out",
+              "these", "those", "its", "amid", "over", "off", "via"}
+
+
 def _news_rising(topic, keywords, k=5):
     """Fallback when Trends is blocked: real (not fabricated) candidate terms
     mined from recent Google News coverage of the topic — how often a phrase
-    recurs across fresh headlines stands in for 'rising query' velocity."""
+    recurs across fresh headlines stands in for 'rising query' velocity.
+
+    Phrases that just restate the parent topic (e.g. "arts and crafts" when the
+    topic IS crafts) are dropped: a micro-trend has to name something specific
+    — a technique, product or format — not echo the category itself."""
+    topic_words = set(topic.lower().split())
     counts = Counter()
     for q in [topic] + list(keywords[:3]):
         url = ("https://news.google.com/rss/search?q=%s&hl=en-US&gl=US&ceid=US:en"
@@ -177,8 +188,13 @@ def _news_rising(topic, keywords, k=5):
             for n in (2, 3):
                 for i in range(len(words) - n + 1):
                     phrase = " ".join(words[i:i + n])
-                    if phrase not in (topic, q) and len(phrase) > 6:
-                        counts[phrase] += 1
+                    if phrase in (topic, q) or len(phrase) <= 6:
+                        continue
+                    phrase_words = phrase.split()
+                    content = set(phrase_words) - _STOPWORDS - topic_words
+                    if len(content) / len(phrase_words) <= 0.5:
+                        continue    # mostly topic/filler words, not a micro-trend
+                    counts[phrase] += 1
     if not counts:
         return None
     top = counts.most_common(k)
