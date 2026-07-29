@@ -129,7 +129,7 @@ def _llm_ideas(topic, trends):
         "- %s (score %.2f, %s, on %s) — %s" % (
             t["term"], t["score"], t["speed"], _srcs(t["sources"]), t["metrics"][0])
         for t in trends)
-        system = (
+      system = (
         "You are the content strategist behind 'The Radar' at a social media agency, briefing a "
         "creator who is filming TODAY. From TODAY'S micro-trends within '%s' (each is already a "
         "specific, niche signal from Google Trends, TikTok or Instagram — NOT the parent category), "
