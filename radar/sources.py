@@ -1,5 +1,5 @@
 """
-radar/sources.py — the three trend sources for The Radar, via Apify.
+radar/sources.py — the three trend sources for The Radar.
 
 Google Trends + TikTok + Instagram. Each source returns a normalised list of
 trend SIGNALS for the topic (default: crafts, Australia, last 24h):
@@ -7,26 +7,36 @@ trend SIGNALS for the topic (default: crafts, Australia, last 24h):
     {"term", "source", "score" (0..1 velocity), "metric" (human label), "url"}
 
 Design rules (matching the main engine):
-  * FAIL-SOFT — any error, timeout, quota or a missing APIFY_API_KEY returns the
-    built-in SAMPLE signals so the dashboard always renders (demo mode). It only
-    goes "live" when a real key + actors are configured.
+  * FAIL-SOFT — any error, timeout, quota or a missing key returns the built-in
+    SAMPLE signals so the dashboard always renders (demo mode).
   * NEVER fabricates live data — sample signals are flagged `sample: True`, and
     engine.collect() marks the whole read as demo vs live so nothing pretends to
-    be real Apify data.
+    be real data.
   * Self-contained — no imports from the main engine, so this folder ports cleanly
     into another dashboard.
+
+Google Trends is free and key-less: the same unofficial endpoint pytrends uses,
+with a real Google News fallback (also free) when Trends rate-limits us — which
+it does hard from cloud/datacenter IPs. TikTok + Instagram go through Apify,
+since neither platform has a free public trend API.
 
 The topic is Google Trends /m/01mrgs == "Craft". Everything is overridable via
 env vars, so the same code runs any topic/category later.
 """
+import http.cookiejar
 import json
 import math
 import os
+import re
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
+from collections import Counter
 
 _BASE = "https://api.apify.com/v2"
+_UA = "Mozilla/5.0 (TheRadar/1.0)"
 
 # ---- the topic (crafts) + region; override via env to run any category ----
 TOPIC       = os.environ.get("RADAR_TOPIC", "crafts")
@@ -34,11 +44,11 @@ TOPIC_MID   = os.environ.get("RADAR_TOPIC_MID", "/m/01mrgs")      # Google Trend
 GEO         = os.environ.get("RADAR_GEO", "AU")
 TIMEFRAME   = os.environ.get("RADAR_TIMEFRAME", "now 1-d")        # last 24h — a daily read
 
-# ---- Apify actors (all overridable). TikTok actor reused from the main engine ----
+# ---- Apify actors (TikTok + Instagram only — Google Trends is free/direct) ----
 TIKTOK_ACTOR    = os.environ.get("APIFY_TIKTOK_ACTOR", "sociavault~tiktok-keyword-search-scraper")
 INSTAGRAM_ACTOR = os.environ.get("APIFY_INSTAGRAM_ACTOR", "apify~instagram-hashtag-scraper")
-TRENDS_ACTOR    = os.environ.get("APIFY_TRENDS_ACTOR", "emastra~google-trends-scraper")
 _TIMEOUT        = float(os.environ.get("APIFY_RUN_TIMEOUT", "120"))
+_TRENDS_TIMEOUT = float(os.environ.get("TRENDS_TIMEOUT", "8"))    # short: never stall a daily read
 
 # seed hashtags/keywords we scan on the social platforms (topline: a small set)
 KEYWORDS = [k.strip() for k in os.environ.get(
@@ -88,34 +98,118 @@ def _num(x, default=0.0):
 
 
 # ======================================================================= TRENDS
+# Free Google Trends: the same unofficial endpoint pytrends uses (explore ->
+# RELATED_QUERIES widget -> widgetdata/relatedsearches), no key, no Apify cost.
+# Google rate-limits this hard from cloud/datacenter IPs, so a 429 trips a
+# process-wide circuit breaker and we fall back to real Google News coverage
+# instead of hammering a blocked endpoint. Sample data is the last resort.
+_TRENDS_API = "https://trends.google.com/trends/api"
+_trends_blocked = False
+
+
+def _consent_cookie():
+    return http.cookiejar.Cookie(
+        version=0, name="CONSENT", value="YES+", port=None, port_specified=False,
+        domain=".google.com", domain_specified=True, domain_initial_dot=True,
+        path="/", path_specified=True, secure=True, expires=None, discard=False,
+        comment=None, comment_url=None, rest={})
+
+
+def _strip_xssi(text):
+    i = text.find("{")
+    return json.loads(text[i:]) if i != -1 else None
+
+
+def _trends_rising(query, geo=GEO, timeframe=TIMEFRAME):
+    """Rising related queries for `query`, straight from Google Trends. None on
+    any failure; trips the circuit breaker on HTTP 429."""
+    global _trends_blocked
+    if _trends_blocked:
+        return None
+    try:
+        cj = http.cookiejar.CookieJar()
+        cj.set_cookie(_consent_cookie())
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+        opener.addheaders = [("User-Agent", _UA)]
+
+        req = json.dumps({"comparisonItem": [{"keyword": query, "geo": geo, "time": timeframe}],
+                          "category": 0, "property": ""})
+        ex_url = "%s/explore?hl=en-US&tz=0&req=%s" % (_TRENDS_API, urllib.parse.quote(req))
+        ex = opener.open(ex_url, timeout=_TRENDS_TIMEOUT).read().decode("utf-8", "ignore")
+        widgets = (_strip_xssi(ex) or {}).get("widgets", [])
+        rq_widget = next((w for w in widgets if w.get("id") == "RELATED_QUERIES"), None)
+        if not rq_widget:
+            return None
+        wreq = json.dumps(rq_widget["request"])
+        rs_url = ("%s/widgetdata/relatedsearches?hl=en-US&tz=0&req=%s&token=%s"
+                  % (_TRENDS_API, urllib.parse.quote(wreq), rq_widget["token"]))
+        rs = opener.open(rs_url, timeout=_TRENDS_TIMEOUT).read().decode("utf-8", "ignore")
+        ranked = (_strip_xssi(rs) or {}).get("default", {}).get("rankedList", [])
+        rising = ranked[1]["rankedKeyword"] if len(ranked) > 1 else []
+        return rising or None
+    except urllib.error.HTTPError as e:
+        if e.code == 429:
+            _trends_blocked = True    # stop hammering a blocked endpoint
+        return None
+    except Exception:
+        return None
+
+
+def _news_rising(topic, keywords, k=5):
+    """Fallback when Trends is blocked: real (not fabricated) candidate terms
+    mined from recent Google News coverage of the topic — how often a phrase
+    recurs across fresh headlines stands in for 'rising query' velocity."""
+    counts = Counter()
+    for q in [topic] + list(keywords[:3]):
+        url = ("https://news.google.com/rss/search?q=%s&hl=en-US&gl=US&ceid=US:en"
+               % urllib.parse.quote(q))
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": _UA})
+            with urllib.request.urlopen(req, timeout=_TRENDS_TIMEOUT) as r:
+                raw = r.read()
+            root = ET.fromstring(raw)
+        except Exception:
+            continue
+        for item in root.iter("item"):
+            title = (item.findtext("title") or "").lower()
+            title = re.sub(r"[^a-z0-9 ]", " ", title)
+            words = title.split()
+            for n in (2, 3):
+                for i in range(len(words) - n + 1):
+                    phrase = " ".join(words[i:i + n])
+                    if phrase not in (topic, q) and len(phrase) > 6:
+                        counts[phrase] += 1
+    if not counts:
+        return None
+    top = counts.most_common(k)
+    peak = top[0][1]
+    return [{"term": term, "source": "google_trends",
+             "score": round(max(0.35, min(1.0, 0.4 + 0.6 * n / peak)), 3),
+             "metric": "Google News: mentioned in %d recent headlines" % n,
+             "url": "https://news.google.com/search?q=%s" % urllib.parse.quote(term)}
+            for term, n in top]
+
+
 def google_trends():
-    """Rising / breakout related queries for the topic from Google Trends (via an
-    Apify actor, since Google 429s direct server access). These 'rising' queries
-    are the early-signal gold the brief asks for. Falls back to sample."""
-    items = _run(TRENDS_ACTOR, {
-        "searchTerms": [TOPIC], "geo": GEO, "timeRange": TIMEFRAME,
-        "isMultiple": False, "isPublic": True, "includeRelatedQueries": True,
-    }) if live() else []
+    """Rising related queries for the topic. Free Google Trends first (no
+    Apify, no cost); falls back to real Google News coverage when Trends is
+    rate-limited; sample data only if both are unreachable."""
+    rising = _trends_rising(TOPIC)
     out = []
-    for it in items:
-        # actors differ; look for a rising/related-queries block defensively
-        rising = (it.get("relatedQueries") or {}).get("rising") or it.get("rising") or []
-        if isinstance(rising, dict):
-            rising = rising.get("rankedKeyword") or rising.get("items") or []
-        for rq in rising:
-            term = (rq.get("query") or rq.get("term") or rq.get("topic", {}).get("title")
-                    if isinstance(rq, dict) else str(rq))
-            if not term:
-                continue
-            val = _num(rq.get("value") or rq.get("growth") or 0) if isinstance(rq, dict) else 0
-            formatted = (rq.get("formattedValue") or ("Breakout" if val >= 5000 else "+%d%%" % val)) \
-                if isinstance(rq, dict) else "rising"
-            score = 1.0 if (isinstance(formatted, str) and "reak" in formatted) else min(1.0, val / 500.0)
-            out.append({"term": term.lower().strip(), "source": "google_trends",
-                        "score": round(max(0.35, score), 3), "metric": "Google Trends: %s" % formatted,
-                        "url": "https://trends.google.com/trends/explore?q=%s&geo=%s"
-                               % (urllib.parse.quote(term), GEO)})
-    return out or _sample("google_trends")
+    for rq in rising or []:
+        term = rq.get("query") or ""
+        if not term:
+            continue
+        val = _num(rq.get("value") or 0)
+        formatted = rq.get("formattedValue") or ("Breakout" if val >= 5000 else "+%d%%" % val)
+        score = 1.0 if (isinstance(formatted, str) and "reak" in formatted) else min(1.0, val / 500.0)
+        out.append({"term": term.lower().strip(), "source": "google_trends",
+                    "score": round(max(0.35, score), 3), "metric": "Google Trends: %s" % formatted,
+                    "url": "https://trends.google.com/trends/explore?q=%s&geo=%s"
+                           % (urllib.parse.quote(term), GEO)})
+    if out:
+        return out
+    return _news_rising(TOPIC, KEYWORDS) or _sample("google_trends")
 
 
 # ======================================================================= TIKTOK
