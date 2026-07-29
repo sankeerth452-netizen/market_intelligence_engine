@@ -169,12 +169,28 @@ def _rule_ideas(trends):
     return ideas
 
 
+def _match_trend(idea, trends, used):
+    """Which trend is this idea actually about? Match by content (the idea's
+    title/signal text) rather than list position — an LLM idea's order isn't
+    guaranteed to follow `trends`, so a positional pairing can attach the
+    wrong link/source to an idea."""
+    text = _canon((idea.get("title") or "") + " " + (idea.get("signal") or ""))
+    for t in trends:
+        if t["term"] not in used and _canon(t["term"]) and _canon(t["term"]) in text:
+            return t
+    return next((t for t in trends if t["term"] not in used), trends[0] if trends else None)
+
+
 def make_ideas(topic, trends):
     ideas = _llm_ideas(topic, trends) or _rule_ideas(trends)
-    # attach the strongest source link for each idea (by matching trend order)
-    for idea, t in zip(ideas, trends):
-        idea.setdefault("link", (t["links"][0] if t.get("links") else {}).get("url", ""))
-        idea.setdefault("source_of_signal", _srcs(t["sources"]))
+    used = set()
+    for idea in ideas:
+        t = _match_trend(idea, trends, used)
+        if t is None:
+            continue
+        used.add(t["term"])
+        idea["link"] = (t["links"][0] if t.get("links") else {}).get("url", "")
+        idea["source_of_signal"] = _srcs(t["sources"])
     return ideas[:5]
 
 
