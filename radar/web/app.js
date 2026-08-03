@@ -50,6 +50,14 @@ function trendRow(t, i) {
   </div>`;
 }
 
+function fmtUpdated(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  return `Updated ${d.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · ${
+    d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`;
+}
+
 function render(d) {
   $("topic").textContent = d.topic || "crafts";
   $("sub").textContent = `Daily social trend discovery · ${(d.topic || "crafts")} · ${d.geo || "AU"}`;
@@ -57,13 +65,14 @@ function render(d) {
   if (d.sample) { badge.textContent = "SAMPLE DATA"; badge.className = "badge badge--sample"; }
   else if (d.live) { badge.textContent = "LIVE · APIFY"; badge.className = "badge badge--live"; }
   else { badge.textContent = "OFFLINE"; badge.className = "badge"; }
+  $("updatedAt").textContent = fmtUpdated(d.generated_at);
 
   $("trendCount").textContent = (d.trends || []).length;
   $("heroMeta").innerHTML = `${esc(fmtDate(d.date))} · sources: Google Trends, TikTok, Instagram` +
     ` · ideas by ${d.ai ? "Claude" : "rules"}`;
 
   $("ideas").innerHTML = (d.ideas || []).map(ideaCard).join("") ||
-    `<p class="foot">No ideas yet — hit Refresh.</p>`;
+    `<p class="foot">No ideas yet — check back after today's auto-refresh.</p>`;
   $("trends").innerHTML = (d.trends || []).map(trendRow).join("");
 
   const note = d.sample
@@ -78,10 +87,82 @@ function load(url, opts) {
   });
 }
 
-$("refresh").addEventListener("click", async () => {
-  const b = $("refresh"); b.disabled = true; b.textContent = "Scanning…";
-  try { await load("/api/refresh", { method: "POST" }); }
-  finally { b.disabled = false; b.textContent = "Refresh"; }
+/* ---------------------------------------------------------- history calendar */
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+                "August", "September", "October", "November", "December"];
+let historyDates = null;  // Set of "YYYY-MM-DD" strings with a stored build
+let calYear, calMonth;    // 0-indexed month, like JS Date
+
+function ymd(y, m, day) {
+  return `${y}-${String(m + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function renderCalendar() {
+  $("calLabel").textContent = `${MONTHS[calMonth]} ${calYear}`;
+  const first = new Date(calYear, calMonth, 1);
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const leading = (first.getDay() + 6) % 7;  // Monday-first offset
+  const today = new Date();
+  const todayStr = ymd(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let cells = "";
+  for (let i = 0; i < leading; i++) cells += `<span class="cal-day cal-day--empty"></span>`;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = ymd(calYear, calMonth, day);
+    const has = historyDates.has(dateStr);
+    const isToday = dateStr === todayStr;
+    cells += `<button type="button" class="cal-day${has ? " cal-day--has" : " cal-day--none"}${
+      isToday ? " cal-day--today" : ""}" ${has ? `data-date="${dateStr}"` : "disabled"}>${day}</button>`;
+  }
+  $("calGrid").innerHTML = cells;
+  $("calEmpty").hidden = historyDates.size > 0;
+
+  $("calGrid").querySelectorAll(".cal-day--has").forEach((btn) => {
+    btn.addEventListener("click", () => viewDate(btn.dataset.date));
+  });
+}
+
+function openHistory() {
+  const panel = $("historyPanel");
+  const opening = panel.hidden;
+  panel.hidden = !opening;
+  if (!opening) return;
+  const now = new Date();
+  if (calYear === undefined) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
+  const draw = () => renderCalendar();
+  if (historyDates) { draw(); return; }
+  fetch("/api/history").then((r) => r.json()).then((d) => {
+    historyDates = new Set(d.dates || []);
+    draw();
+  }).catch(() => { historyDates = new Set(); draw(); });
+}
+
+function viewDate(dateStr) {
+  fetch(`/api/history/${dateStr}`).then((r) => {
+    if (!r.ok) throw new Error("not found");
+    return r.json();
+  }).then((d) => {
+    render(d);
+    $("viewingDate").textContent = dateStr;
+    $("viewingBanner").hidden = false;
+    $("historyPanel").hidden = true;
+  }).catch(() => {});
+}
+
+$("historyBtn").addEventListener("click", openHistory);
+$("historyClose").addEventListener("click", () => { $("historyPanel").hidden = true; });
+$("calPrev").addEventListener("click", () => {
+  calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+});
+$("calNext").addEventListener("click", () => {
+  calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+});
+$("backToToday").addEventListener("click", (e) => {
+  e.preventDefault();
+  $("viewingBanner").hidden = true;
+  load("/api/radar");
 });
 
 load("/api/radar");
