@@ -20,6 +20,7 @@ import re
 import urllib.request
 
 import sources
+import store
 
 MODEL = os.environ.get("RADAR_MODEL", os.environ.get("ASSISTANT_MODEL", "claude-haiku-4-5-20251001"))
 _DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -241,9 +242,16 @@ def build_radar():
 
 
 def daily(force=False):
-    """Today's radar, cached to one build per day (unless forced)."""
+    """Today's radar, built once per calendar day (unless forced). Checked in
+    order: the persistent store (survives restarts/redeploys, when configured),
+    then the local disk cache (this process only), then a fresh build — which
+    is saved to both so the next request, on this instance or after a
+    restart, doesn't rebuild (and re-bills Apify) needlessly."""
     today = _dt.date.today().isoformat()
     if not force:
+        stored = store.load(today, sources.TOPIC, sources.GEO)
+        if stored:
+            return stored
         try:
             with open(_CACHE) as f:
                 cached = json.load(f)
@@ -252,6 +260,7 @@ def daily(force=False):
         except (OSError, ValueError):
             pass
     result = build_radar()
+    store.save(today, sources.TOPIC, sources.GEO, result)
     try:
         os.makedirs(_DATA, exist_ok=True)
         with open(_CACHE, "w") as f:
@@ -259,3 +268,15 @@ def daily(force=False):
     except OSError:
         pass
     return result
+
+
+def history(date):
+    """A specific past day's stored build, or None if unavailable (no
+    database configured, or nothing stored for that date)."""
+    return store.load(date, sources.TOPIC, sources.GEO)
+
+
+def history_dates():
+    """All dates with a stored build, newest first — empty if no database
+    is configured."""
+    return store.list_dates(sources.TOPIC, sources.GEO)
