@@ -19,9 +19,26 @@
       </div>
       <div class="top__right">
         <span class="badge" id="modeBadge">—</span>
-        <button id="refresh" class="refresh">Refresh</button>
+        <span class="updated" id="updatedAt"></span>
+        <button id="historyBtn" class="history-btn" type="button">History</button>
       </div>
     </header>
+
+    <div id="historyPanel" class="history-panel" hidden>
+      <div class="history-panel__head">
+        <button id="calPrev" class="cal-nav" type="button" aria-label="Previous month">‹</button>
+        <div id="calLabel" class="cal-label">—</div>
+        <button id="calNext" class="cal-nav" type="button" aria-label="Next month">›</button>
+        <button id="historyClose" class="cal-close" type="button" aria-label="Close history">✕</button>
+      </div>
+      <div class="cal-dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      <div id="calGrid" class="cal-grid"></div>
+      <p id="calEmpty" class="cal-empty" hidden>No history yet — this app isn't storing past days (no database configured).</p>
+    </div>
+
+    <div id="viewingBanner" class="viewing-banner" hidden>
+      Viewing <b id="viewingDate"></b> — <a href="#" id="backToToday">back to today →</a>
+    </div>
 
     <section class="hero">
       <div class="hero__l">
